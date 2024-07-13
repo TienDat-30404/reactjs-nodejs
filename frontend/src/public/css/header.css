@@ -1,0 +1,10 @@
+.container .header_support li:not(:first-child) {
+  margin-left: 15px;
+}
+.container .header_support a 
+{
+    font-size : 14px;
+    margin-left : -10px;
+    color : black;
+}
+/*# sourceMappingURL=header.css.map */
