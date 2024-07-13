@@ -1,4 +1,4 @@
-.container .header_support li
+.container .header_support li:not(:first-child)
 {
-    margin-left: 100px;
+    margin-left: 10px;
 }

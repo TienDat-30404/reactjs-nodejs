@@ -1,10 +1,10 @@
-import HomePage from "../pages/HomePage";
+import Body from "../pages/Content/Body";
 import Product from "../pages/Product";
 import NotFoundPage from "../pages/NotFoundPage";
 export const routes = [
     {
         path : '/',
-        page : HomePage,
+        page : Body,
         isShowHeader : true
     }, 
     {

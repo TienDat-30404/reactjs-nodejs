@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import { routes } from './routes';
 import { Fragment } from 'react';
+import './public/css/style.css'
 import DefaultComponent from './components/DefaultComponent';
 function App() {
   return (
-    <div> 
+    <div className='div_biggest'> 
       <Router>
         <Routes>
           {routes.map((route) => {

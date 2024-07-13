@@ -6,7 +6,7 @@ import '../../public/css/header.css'
 import { inputClassNameSearch, inputTypeSearch, inputPlaceholderSearch, buttonClassNameSearch, buttonTypeSearch, buttonContentSearch, buttonClassNameDisplayOrHidden, buttonTypeDisplayOrHidden, buttonContentDisplayOrHidden } from "../../until/variablesComponent/Header";
 const Header = () => {
     return (
-        <div>
+        <div className="bg-white">
             <div className="container d-flex">
                 <div className="row col-12">
                     <div className="col-2 d-flex align-items-center">
@@ -73,16 +73,16 @@ const Header = () => {
                         <div className="row col-12 align-items-center">
                             <ul class="nav col-8">
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">điện gia dụng</a>
+                                    <a class="nav-link active text-muted" aria-current="page" href="#">điện gia dụng</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">xe cộ</a>
+                                    <a class="nav-link text-muted" href="#">xe cộ</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">mẹ & bé</a>
+                                    <a class="nav-link text-muted" href="#">mẹ & bé</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">khỏe đẹp</a>
+                                    <a class="nav-link text-muted" href="#">khỏe đẹp</a>
                                 </li>
 
                             </ul>
