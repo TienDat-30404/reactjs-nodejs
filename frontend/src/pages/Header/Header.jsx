@@ -52,17 +52,17 @@ const Header = () => {
                                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                                         <ul className="navbar-nav me-auto mb-2 mb-lg-0 ">
                                             <li className="nav-item d-flex align-items-center me-4">
-                                                <i class="bi bi-house-door-fill text-primary"></i>
+                                                <i className="bi bi-house-door-fill text-primary"></i>
                                                 <a className="nav-link active" aria-current="page" href="#">
                                                     Trang chủ
                                                 </a>
                                             </li>
                                             <li className="nav-item me-4 d-flex align-items-center ms-4">
-                                                <i class="bi bi-person-circle"></i>
+                                                <i className="bi bi-person-circle"></i>
                                                 <a className="nav-link" href="#">Tài khoản</a>
                                             </li>
                                             <li className="nav-item d-flex align-items-center ms-4 ">
-                                                <i class="bi bi-cart-check-fill"></i>
+                                                <i className="bi bi-cart-check-fill"></i>
                                                 <a className="nav-link" href="#">Giỏ hàng</a>
                                             </li>
                                         </ul>
@@ -71,30 +71,30 @@ const Header = () => {
                             </nav>
                         </div>
                         <div className="row col-12 align-items-center">
-                            <ul class="nav col-8">
-                                <li class="nav-item">
-                                    <a class="nav-link active text-muted" aria-current="page" href="#">điện gia dụng</a>
+                            <ul className="nav col-8">
+                                <li className="nav-item">
+                                    <a className="nav-link active text-muted" aria-current="page" href="#">điện gia dụng</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-muted" href="#">xe cộ</a>
+                                <li className="nav-item">
+                                    <a className="nav-link text-muted" href="#">xe cộ</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-muted" href="#">mẹ & bé</a>
+                                <li className="nav-item">
+                                    <a className="nav-link text-muted" href="#">mẹ & bé</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-muted" href="#">khỏe đẹp</a>
+                                <li className="nav-item">
+                                    <a className="nav-link text-muted" href="#">khỏe đẹp</a>
                                 </li>
 
                             </ul>
-                            <div class="col-4" >
-                                <i class="bi bi-geo-alt"></i>
+                            <div className="col-4" >
+                                <i className="bi bi-geo-alt"></i>
                                 Giao đến <a href="#">Q1, P.Bến Nghé, Hồ Chí Minh</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="border-top border-gray"></div>
+            <div className="border-top border-gray"></div>
             <HeaderSupport />
         </div>
 

@@ -2,7 +2,7 @@ import React from 'react'
 
 const Utilities = () => {
     return (
-        <div className='mt-3 bg-white utilities'>
+        <div className='mt-3 bg-white rounded-2 utilities '>
             <ul class="nav flex-column">
                 <p style = {{fontWeight : '600'}} class="text-capitalize mt-2 ms-4 ">Tiện ích</p>
 

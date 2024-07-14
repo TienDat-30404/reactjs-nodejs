@@ -1,7 +1,6 @@
 import React from 'react'
-import Category from './Category'
-import Utilities from './Utilities'
-import '../../../public/css/left.css'
+import Category from './Category/Category'
+import Utilities from './Utilities/Utilities'
 const Left = () => {
     return (
         <div className= "col-2-5">
