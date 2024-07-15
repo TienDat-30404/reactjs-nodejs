@@ -1,6 +1,6 @@
 import Body from "../pages/Content/Body";
-import Product from "../pages/Product";
 import NotFoundPage from "../pages/NotFoundPage";
+import Detail from "../components/Detail";
 export const routes = [
     {
         path : '/',
@@ -8,10 +8,10 @@ export const routes = [
         isShowHeader : true
     }, 
     {
-        path : '/product',
-        page : Product,
+        path : '/detail',
+        page : Detail,
         isShowHeader : true
-    },
+    },  
     {
         path : '*',
         page : NotFoundPage

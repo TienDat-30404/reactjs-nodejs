@@ -1,6 +1,5 @@
 const HeaderSupport = () => {
     return (
-        <div>
             <div className="container mt-1 mb-1">
                 <ul
                     className="nav header_support">
@@ -24,10 +23,9 @@ const HeaderSupport = () => {
                         <a className="nav-link" href="">Giá siêu rẻ</a>
                     </li>
                 </ul>
-            </div>
             <div
                 className="border-top border-gray"></div>
-        </div>
+            </div>
     )
 }
 export default HeaderSupport

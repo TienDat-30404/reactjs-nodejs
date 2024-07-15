@@ -1,0 +1,36 @@
+.detail .benefit i {
+  margin-right: 7px;
+  color: blue;
+}
+
+.detail .benefit li:not(:first-child) {
+  margin-top: 3px;
+}
+
+.border-space {
+  width: 1px;
+  height: 15px;
+  background-color: #ccc;
+  margin-top: 3px;
+  margin-right: 7px;
+}
+
+.detail .shipper li {
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  .introduce-shop-official {
+    display: flex;
+    flex-direction: column;
+  }
+}
+.payment .click_number button:nth-child(1) {
+  border: 1px solid #ccc;
+}
+
+.payment .click_number button {
+  border: 1px solid #777;
+}
+
+/*# sourceMappingURL=detail.css.map */

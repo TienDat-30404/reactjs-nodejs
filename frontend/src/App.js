@@ -4,6 +4,7 @@ import { Fragment } from 'react';
 import './public/css/main.css'
 import './public/css/left.css'
 import './public/css/right.css'
+import './public/css/detail.css'
 import DefaultComponent from './components/DefaultComponent';
 function App() {
   return (

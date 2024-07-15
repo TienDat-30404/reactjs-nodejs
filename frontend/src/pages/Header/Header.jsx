@@ -7,7 +7,7 @@ import { inputClassNameSearch, inputTypeSearch, inputPlaceholderSearch, buttonCl
 const Header = () => {
     return (
         <div className="bg-white">
-            <div className="container d-flex">
+            <div  className="container d-flex">
                 <div className="row col-12">
                     <div className="col-2 d-flex align-items-center">
                         <a className="navbar-brand" href="#">

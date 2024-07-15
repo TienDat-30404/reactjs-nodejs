@@ -1,4 +1,5 @@
 import React from 'react'
+import CartProduct from '../../../../../components/CartProduct'
 export default function Product() {
     return (
         <div className='mt-2 bg-white rounded-2 product'>
@@ -48,241 +49,49 @@ export default function Product() {
                             </div>  
                         </div>
                     </div>
-                    <div className="card column-1-5" >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
-                    <div className="card column-1-5 " >
-                        <a href="" className="nav-link">
-                            <img src="https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp" className="card-img-top" alt="..." />
-                            <div className="">
-                                <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />
-                                <img width="90px" src="https://salt.tikicdn.com/ts/tka/69/cf/22/1be823299ae34c7ddcd922e73abd4909.png" alt="" />
-                                <p style={{ fontSize: "15px", marginBottom: '0px' }} className="">Áo choàng văn phòng kiêm chăn công sở 2 lớp dày</p>
-                                <div>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "11px", color: "orange" }} class="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">913.000đ</p>
-                                <a href="#" className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
-                            </div>
-                        </a>
-                    </div>
+                    
+                    <CartProduct 
+                        image = "https://salt.tikicdn.com/cache/280x280/ts/product/4c/43/d9/b64bb0f049889968e3a82da944167efc.jpg.webp"
+                        name = "Áo choàng văn phòng kiêm chăn công sở 2 lớp dày"
+                        price = "123.000đ"
+                    />
+                    <CartProduct 
+                        image = "https://salt.tikicdn.com/cache/750x750/ts/product/89/33/44/9349a75d091ed4a6a276731c53b58bd1.png.webp"
+                        name = "Vali Kéo Nhựa Du Lịch SAKOS SAPPHIRE Khung Nhôm Z22"
+                        price = "6.549.000đ"
+                    />
+                    <CartProduct 
+                        image = "https://salt.tikicdn.com/cache/750x750/ts/product/ab/b5/de/86e584a77eb24801aed7c54e4191c8e0.jpg.webp"
+                        name = "Nồi áp suất Elmich PCE-1805 dung tích 2.5L - Hàng Chính Hãng"
+                        price = "564.000đ"
+                    />
+                    <CartProduct 
+                        image = "https://salt.tikicdn.com/cache/750x750/ts/product/99/86/04/7a74043bebfb2645b559fd94587ecf77.png.webp"
+                        name = "Apple iPhone 15 Pro"
+                        price = "23.990.000đ"
+                    />
+                    <CartProduct 
+                        image = "https://salt.tikicdn.com/cache/750x750/ts/product/2f/70/6a/f0890a452f9756b2b77f4bcc1eb978f2.jpg.webp"
+                        name = "[MỚI] Tã/bỉm quần Mở Một Bên Bobby"
+                        price = "254.000đ"
+                    />
+                    <CartProduct 
+                        image = "https://salt.tikicdn.com/cache/750x750/media/catalog/producttmp/bf/bd/f3/ad64a0494263c4e1e9d9c1288f044cc6.jpg.webp"
+                        name = "Bao cao su Durex Pleasuremax Hộp 12 Bao"
+                        price = "192.000đ"
+                    />
+                    <CartProduct 
+                        image = "https://salt.tikicdn.com/cache/750x750/ts/product/1c/dd/b7/8b02cc1ddf5ab52bb1fcf5e88b2ee4d8.png.webp"
+                        name = "Tai Nghe Bluetooth Chụp Tai Sony WH-1000XM5 Hi-Res Noise Canceling - Hàng Chính Hãng"
+                        price = "6.780.000đ"
+                    />
+                    <CartProduct 
+                        image = "https://salt.tikicdn.com/cache/750x750/ts/product/21/30/c8/0626ae5799d1433f0bc5b97c5ef9a983.jpg.webp"
+                        name = "Sữa bột Nestlé NAN OPTIPRO PLUS 1 800g/lon với 5HMO Sản Xuất Tại Thụy Sĩ (0 - 6 tháng)"
+                        price = "478.000đ"
+                    />
+                    
+                    
                 </div>
             </div>
         </div>
