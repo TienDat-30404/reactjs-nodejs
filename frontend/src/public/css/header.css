@@ -2,4 +2,69 @@
   margin-left: 10px;
 }
 
+p {
+  margin-bottom: 0px;
+}
+
+a {
+  text-decoration: none;
+}
+
+.header .menu-directional a :hover {
+  background-color: #efefef;
+}
+
+.text_remerber-password {
+  color: rgb(0, 221, 255);
+  font-size: 14px;
+}
+
+.note_login {
+  font-size: 14px;
+}
+
+.icon_close {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  color: black;
+}
+
+.icon_close:hover {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.click_switch {
+  color: blue;
+}
+
+.click_switch:hover {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.page_access-shop {
+  display: flex;
+  background-color: white;
+  width: 800px;
+  height: 550px;
+  padding: 0px 0px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.page_access-shop input {
+  height: 35px;
+}
+
+.page_access-shop input {
+  height: 35px;
+}
+
 /*# sourceMappingURL=header.css.map */

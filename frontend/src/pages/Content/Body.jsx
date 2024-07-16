@@ -1,6 +1,7 @@
 import React from 'react'
 import Left from './Left/Left'
 import Right from './Right/Right'
+import Login from '../Login/Login'
 const Body = () => {
     return (
         <div className='mt-3'>
@@ -9,6 +10,7 @@ const Body = () => {
                     <Left />
                     <Right />
                 </div>
+<Login />
             </div>
         </div>
   )

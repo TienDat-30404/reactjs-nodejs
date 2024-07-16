@@ -4,10 +4,10 @@ import ButtonComponent from "../../components/ButtonComponent";
 import HeaderSupport from "./HeaderSupport";
 import '../../public/css/header.css'
 import { inputClassNameSearch, inputTypeSearch, inputPlaceholderSearch, buttonClassNameSearch, buttonTypeSearch, buttonContentSearch, buttonClassNameDisplayOrHidden, buttonTypeDisplayOrHidden, buttonContentDisplayOrHidden } from "../../until/variablesComponent/Header";
-const Header = () => {
+const Header = ({onLoginClick}) => {
     return (
         <div className="bg-white">
-            <div  className="container d-flex">
+            <div  className="container d-flex header">
                 <div className="row col-12">
                     <div className="col-2 d-flex align-items-center">
                         <a className="navbar-brand" href="#">
@@ -50,21 +50,25 @@ const Header = () => {
                                         content={buttonContentDisplayOrHidden}
                                     />
                                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                                        <ul className="navbar-nav me-auto mb-2 mb-lg-0 ">
-                                            <li className="nav-item d-flex align-items-center me-4">
-                                                <i className="bi bi-house-door-fill text-primary"></i>
-                                                <a className="nav-link active" aria-current="page" href="#">
-                                                    Trang chủ
-                                                </a>
-                                            </li>
-                                            <li className="nav-item me-4 d-flex align-items-center ms-4">
-                                                <i className="bi bi-person-circle"></i>
-                                                <a className="nav-link" href="#">Tài khoản</a>
-                                            </li>
-                                            <li className="nav-item d-flex align-items-center ms-4 ">
-                                                <i className="bi bi-cart-check-fill"></i>
-                                                <a className="nav-link" href="#">Giỏ hàng</a>
-                                            </li>
+                                        <ul className="navbar-nav me-auto mb-2 mb-lg-0 menu-directional">
+                                            <a className=" aling-items-center" href="">
+                                                <li className="nav-item d-flex align-items-center me-4">
+                                                    <i  className="bi bi-house-door-fill text-primary"></i>
+                                                    <p className="nav-link active" aria-current="page" href="#">Trang chủ</p>
+                                                </li>
+                                            </a>
+                                            <a href="" onClick={onLoginClick}>
+                                                <li className="nav-item me-4 d-flex align-items-center ms-4">
+                                                    <i className="bi bi-person-circle"></i>
+                                                    <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">Tài khoản</p>
+                                                </li>
+                                            </a>
+                                            <a href="">
+                                                <li className="nav-item d-flex align-items-center ms-4 ">
+                                                    <i className="bi bi-cart-check-fill"></i>
+                                                    <a className="nav-link" href="#">Giỏ hàng</a>
+                                                </li>
+                                            </a>
                                         </ul>
                                     </div>
                                 </div>
@@ -100,4 +104,6 @@ const Header = () => {
 
     )
 }
+
+
 export default Header

@@ -1,0 +1,44 @@
+import React from 'react';
+
+function SignInModal({ show, handleClose, switchLogin }) {
+  return (
+    <div className={`modal bg- ${show ? 'd-block' : 'd-none'}  modal-display`} tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div className='modal_base'>
+        <div className='page_access-shop'>
+          <div style={{ width: '50%' }} className=''>
+            <img width="100%" height="100%" src="https://images.pexels.com/photos/4321802/pexels-photo-4321802.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="" />
+          </div>
+          <div style={{ width: '50%' }} className='m-3'>
+            <i onClick={handleClose} class="bi bi-x-lg icon_close"></i>
+            <h3 className='fw-bold'>Hello, </h3>
+            <h3 className='fw-bold'>Welcome Back </h3>
+            <div className='mb-2'>
+              <label for="inputPassword5" class="form-label">Phone</label>
+              <input type="text" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock" />
+            </div>
+            <div className='mb-2'>
+              <label for="inputPassword5" class="form-label">Email</label>
+              <input type="text" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock" />
+            </div>
+            <div>
+              <label for="inputPassword5" class="form-label">Password</label>
+              <input type="password" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock" />
+            </div>
+            <div>
+              <label for="inputPassword5" class="form-label">Confirm Password</label>
+              <input type="password" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock" />
+            </div>
+           
+            <button type="button" class="btn btn-info text-white w-100 mt-3 fw-bold">Sign Up</button>
+            <p className='mt-3 text-center'>If you already have an account? <a onClick={switchLogin} className='click_switch'>Click Here</a></p>
+            <p className='text-center mt-2 note_login'>Bằng việc tiếp tục, bạn đã đọc và đồng ý với <a href="">điều khoản sử dụng</a> và <a href="">Chính sách bảo mật thông tin cá nhân</a> của Tiki </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  );
+}
+
+export default SignInModal;
