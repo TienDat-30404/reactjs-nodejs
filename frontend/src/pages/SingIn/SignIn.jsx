@@ -13,7 +13,7 @@ function SignInModal({ show, handleClose, switchLogin }) {
             <h3 className='fw-bold'>Hello, </h3>
             <h3 className='fw-bold'>Welcome Back </h3>
             <div className='mb-2'>
-              <label for="inputPassword5" class="form-label">Phone</label>
+              <label for="inputPassword5" class="form-label">Name</label>
               <input type="text" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock" />
             </div>
             <div className='mb-2'>

@@ -102,7 +102,7 @@ export default function Detail() {
                                 <i style={{ fontSize: "13px", color: "orange" }} className="bi bi-star-fill"></i>
                                 <h6 style={{ fontSize: '13px', marginBottom: '0px' }} classN ame='fw-bold me-2 '>5.4tr+ đánh giá</h6>
                             </div>
-                            <div style={{ width: '100%', height: '2px', backgroundColor: 'red' }} className="b"></div>
+                            <div style={{ width: '100%', height: '1px', backgroundColor: '#777' }} className="b"></div>
                         </div>
                     </div>
                     <h6 className='mt-2 mb-0'>Số lượng</h6>
