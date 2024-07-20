@@ -1,7 +1,7 @@
 const {validateEmail, validatePassword} = require('../utils/validate')
 const User = require('../model/UserModel')
 const bcrypt = require('bcrypt')
-const generateToken = require('../utils/jwt')
+const {generateToken, generateRefreshToken} = require('../utils/jwt')
 const validateSignIn = async (req, res, next) => {
     try 
     {
@@ -55,10 +55,12 @@ const validateLogin = async (req, res, next) => {
         })
     }
     const accessToken = generateToken(isCheckUser.id, isCheckUser.name)
+    const refreshToken = generateRefreshToken(isCheckUser.id, isCheckUser.name)
     console.log(accessToken)
     return res.status(200).json({
         "status" : "Successfully",
-        token : accessToken
+        token : accessToken,
+        refresh : refreshToken
     })
 }
 module.exports = {validateSignIn, validateLogin}
