@@ -2,6 +2,7 @@ const {validateEmail, validatePassword} = require('../utils/validate')
 const User = require('../model/UserModel')
 const bcrypt = require('bcrypt')
 const {generateToken, generateRefreshToken} = require('../utils/jwt')
+// validate for sign in
 const validateSignIn = async (req, res, next) => {
     try 
     {
@@ -36,6 +37,7 @@ const validateSignIn = async (req, res, next) => {
     }
 }
 
+// validate for login
 const validateLogin = async (req, res, next) => {
     const {email, password} = req.body  
     const isCheckUser = await User.findOne({email})
@@ -54,8 +56,14 @@ const validateLogin = async (req, res, next) => {
             "message" : "Incorrect Password"
         })
     }
-    const accessToken = generateToken(isCheckUser.id, isCheckUser.name)
-    const refreshToken = generateRefreshToken(isCheckUser.id, isCheckUser.name)
+    const payloadToken = {
+        id: isCheckUser.id,
+        name: isCheckUser.name,
+        idRole: isCheckUser.idRole
+    };
+    
+    const accessToken = generateToken(payloadToken)
+    const refreshToken = generateRefreshToken(payloadToken)
     console.log(accessToken)
     return res.status(200).json({
         "status" : "Successfully",
@@ -63,4 +71,38 @@ const validateLogin = async (req, res, next) => {
         refresh : refreshToken
     })
 }
-module.exports = {validateSignIn, validateLogin}
+
+// validate update user
+const validateUpdateUser = async (req, res, next) => {
+    try 
+    {
+        const {name, email, password} = req.body
+        const idUser = req.params.id
+        const countNameUser = await User.countDocuments({name})
+        const countEmailUser = await User.countDocuments({email})
+        const isCheckUser = await User.findOne({id: idUser})
+        
+        if(countNameUser == 1 && name !== isCheckUser.name)
+        {
+            return res.status(400).json({message : "Tên người dùng đã tồn tại"})
+        }
+        if(countEmailUser == 1 && email !== isCheckUser.email)
+        {
+            return res.status(400).json({message : "Email đã tồn tại"})
+        }
+        if(!validateEmail(email)) 
+        {
+            return res.status(400).json({message : "Email không hợp lệ"})
+        }
+        if(!validatePassword(password))
+        {
+            return res.status(400).json({message : "Mật khẩu tối thiểu 6 kí tự"})
+        }
+        next()
+    }
+    catch(error)
+    {
+        next(error)
+    }
+}
+module.exports = {validateSignIn, validateLogin, validateUpdateUser}

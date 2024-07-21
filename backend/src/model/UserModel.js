@@ -9,7 +9,8 @@ const UserSchema = new Schema(
 
         password: { type: String, required: true,},
 
-        confirm_password: {type: String, required: true,}
+        confirm_password: {type: String, required: true,},
+        idRole : {type : Number, required : true, default : 0}
     },
     { timestamps: true });
 

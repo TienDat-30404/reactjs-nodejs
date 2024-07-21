@@ -1,7 +1,12 @@
 const express = require('express')
 const router = express.Router()
 const UserController = require('../controller/UserController')
-const {validateSignIn, validateLogin} = require('../middlewares/validationMiddleWare')
+const {validateSignIn, validateLogin, validateUpdateUser} = require('../middlewares/validationMiddleWare')
+const authencationMiddleWare = require('../middlewares/authencationMiddleWare')
 router.get('/sign-in', validateSignIn, UserController.createUser)
 router.get('/sign-up', validateLogin, UserController.loginUser)
+router.put('/update-user/:id', validateUpdateUser, UserController.updateUser)
+router.delete('/delete-user/:id', authencationMiddleWare, UserController.deleteUser)
+router.get('/get-all-user', UserController.getAllUser)
+router.post('/refresh-token', UserController.refreshToken)
 module.exports = router
