@@ -7,7 +7,7 @@ const createUser = async (req, res, next) => {
         const { name, email, password, confirm_password } = req.body;
         const newUser = new User({ name, email, password : hashPassword(password), confirm_password, idRole : 0 });
         await newUser.save();
-        res.status(201).json(newUser);
+        res.status(200).json(newUser);
     } catch (error) {
         next(error);
 
@@ -23,10 +23,10 @@ const loginUser = async(req, res, next) => {
 const updateUser = async (req, res, next) => {
     try
     {
-        const idUser = req.params.id
+        const idUser = req.params.idUser
         const newData = req.body
         newData.password = hashPassword(newData.password)
-        await User.updateOne({id : idUser}, newData)
+        await User.updateOne({idUser : idUser}, newData)
         res.status(200).json({
             message : "Update successfully",
             newData
@@ -41,8 +41,9 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     try 
     {
-        const idUser = req.params.id
-        const delUser = await User.deleteOne({id : idUser}) 
+        const idUser = req.params.idUser
+        console.log(idUser)
+        const delUser = await User.deleteOne({idUser : idUser}) 
         if(delUser.deletedCount > 0)
         {
             return res.status(200).json({
@@ -98,7 +99,7 @@ const getAllUser = async (req, res, next) => {
 const detailUser = async (req, res, next) => {
     try 
     {
-        const idUser = await User.findOne({id : req.params.id})
+        const idUser = await User.findOne({idUser : req.params.idUser})
         if(idUser == null)
         {
             return res.status(400).json({

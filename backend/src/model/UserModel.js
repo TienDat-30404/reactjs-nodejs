@@ -23,7 +23,7 @@ UserSchema.pre('save', function (next) {
 });
 
 // Thêm plugin AutoIncrement để tự động tăng giá trị của 'id'
-UserSchema.plugin(AutoIncrement, { inc_field: 'id' });
+UserSchema.plugin(AutoIncrement, { inc_field: 'idUser' });
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;

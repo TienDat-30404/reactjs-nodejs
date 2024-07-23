@@ -17,11 +17,11 @@ const authencationMiddleWare = (req, res, next) => {
             else if(user.idRole == 1)
             {
                 return res.status(200).json({
-                    message : "You have not permission to delete this user"
+                    message : "You have not permission to delete"
                 })
             }
         }
-        
+
       });
 }
 module.exports = authencationMiddleWare

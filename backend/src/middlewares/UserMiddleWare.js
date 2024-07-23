@@ -1,4 +1,4 @@
-const {validateEmail, validatePassword} = require('../utils/validate')
+const {validateEmail, validatePassword, validateNameUser} = require('../utils/validate')
 const User = require('../model/UserModel')
 const bcrypt = require('bcrypt')
 const {generateToken, generateRefreshToken} = require('../utils/jwt')
@@ -9,6 +9,10 @@ const validateSignIn = async (req, res, next) => {
         const {name, email, password, confirm_password} = req.body
         const existUser = await User.findOne({name})
         const existEmail = await User.countDocuments({email}) // i chang User.findOne, chỉ khác kiểu trả về
+        if(!validateNameUser(name))
+        {
+            return res.status(400).json({message : "Tên người dùng không được rỗng"})
+        }
         if(existUser)
         {
             return res.status(400).json({message : "Tên người dùng đã tồn tại"})
@@ -57,14 +61,13 @@ const validateLogin = async (req, res, next) => {
         })
     }
     const payloadToken = {
-        id: isCheckUser.id,
+        idUser: isCheckUser.idUser,
         name: isCheckUser.name,
         idRole: isCheckUser.idRole
     };
     
     const accessToken = generateToken(payloadToken)
     const refreshToken = generateRefreshToken(payloadToken)
-    console.log(accessToken)
     return res.status(200).json({
         "status" : "Successfully",
         token : accessToken,
@@ -77,11 +80,17 @@ const validateUpdateUser = async (req, res, next) => {
     try 
     {
         const {name, email, password} = req.body
-        const idUser = req.params.id
+        const idUser = req.params.idUser
         const countNameUser = await User.countDocuments({name})
         const countEmailUser = await User.countDocuments({email})
-        const isCheckUser = await User.findOne({id: idUser})
-        
+        const isCheckUser = await User.findOne({idUser: idUser})
+        console.log(isCheckUser)
+        if(!validateNameUser(name))
+        {
+            return res.status(200).json({
+                message : "Tên người dùng không được rỗng"
+            })
+        }
         if(countNameUser == 1 && name !== isCheckUser.name)
         {
             return res.status(400).json({message : "Tên người dùng đã tồn tại"})

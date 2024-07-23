@@ -1,0 +1,12 @@
+const express = require('express')
+const router = express.Router()
+const authencationMiddleWare = require('../middlewares/authencationMiddleWare')
+const ProductController = require('../controller/ProductController')
+const {validateAddProduct, validateUpdateProduct} = require('../middlewares/ProductMiddleWare')
+const Product = require('../model/ProductModel')
+router.get('/add-product', validateAddProduct, ProductController.addProduct)
+router.put('/update-product/:idProduct', validateUpdateProduct, ProductController.updateProduct)
+router.delete('/delete-product/:idProduct', authencationMiddleWare, ProductController.deleteProduct)
+router.get('/get-all-product', ProductController.getAllProduct)
+router.get('/detail-product/:idProduct', ProductController.getDetailProduct)
+module.exports = router
