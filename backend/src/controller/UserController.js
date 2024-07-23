@@ -1,5 +1,6 @@
 const User = require('../model/UserModel')
 const {hashPassword} = require('../utils/validate')
+const refreshTokenJWT = require('../utils/jwt')
 // [GET] : /sign-in
 const createUser = async (req, res, next) => {
     try {
@@ -93,9 +94,47 @@ const getAllUser = async (req, res, next) => {
     return res.status(200).json(getAllUser)
 }
 
-const refreshToken = (req, res, nexxt) => {
-    const token = req.headers['authorization']
-    console.log(token)
+
+const detailUser = async (req, res, next) => {
+    try 
+    {
+        const idUser = await User.findOne({id : req.params.id})
+        if(idUser == null)
+        {
+            return res.status(400).json({
+                mesage : "Fail Detail User"
+            })
+        }
+        return res.status(200).json({
+            idUser
+        })
+    }
+    catch(error)
+    {
+        next(error)
+    }
 }
 
-module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken }
+const refreshToken = async (req, res, next) => {
+    try
+    {
+        const tokenOld = req.headers['authorization'].split(' ')[1]
+        const tokenNewWhenRefresh = await refreshTokenJWT.refreshToken(tokenOld)
+        return res.status(200).json({
+            tokenNewWhenRefresh
+        })
+    }
+    catch(error)
+    {
+        console.log(error);
+        if (error.name === 'TokenExpiredError') {
+            res.status(401).json({ message: "Token has expired" });
+        } else {
+            res.status(400).json({ message: "Error Refresh Token" });
+        }
+    }
+    
+
+}
+
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser }
