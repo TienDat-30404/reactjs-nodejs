@@ -39,7 +39,9 @@ const deleteProduct = async (req, res, next) => {
         }
         else 
         {
-            message : "Delete product Fail"
+            return res.status(400).json({
+                message : "Delete product Fail"
+            })
         }
     }
     catch(error)
@@ -51,11 +53,37 @@ const deleteProduct = async (req, res, next) => {
 
 // [GET] /get-all-product
 const getAllProduct = async (req, res, next) => {
-    try
+    try 
     {
-        const getAllProduct = await Product.find({})
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 5
+        const startPage = (page - 1) * limit
+        
+        const sortBy = req.query.sortBy || "idProduct"
+        const type = req.query.type === "asc" ? 1 : -1  // nếu là 1 thì sắp xếp tăng dần và ngược lại
+        const objectSort = {}
+        objectSort[sortBy] = type
+        console.log(objectSort)
+
+        const objectFilter = {}
+        if(req.query.idCategory)
+        {
+            objectFilter.idCategory = req.query.idCategory
+        }
+        console.log(objectFilter)
+
+        const products = await Product.find(objectFilter)
+                                      .skip(startPage)
+                                      .limit(limit)
+                                      .sort(objectSort)
+        const totalProducts = await Product.countDocuments({})
+        const totalPages = Math.ceil(totalProducts / limit)
         return res.status(200).json({
-            getAllProduct
+            products,
+            page,   
+            totalProducts,
+            totalPages,
+            objectSort
         })
     }
     catch(error)
@@ -69,7 +97,6 @@ const getDetailProduct = async (req, res, next) => {
     try
     {
         const idProduct = req.params.idProduct
-        console.log(idProduct)
         const detailProduct = await Product.findOne({idProduct : idProduct})
         if(detailProduct == null)
         {
