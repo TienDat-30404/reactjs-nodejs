@@ -7,13 +7,7 @@ const validateEmail = (email) => {
 };
 
 // validate password
-const validatePassword = (password) => {
-    return password.length >= 6
-}
 
-const validateNameUser = (name) => {
-    return name.length > 0
-}
 
 const hashPassword = (password) => {
     return bcrypt.hashSync(password, 10)
@@ -52,6 +46,6 @@ const validateNameProductWhenUpdate = async (id, name) => {
     return countNameProduct == 1 && (name != isCheckNameProduct.name)
 }
 
-module.exports = {validateEmail, validatePassword, validateNameUser, hashPassword, validateNameProduct, validatePriceProduct, validateTypeQuantityProduct,
+module.exports = {validateEmail, hashPassword, validateNameProduct, validatePriceProduct, validateTypeQuantityProduct,
     validateQuantityProductBiggerZero, validateNameProductWhenUpdate
 }

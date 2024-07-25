@@ -71,7 +71,7 @@ const getAllProduct = async (req, res, next) => {
             objectFilter.idCategory = req.query.idCategory
         }
         console.log(objectFilter)
-
+        
         const products = await Product.find(objectFilter)
                                       .skip(startPage)
                                       .limit(limit)

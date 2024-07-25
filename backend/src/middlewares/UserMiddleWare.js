@@ -1,117 +1,120 @@
-const {validateEmail, validatePassword, validateNameUser} = require('../utils/validate')
+const { validateEmail } = require('../utils/validate')
 const User = require('../model/UserModel')
 const bcrypt = require('bcrypt')
-const {generateToken, generateRefreshToken} = require('../utils/jwt')
+const { generateToken, generateRefreshToken } = require('../utils/jwt')
 // validate for sign in
 const validateSignIn = async (req, res, next) => {
-    try 
-    {
-        const {name, email, password, confirm_password} = req.body
-        const existUser = await User.findOne({name})
-        const existEmail = await User.countDocuments({email}) // i chang User.findOne, chỉ khác kiểu trả về
-        if(!validateNameUser(name))
-        {
-            return res.status(400).json({message : "Tên người dùng không được rỗng"})
+    try {
+        const { name, email, password, confirm_password } = req.body
+        const existUser = await User.findOne({ name })
+        const errors = {};
+        const existEmail = await User.countDocuments({ email }) // i chang User.findOne, chỉ khác kiểu trả về
+        if (name == "") {
+            errors.name = "Tên người dùng không được để trống";
         }
-        if(existUser)
-        {
-            return res.status(400).json({message : "Tên người dùng đã tồn tại"})
+        if (existUser) {
+            errors.name = "Tên người dùng đã tồn tại";
         }
-        if(existEmail > 0)
-        {
-            return res.status(400).json({message : "Email đã tồn tại"})
+        if (email == "") {
+            errors.email = "Email không được để trống"
         }
-        if(!validateEmail(email)) 
-        {
-            return res.status(400).json({message : "Email không hợp lệ"})
+        if (!validateEmail(email)) {
+            errors.email = "Email không hợp lệ";
         }
-        if(!validatePassword(password))
-        {
-            return res.status(400).json({message : "Mật khẩu tối thiểu 6 kí tự"})
+        if (existEmail > 0) {
+            errors.email = "Email đã tồn tại";
         }
-        if(password !== confirm_password)
-        {
-            return res.status(400).json({message : "Mật khẩu không trùng khớp"})
+        if (password == "") {
+            errors.password = "Mật khẩu không được để trống"
+        }
+        if (password.length < 6) {
+            errors.password = "Mật khẩu tối thiểu 6 kí tự";
+        }
+        if (confirm_password == "") {
+            errors.confirm_password = "Xác nhận mật khẩu không được để trống"
+        }
+        if (password !== confirm_password) {
+            errors.confirm_password = "Mật khẩu không trùng khớp";
+        }
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({ errors });
         }
         next()
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 }
 
 // validate for login
 const validateLogin = async (req, res, next) => {
-    const {email, password} = req.body  
-    const isCheckUser = await User.findOne({email})
-    if(isCheckUser == null)
-    {
-        return res.status(200).json({
-            "status" : "Successfully",
-            "message" : "Email is not defined"
-        })
+    const { email, password } = req.body
+    const isCheckUser = await User.findOne({ email })
+    const errors = {}
+
+    if (password == "") {
+        errors.password = "Mật khẩu không được để trống"
     }
-    const comparePassword = bcrypt.compareSync(password, isCheckUser.password); 
-    if(!comparePassword)
-    {
-        return res.status(400).json({
-            "status" : "Successfully",
-            "message" : "Incorrect Password"
-        })
+
+    if (isCheckUser == null) {
+        errors.email = "Email không chính xác"
+    }
+    else {
+        const comparePassword = bcrypt.compareSync(password, isCheckUser.password);
+        if (!comparePassword) {
+            errors.password = "Mật khẩu không chính xác"
+        }
+    }
+    if (email == "") {
+        errors.email = "Email không được để trống"
+    }
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ errors })
     }
     const payloadToken = {
         idUser: isCheckUser.idUser,
         name: isCheckUser.name,
         idRole: isCheckUser.idRole
     };
-    
+
     const accessToken = generateToken(payloadToken)
     const refreshToken = generateRefreshToken(payloadToken)
     return res.status(200).json({
-        "status" : "Successfully",
-        token : accessToken,
-        refresh : refreshToken
+        token: accessToken,
+        refresh: refreshToken
     })
 }
 
 // validate update user
 const validateUpdateUser = async (req, res, next) => {
-    try 
-    {
-        const {name, email, password} = req.body
+    try {
+        const { name, email, password } = req.body
         const idUser = req.params.idUser
-        const countNameUser = await User.countDocuments({name})
-        const countEmailUser = await User.countDocuments({email})
-        const isCheckUser = await User.findOne({idUser: idUser})
+        const countNameUser = await User.countDocuments({ name })
+        const countEmailUser = await User.countDocuments({ email })
+        const isCheckUser = await User.findOne({ idUser: idUser })
         console.log(isCheckUser)
-        if(!validateNameUser(name))
-        {
+        if (!validateNameUser(name)) {
             return res.status(200).json({
-                message : "Tên người dùng không được rỗng"
+                message: "Tên người dùng không được rỗng"
             })
         }
-        if(countNameUser == 1 && name !== isCheckUser.name)
-        {
-            return res.status(400).json({message : "Tên người dùng đã tồn tại"})
+        if (countNameUser == 1 && name !== isCheckUser.name) {
+            return res.status(400).json({ message: "Tên người dùng đã tồn tại" })
         }
-        if(countEmailUser == 1 && email !== isCheckUser.email)
-        {
-            return res.status(400).json({message : "Email đã tồn tại"})
+        if (countEmailUser == 1 && email !== isCheckUser.email) {
+            return res.status(400).json({ message: "Email đã tồn tại" })
         }
-        if(!validateEmail(email)) 
-        {
-            return res.status(400).json({message : "Email không hợp lệ"})
+        if (!validateEmail(email)) {
+            return res.status(400).json({ message: "Email không hợp lệ" })
         }
-        if(!validatePassword(password))
-        {
-            return res.status(400).json({message : "Mật khẩu tối thiểu 6 kí tự"})
+        if (!validatePassword(password)) {
+            return res.status(400).json({ message: "Mật khẩu tối thiểu 6 kí tự" })
         }
         next()
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 }
-module.exports = {validateSignIn, validateLogin, validateUpdateUser}
+module.exports = { validateSignIn, validateLogin, validateUpdateUser }

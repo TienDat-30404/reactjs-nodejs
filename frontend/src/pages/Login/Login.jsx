@@ -1,24 +1,75 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function LoginModal({ show, handleClose, switchSignIn }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const dataLogin = {email, password}
+  const [errors, setErrors] = useState({})
+  const handleClickLogin = async () => {
+    try 
+    {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataLogin),
+      })
+      const userData = await response.json()
+      if(userData.errors)
+      {
+        setErrors(userData.errors)
+        return
+      }
+      else 
+      {
+        alert("Đăng nhập thành công")
+        setErrors('')
+        handleClose()
+      }
+    }
+    catch(error)
+    {
+      console.error(error)
+    }
+  }
+
+  const handleCloseModal = () => {
+    setEmail('')
+    setPassword('')
+    setErrors('')
+    handleClose()
+  }
   return (
-    <div className={`modal bg- ${show ? 'd-block' : 'd-none'}  modal-display`} tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div className={`modal bg- ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div className='modal_base'>
         <div className='page_access-shop'>
           <div style={{ width: '50%' }} className=''>
             <img width="100%" height="100%" src="https://images.pexels.com/photos/4321802/pexels-photo-4321802.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="" />
           </div>
           <div style={{ width: '50%' }} className='m-3'>
-            <i onClick={handleClose} class="bi bi-x-lg icon_close"></i>
+            <i onClick={handleCloseModal} className="bi bi-x-lg icon_close"></i>
             <h3 className='fw-bold'>Hello, </h3>
             <h3 className='fw-bold'>Welcome Back </h3>
             <div className='mb-2'>
-              <label for="inputPassword5" class="form-label">Email</label>
-              <input type="text" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock" />
+              <label htmlFor="inputPassword5" className="form-label">Email</label>
+              <input 
+                value = {email} 
+                onChange={e => setEmail(e.target.value)} 
+                type="text" 
+                className={`form-control ${errors.email ? 'is-invalid' : ''}`} aria-describedby="passwordHelpBlock" 
+              />
+              {errors.email && <p style = {{ color : 'red', fontSize : '13px' }}>{errors.email}</p>}
             </div>
             <div>
-              <label for="inputPassword5" class="form-label">Password</label>
-              <input type="password" id="inputPassword5" class="form-control" aria-describedby="passwordHelpBlock" />
+              <label htmlFor="inputPassword5" className="form-label">Password</label>
+              <input 
+                value = {password} 
+                onChange={e => setPassword(e.target.value)} 
+                type="password" 
+                className={`form-control ${errors.password ? 'is-invalid' : ''}`} aria-describedby="passwordHelpBlock" 
+              />
+              {errors.password && <p style = {{ color : 'red', fontSize : '13px' }}>{errors.password}</p>}
             </div>
             <div className='mt-3 d-flex align-items-center justify-content-between'>
               <div className='d-flex r align-items-center'>
@@ -27,7 +78,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
               </div>
               <a style={{ fontSize: '14px' }} href="">Forgot Password?</a>
             </div>
-            <button type="button" class="btn btn-info text-white w-100 mt-3 fw-bold">Login</button>
+            <button onClick={handleClickLogin} type="button" className="btn btn-info text-white w-100 mt-3 fw-bold">Login</button>
             <p className='mt-3 text-center'>Don't Have An Account? <a className='click_switch' onClick={switchSignIn}>Click Here</a></p>
             <div>
               <p className='text-center mt-1'>Hoặc tiếp tục bằng</p>

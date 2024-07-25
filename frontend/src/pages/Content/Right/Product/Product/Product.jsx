@@ -7,23 +7,23 @@ export default function Product() {
             <ul className="nav">
                 <li className="nav-item d-flex align-items-center flex-column">
                     <img className='mt-2' width="40px" src="https://salt.tikicdn.com/cache/w100/ts/ta/70/b9/49/43f25c0f4ee6b7a0d918f047e37e8c87.png.webp" alt="" />
-                    <a className="nav-link active" aria-current="page" href="#">Dành cho bạn</a>
+                    <a className="nav-link active" aria-current="page">Dành cho bạn</a>
                 </li>
                 <li className="nav-item d-flex align-items-center flex-column">
                     <img className='mt-2' width="40px" src="https://salt.tikicdn.com/cache/w100/ts/ta/12/59/f8/ef3c42e93fac779a393a5cd98a394ea6.png.webp" alt="" />
-                    <a className="nav-link active" aria-current="page" href="#">Top Deal</a>
+                    <a className="nav-link active" aria-current="page">Top Deal</a>
                 </li>
                 <li className="nav-item d-flex align-items-center flex-column">
                     <img className='mt-2' width="40px" src="https://salt.tikicdn.com/cache/w100/ts/ta/37/58/02/85786ae9e80eea21104c096b6593b37d.jpg.webp" alt="" />
-                    <a className="nav-link active" aria-current="page" href="#">Sách xả kho - 60%</a>
+                    <a className="nav-link active" aria-current="page">Sách xả kho - 60%</a>
                 </li>
                 <li className="nav-item d-flex align-items-center flex-column">
                     <img className='mt-2' width="40px" src="https://salt.tikicdn.com/cache/w100/ts/ta/f0/db/cd/dc286242f00373007d79073074384f45.png.webp" alt="" />
-                    <a className="nav-link active" aria-current="page" href="#">Thể thao - 50%</a>
+                    <a className="nav-link active" aria-current="page">Thể thao - 50%</a>
                 </li>
                 <li className="nav-item d-flex align-items-center flex-column">
                     <img className='mt-2' width="40px" src="https://salt.tikicdn.com/cache/w100/ts/ta/a3/2e/66/05032c91d5d30f4171b2642b635c1ef6.png.webp" alt="" />
-                    <a className="nav-link active" aria-current="page" href="#">Thể thao - 50%</a>
+                    <a className="nav-link active" aria-current="page">Thể thao - 50%</a>
                 </li>
             </ul>
             <div className='row d-flex ms-3'>

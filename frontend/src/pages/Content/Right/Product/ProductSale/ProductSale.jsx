@@ -3,12 +3,12 @@ import CartProduct from '../../../../../components/CartProduct'
 export default function ProductSale() {
     return (
         <div className='mt-3 bg-white rounded-2 product-sale'>
-            <div className='d-flex justify-content-between ms-4 me-4'>
+            <div className='d-flex justify-content-between align-items-center ms-4 me-4 mb-2'>
                 <div className='d-flex align-items-center'>
                     <img className='rounded-4 me-2' width="40px" src="https://salt.tikicdn.com/ts/upload/2f/52/8e/00ab5fbea9d35fcc3cadbc28d7c6b14e.png" alt="" />
-                    <p className="pt-3 text-uppercase text-danger fw-bold">TOP DEAL - SIÊU GIÁ RẺ</p>
+                    <p className=" text-uppercase text-danger fw-bold">TOP DEAL - SIÊU GIÁ RẺ</p>
                 </div>
-                <a className=" pt-3 text-capitalize text-primary nav-link" href="">Xem Tất Cả</a>
+                <a className="text-capitalize text-primary nav-link">Xem Tất Cả</a>
             </div>
             <div className='d-flex align-items-center ms-4'>
                 <p className='border border-primary rounded-5 px-3 py-1 text-primary'>Chăm sóc nhà cửa</p>

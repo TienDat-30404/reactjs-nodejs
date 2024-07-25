@@ -3,14 +3,19 @@ import InputComponent from "../../components/InputComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import HeaderSupport from "./HeaderSupport";
 import '../../public/css/header.css'
+import { useNavigate } from "react-router-dom";
 import { inputClassNameSearch, inputTypeSearch, inputPlaceholderSearch, buttonClassNameSearch, buttonTypeSearch, buttonContentSearch, buttonClassNameDisplayOrHidden, buttonTypeDisplayOrHidden, buttonContentDisplayOrHidden } from "../../until/variablesComponent/Header";
-const Header = ({onLoginClick}) => {
+const Header = ({ onLoginClick }) => {
+    const navigate = useNavigate()
+    const gg = () => {
+        navigate('/detail')
+    }
     return (
         <div className="bg-white">
-            <div  className="container d-flex header">
+            <div className="container d-flex header">
                 <div className="row col-12">
                     <div className="col-2 d-flex align-items-center">
-                        <a className="navbar-brand" href="#">
+                        <a className="navbar-brand">
                             <img
                                 src="https://salt.tikicdn.com/ts/upload/0e/07/78/ee828743c9afa9792cf20d75995e134e.png"
                                 width="100"
@@ -51,24 +56,18 @@ const Header = ({onLoginClick}) => {
                                     />
                                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                                         <ul className="navbar-nav me-auto mb-2 mb-lg-0 menu-directional">
-                                            <a className=" aling-items-center" href="">
-                                                <li className="nav-item d-flex align-items-center me-4">
-                                                    <i  className="bi bi-house-door-fill text-primary"></i>
-                                                    <p className="nav-link active" aria-current="page" href="#">Trang chủ</p>
-                                                </li>
-                                            </a>
-                                            <a href="" onClick={onLoginClick}>
-                                                <li className="nav-item me-4 d-flex align-items-center ms-4">
-                                                    <i className="bi bi-person-circle"></i>
-                                                    <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">Tài khoản</p>
-                                                </li>
-                                            </a>
-                                            <a href="">
-                                                <li className="nav-item d-flex align-items-center ms-4 ">
-                                                    <i className="bi bi-cart-check-fill"></i>
-                                                    <a className="nav-link" href="#">Giỏ hàng</a>
-                                                </li>
-                                            </a>
+                                            <li style = {{ cursor : "pointer" }} className="nav-item d-flex align-items-center me-4">
+                                                <i className="bi bi-house-door-fill text-primary"></i>
+                                                <p className="nav-link active" aria-current="page">Trang chủ</p>
+                                            </li>
+                                            <li style = {{ cursor : "pointer" }} onClick={onLoginClick} className="nav-item me-4 d-flex align-items-center ms-4">
+                                                <i className="bi bi-person-circle"></i>
+                                                <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">Tài khoản</p>
+                                            </li>
+                                            <li style = {{ cursor : "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
+                                                <i className="bi bi-cart-check-fill"></i>
+                                                <a className="nav-link">Giỏ hàng</a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
@@ -77,22 +76,22 @@ const Header = ({onLoginClick}) => {
                         <div className="row col-12 align-items-center">
                             <ul className="nav col-8">
                                 <li className="nav-item">
-                                    <a className="nav-link active text-muted" aria-current="page" href="#">điện gia dụng</a>
+                                    <a className="nav-link active text-muted" aria-current="page">điện gia dụng</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link text-muted" href="#">xe cộ</a>
+                                    <a className="nav-link text-muted">xe cộ</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link text-muted" href="#">mẹ & bé</a>
+                                    <a className="nav-link text-muted">mẹ & bé</a>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link text-muted" href="#">khỏe đẹp</a>
+                                    <a className="nav-link text-muted">khỏe đẹp</a>
                                 </li>
 
                             </ul>
                             <div className="col-4" >
                                 <i className="bi bi-geo-alt"></i>
-                                Giao đến <a href="#">Q1, P.Bến Nghé, Hồ Chí Minh</a>
+                                Giao đến <a>Q1, P.Bến Nghé, Hồ Chí Minh</a>
                             </div>
                         </div>
                     </div>

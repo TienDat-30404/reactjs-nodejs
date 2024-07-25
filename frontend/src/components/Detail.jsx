@@ -107,16 +107,16 @@ export default function Detail() {
                     </div>
                     <h6 className='mt-2 mb-0'>Số lượng</h6>
                     <div className='mt-3 click_number'>
-                        <button type="button" class="btn" disabled>-</button>
-                        <button type="button" class="btn ms-1">1</button>
-                        <button type="button" class="btn ms-1 ">+</button>
+                        <button type="button" className="btn" disabled>-</button>
+                        <button type="button" className="btn ms-1">1</button>
+                        <button type="button" className="btn ms-1 ">+</button>
                     </div>
                     <h6 className='mt-3 mb-0'>Tạm tính</h6>
                     <h4 className='mt-3 mb-0'>1.000.000₫</h4>
                     <div className='d-flex flex-column mt-3'>
-                        <button type="button" class="btn btn-danger">Mua ngay</button>
-                        <button type="button" class="btn border-primary bg-white text-primary mt-2">Thêm vào giỏ</button>
-                        <button type="button" class="btn border-primary bg-white text-primary mt-2">Mua trước trả sau</button>
+                        <button type="button" className="btn btn-danger">Mua ngay</button>
+                        <button type="button" className="btn border-primary bg-white text-primary mt-2">Thêm vào giỏ</button>
+                        <button type="button" className="btn border-primary bg-white text-primary mt-2">Mua trước trả sau</button>
                     </div>
                 </div>
             </div>

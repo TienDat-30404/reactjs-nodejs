@@ -67,4 +67,8 @@
   max-height: 55px; /* Adjust based on font size and line height */
 }
 
+p {
+  padding-top: 0;
+}
+
 /*# sourceMappingURL=right.css.map */
