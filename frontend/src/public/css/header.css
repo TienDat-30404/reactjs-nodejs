@@ -67,4 +67,8 @@ a {
   height: 35px;
 }
 
+.info-avatar div:hover {
+  background-color: red;
+}
+
 /*# sourceMappingURL=header.css.map */

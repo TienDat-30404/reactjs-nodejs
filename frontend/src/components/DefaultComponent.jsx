@@ -6,7 +6,8 @@ import SignInModal from "../pages/SingIn/SignIn";
 const DefaultComponent = ({ children }) => {
     const [showModalLogin, setShowModalLogin] = useState(false);
     const [showModalSignIn, setShowModalSignIn] = useState(false)
-    const handleLoginClick = (event) => {
+    const [showLogout, setShowLogout] = useState(false)
+    const handleDisplayLogin = (event) => {
         event.preventDefault();
         setShowModalLogin(true);
     };
@@ -28,12 +29,33 @@ const DefaultComponent = ({ children }) => {
         setShowModalLogin(true)
         setShowModalSignIn(false)
     }
-     
+
+    const handleDisplayLogout = () => {
+        setShowLogout(!showLogout)
+    }
+
+    const handleClickLogout = () => {
+        localStorage.removeItem('token')
+        window.location.reload();
+    }
+    const token = localStorage.getItem('token')
+    var actionInfo
+    if (token == null) {
+        actionInfo = handleDisplayLogin
+    }
+    else {
+        actionInfo = handleDisplayLogout
+    }
     return (
         <div>
-            <Header onLoginClick={handleLoginClick} />
-            <LoginModal show={showModalLogin} handleClose={handleCloseModalLogin} switchSignIn={switchSignIn} />
+            <Header 
+                DisplayLoginOrLogout={actionInfo}
+                statusHiddenLogout={showLogout} 
+                setStatusHiddenLogout={setShowLogout} 
+                handleClickLogout={handleClickLogout}
+            />
             {children}
+            <LoginModal show={showModalLogin} handleClose={handleCloseModalLogin} switchSignIn={switchSignIn} />
             <SignInModal show={showModalSignIn} handleClose={handleCloseModalSignUp} switchLogin={switchLogin} />
         </div>
     )

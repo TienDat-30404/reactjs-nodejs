@@ -25,9 +25,8 @@ function LoginModal({ show, handleClose, switchSignIn }) {
         setPassword('')
         handleClose()
         alert("Đăng nhập thành công")
+        localStorage.setItem('token', userData.token)
       }
-      console.log(userData.token)
-      localStorage.setItem('token', userData.token)
     }
     catch (error) {
       console.error(error)
