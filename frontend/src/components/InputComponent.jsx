@@ -11,4 +11,9 @@ const InputComponent = ({ className, type, placeholder, ...rest }) => {
     )
 }
 
-export default InputComponent
+const ErrorMessageInput = ({errors, field}) => {
+    return(
+        <p style={{ color: 'red', fontSize: '13px' }}>{errors[field]}</p>
+    )    
+}
+export {InputComponent, ErrorMessageInput}

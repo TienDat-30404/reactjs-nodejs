@@ -29,7 +29,7 @@ export default function Product() {
             <div className='row d-flex ms-3'>
                 <div className='row'>
                     <div className='mt-2 video_product'>
-                        <iframe style = {{width : '100%', height : '55%'}} src="https://www.youtube.com/embed/8pzyxuaV5iw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <iframe style = {{width : '100%', height : '55%'}} src="https://www.youtube.com/embed/8pzyxuaV5iw" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                         <div className='d-flex image_demo-video'>
                             <img src="https://salt.tikicdn.com/cache/280x280/ts/product/6a/a0/ff/b10971d31123358faa64ef43e6b7823d.jpg" alt="" />
                             <div>

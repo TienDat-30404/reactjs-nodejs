@@ -1,5 +1,5 @@
 import React from "react";
-import InputComponent from "../../components/InputComponent";
+import {InputComponent} from "../../components/InputComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import HeaderSupport from "./HeaderSupport";
 import '../../public/css/header.css'
@@ -7,9 +7,6 @@ import { useNavigate } from "react-router-dom";
 import { inputClassNameSearch, inputTypeSearch, inputPlaceholderSearch, buttonClassNameSearch, buttonTypeSearch, buttonContentSearch, buttonClassNameDisplayOrHidden, buttonTypeDisplayOrHidden, buttonContentDisplayOrHidden } from "../../until/variablesComponent/Header";
 const Header = ({ onLoginClick }) => {
     const navigate = useNavigate()
-    const gg = () => {
-        navigate('/detail')
-    }
     return (
         <div className="bg-white">
             <div className="container d-flex header">

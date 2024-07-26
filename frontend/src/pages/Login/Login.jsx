@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
-
+import React, { useDebugValue, useState } from 'react';
+import { InputComponent, ErrorMessageInput } from '../../components/InputComponent';
 function LoginModal({ show, handleClose, switchSignIn }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const dataLogin = {email, password}
+  const dataLogin = { email, password }
   const [errors, setErrors] = useState({})
   const handleClickLogin = async () => {
-    try 
-    {
+    try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up`, {
         method: 'POST',
         headers: {
@@ -16,20 +15,21 @@ function LoginModal({ show, handleClose, switchSignIn }) {
         body: JSON.stringify(dataLogin),
       })
       const userData = await response.json()
-      if(userData.errors)
-      {
+      if (userData.errors) {
         setErrors(userData.errors)
         return
       }
-      else 
-      {
-        alert("Đăng nhập thành công")
-        setErrors('')
+      else {
+        setErrors({})
+        setEmail('')
+        setPassword('')
         handleClose()
+        alert("Đăng nhập thành công")
       }
+      console.log(userData.token)
+      localStorage.setItem('token', userData.token)
     }
-    catch(error)
-    {
+    catch (error) {
       console.error(error)
     }
   }
@@ -37,11 +37,11 @@ function LoginModal({ show, handleClose, switchSignIn }) {
   const handleCloseModal = () => {
     setEmail('')
     setPassword('')
-    setErrors('')
+    setErrors({})
     handleClose()
   }
   return (
-    <div className={`modal bg- ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div className={`modal bg- ${show ? 'd-block' : 'd-none'}  modal-display`} >
       <div className='modal_base'>
         <div className='page_access-shop'>
           <div style={{ width: '50%' }} className=''>
@@ -53,23 +53,23 @@ function LoginModal({ show, handleClose, switchSignIn }) {
             <h3 className='fw-bold'>Welcome Back </h3>
             <div className='mb-2'>
               <label htmlFor="inputPassword5" className="form-label">Email</label>
-              <input 
-                value = {email} 
-                onChange={e => setEmail(e.target.value)} 
-                type="text" 
-                className={`form-control ${errors.email ? 'is-invalid' : ''}`} aria-describedby="passwordHelpBlock" 
+              <InputComponent
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                type="text"
+                className={`form-control ${errors.email ? 'is-invalid' : ''}`}
               />
-              {errors.email && <p style = {{ color : 'red', fontSize : '13px' }}>{errors.email}</p>}
+              {errors.email && <ErrorMessageInput errors={errors} field="email" />}
             </div>
             <div>
               <label htmlFor="inputPassword5" className="form-label">Password</label>
-              <input 
-                value = {password} 
-                onChange={e => setPassword(e.target.value)} 
-                type="password" 
-                className={`form-control ${errors.password ? 'is-invalid' : ''}`} aria-describedby="passwordHelpBlock" 
+              <InputComponent
+                className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                type="password"
               />
-              {errors.password && <p style = {{ color : 'red', fontSize : '13px' }}>{errors.password}</p>}
+              {errors.password && <ErrorMessageInput errors={errors} field="password" />}
             </div>
             <div className='mt-3 d-flex align-items-center justify-content-between'>
               <div className='d-flex r align-items-center'>
