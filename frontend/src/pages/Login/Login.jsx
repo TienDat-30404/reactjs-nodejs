@@ -1,10 +1,13 @@
-import React, { useDebugValue, useState } from 'react';
+import React, { useState } from 'react';
 import { InputComponent, ErrorMessageInput } from '../../components/InputComponent';
+import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
 function LoginModal({ show, handleClose, switchSignIn }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const dataLogin = { email, password }
   const [errors, setErrors] = useState({})
+  const saveTokenOnRedux = useSaveTokenOnRedux();
+
   const handleClickLogin = async () => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up`, {
@@ -13,10 +16,11 @@ function LoginModal({ show, handleClose, switchSignIn }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(dataLogin),
+        credentials: 'include' // Để gửi cookie từ client đến server
       })
       const userData = await response.json()
       if (userData.errors) {
-        setErrors(userData.errors)
+        setErrors(userData.errors)  
         return
       }
       else {
@@ -25,7 +29,8 @@ function LoginModal({ show, handleClose, switchSignIn }) {
         setPassword('')
         handleClose()
         alert("Đăng nhập thành công")
-        localStorage.setItem('token', userData.token)
+        setCookieForToken(userData.token)
+        saveTokenOnRedux(userData.token)
       }
     }
     catch (error) {

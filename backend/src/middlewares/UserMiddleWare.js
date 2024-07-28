@@ -71,18 +71,7 @@ const validateLogin = async (req, res, next) => {
     if (Object.keys(errors).length > 0) {
         return res.status(400).json({ errors })
     }
-    const payloadToken = {
-        idUser: isCheckUser.idUser,
-        name: isCheckUser.name,
-        idRole: isCheckUser.idRole
-    };
-
-    const accessToken = generateToken(payloadToken)
-    const refreshToken = generateRefreshToken(payloadToken)
-    return res.status(200).json({
-        token: accessToken,
-        refresh: refreshToken
-    })
+    next()
 }
 
 // validate update user
@@ -93,7 +82,6 @@ const validateUpdateUser = async (req, res, next) => {
         const countNameUser = await User.countDocuments({ name })
         const countEmailUser = await User.countDocuments({ email })
         const isCheckUser = await User.findOne({ idUser: idUser })
-        console.log(isCheckUser)
         if (!validateNameUser(name)) {
             return res.status(200).json({
                 message: "Tên người dùng không được rỗng"

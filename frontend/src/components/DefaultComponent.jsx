@@ -1,9 +1,12 @@
 import React from "react";
 import { useState } from "react";
+import { useSelector } from 'react-redux';
 import Header from "../pages/Header/Header";
 import LoginModal from "../pages/Login/Login";
 import SignInModal from "../pages/SingIn/SignIn";
+
 const DefaultComponent = ({ children }) => {
+    const {isAuthenticated} = useSelector(state => state.auth)
     const [showModalLogin, setShowModalLogin] = useState(false);
     const [showModalSignIn, setShowModalSignIn] = useState(false)
     const [showLogout, setShowLogout] = useState(false)
@@ -34,25 +37,13 @@ const DefaultComponent = ({ children }) => {
         setShowLogout(!showLogout)
     }
 
-    const handleClickLogout = () => {
-        localStorage.removeItem('token')
-        window.location.reload();
-    }
-    const token = localStorage.getItem('token')
-    var actionInfo
-    if (token == null) {
-        actionInfo = handleDisplayLogin
-    }
-    else {
-        actionInfo = handleDisplayLogout
-    }
+    const actionInfo = isAuthenticated ? handleDisplayLogout : handleDisplayLogin
     return (
         <div>
             <Header 
                 DisplayLoginOrLogout={actionInfo}
                 statusHiddenLogout={showLogout} 
                 setStatusHiddenLogout={setShowLogout} 
-                handleClickLogout={handleClickLogout}
             />
             {children}
             <LoginModal show={showModalLogin} handleClose={handleCloseModalLogin} switchSignIn={switchSignIn} />

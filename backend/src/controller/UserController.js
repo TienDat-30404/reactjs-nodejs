@@ -1,7 +1,8 @@
 const User = require('../model/UserModel')
+const { generateToken, generateRefreshToken } = require('../utils/jwt')
 const {hashPassword} = require('../utils/validate')
 const refreshTokenJWT = require('../utils/jwt')
-// [GET] : /sign-in
+// [POST] : /sign-in
 const createUser = async (req, res, next) => {
     try {
         const { name, email, password, confirm_password } = req.body;
@@ -14,9 +15,28 @@ const createUser = async (req, res, next) => {
     }
 }
 
-// [GET] : /sign-up
+// [POST] : /sign-up
 const loginUser = async(req, res, next) => {
-    const {email, password } = req.body
+    const {email } = req.body
+    const isCheckUser = await User.findOne({ email })
+    const payloadToken = {
+        idUser: isCheckUser.idUser,
+        name: isCheckUser.name,
+        idRole: isCheckUser.idRole
+    };
+
+    const accessToken = generateToken(payloadToken)
+    const refreshToken = generateRefreshToken(payloadToken)
+    // Lưu refresh token vào cookie
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,   // Cookie chỉ có thể được truy cập bởi server, ko thể truy cập qua client(chẳng hạn Cookies.get('refreshToken'))
+        Secure: true,  // Chỉ gửi cookie qua HTTPS (bật trong môi trường production)
+        sameSite: 'strict', // Chỉ cho phép gửi cookie khi đến từ cùng một site (tăng cường bảo mật)
+        maxAge: 24 * 60 * 60 * 1000 // Thời gian sống của cookie (1 ngày trong ví dụ này)
+    });
+    return res.status(200).json({
+        token: accessToken
+    })
 }
 
 // [PUT] : /update-user/:id
@@ -42,7 +62,6 @@ const deleteUser = async (req, res, next) => {
     try 
     {
         const idUser = req.params.idUser
-        console.log(idUser)
         const delUser = await User.deleteOne({idUser : idUser}) 
         if(delUser.deletedCount > 0)
         {
@@ -119,10 +138,15 @@ const detailUser = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
     try
     {
-        const tokenOld = req.headers['authorization'].split(' ')[1]
-        const tokenNewWhenRefresh = await refreshTokenJWT.refreshToken(tokenOld)
+        const token = req.cookies.refreshToken
+        if(!token)
+        {
+            return res.status(401)
+        }
+        const tokenNew = await refreshTokenJWT.refreshToken(token)
         return res.status(200).json({
-            tokenNewWhenRefresh
+            success : "Success",
+            tokenNew
         })
     }
     catch(error)
@@ -134,8 +158,21 @@ const refreshToken = async (req, res, next) => {
             res.status(400).json({ message: "Error Refresh Token" });
         }
     }
-    
-
 }
 
-module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser }
+
+const logoutRefreshToken = (req, res, next) => {
+    try 
+    {
+        res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
+        return res.status(200).json({
+            message : "Success"
+        })
+    }
+    catch(error)
+    {
+        next(error)
+    }
+
+}
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken}

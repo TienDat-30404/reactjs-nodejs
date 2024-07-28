@@ -1,30 +1,41 @@
 import React from "react";
+import Cookies from 'js-cookie'
 import { InputComponent } from "../../components/InputComponent";
 import ButtonComponent from "../../components/ButtonComponent";
 import ImageComponent from "../../components/ImageComponent";
 import HeaderSupport from "./HeaderSupport";
 import '../../public/css/header.css'
 import { jwtDecode } from 'jwt-decode';
+import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useEffect } from "react";
+import { logoutSuccess } from "../../redux/userSlice";
+import { logoutUser } from "../../until/tokenUser";
 import { inputClassNameSearch, inputTypeSearch, inputPlaceholderSearch, buttonClassNameSearch, buttonTypeSearch, buttonContentSearch, buttonClassNameDisplayOrHidden, buttonTypeDisplayOrHidden, buttonContentDisplayOrHidden } from "../../until/variablesComponent/Header";
-const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout, handleClickLogout}) => {
-    const tokenUser = localStorage.getItem('token')
-    var nameUser
-    var avatarUser
-    if (tokenUser == null) {
-        nameUser = "Tài khoản"
-        avatarUser = <i className="bi bi-person-circle"></i>
+const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
+    const dispatch = useDispatch()
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    var userName 
+    if(isAuthenticated)
+    {
+        const jsonTokenUser = jwtDecode(userData.dataLogin)
+        userName = jsonTokenUser.name
     }
-    else {
-        const jsonTokenUser = jwtDecode(tokenUser);
-        nameUser = jsonTokenUser.name
-        avatarUser = <ImageComponent
-            src="https://imgt.taimienphi.vn/cf/Images/np/2020/1/3/top-anh-dai-dien-dep-chat-24.jpg"
-            width="30px"
-            height="30px"
-            borderRadius="5px"
-        />
+    const refreshToken = async () => {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/refresh-token`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include' // Để gửi cookie từ client đến server
+        })
+        const dataToken = await response.json()
+        console.log(dataToken.tokenNew)
     }
+    const handleClickLogout = () => {
+        logoutUser()
+        dispatch(logoutSuccess())
+    };
+    
     const avatarRef = useRef(null);
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -81,10 +92,25 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                     />
                                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                                         <ul className="navbar-nav me-auto mb-2 mb-lg-0 menu-directional">
-                                            <li ref={avatarRef}  style={{ cursor: "pointer" }} onClick={DisplayLoginOrLogout} className="nav-item me-4 d-flex flex-column align-items-center ms-4">
+                                            <li ref={avatarRef} style={{ cursor: "pointer" }} onClick={DisplayLoginOrLogout} className="nav-item me-4 d-flex flex-column align-items-center ms-4">
                                                 <div className="d-flex align-items-center">
-                                                    {avatarUser}
-                                                    <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">{nameUser}</p>
+                                                    {isAuthenticated ? (
+                                                        <>
+                                                            <ImageComponent
+                                                                src="https://imgt.taimienphi.vn/cf/Images/np/2020/1/3/top-anh-dai-dien-dep-chat-24.jpg"
+                                                                width="30px"
+                                                                height="30px"
+                                                                borderRadius="5px"
+                                                            />
+                                                            <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">{userName}</p>
+                                                        </>
+                                                    ) :
+                                                    (
+                                                        <>
+                                                            <i className="bi bi-person-circle"></i>
+                                                            <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">Tài khoản</p>
+                                                        </>       
+                                                    )}
                                                 </div>
                                                 <div className={`info-avatar ${statusHiddenLogout ? 'd-block' : 'd-none'}`} style={{ boxShadow: '0px 0px 10px 0px', backgroundColor: 'white', position: 'absolute', left: '12%', top: '80%', width: '200px' }}>
                                                     <div className="d-flex align-items-center p-2 ">
@@ -99,7 +125,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                             </li>
                                             <li style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
                                                 <i className="bi bi-cart-check-fill"></i>
-                                                <a className="nav-link">Giỏ hàng</a>
+                                                <a onClick={refreshToken} className="nav-link">Giỏ hàng</a>
                                             </li>
                                         </ul>
                                     </div>

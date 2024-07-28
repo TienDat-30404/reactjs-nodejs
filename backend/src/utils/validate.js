@@ -29,7 +29,6 @@ const validatePriceProduct = (price) => {
 // valitdate TypeOf Quantity Product
 const validateTypeQuantityProduct = (quantity) => {
     const isCheckTypeOfQuantity = Number.isInteger(quantity)
-    console.log(isCheckTypeOfQuantity)
     return isCheckTypeOfQuantity
 }
 
