@@ -2,6 +2,7 @@ import Body from "../pages/Content/Body";
 import NotFoundPage from "../pages/NotFoundPage";
 import Detail from "../components/Detail";
 import Login from "../pages/Login/Login";
+import ProfileUser from "../pages/ProfileUser/ProfileUser";
 export const routes = [
     {
         path : '/',
@@ -20,6 +21,11 @@ export const routes = [
     {
         path : 'login',
         page : Login
+    },
+    {
+        path : '/profile-user',
+        page : ProfileUser,
+        isShowHeader : true
     }
 ]
      

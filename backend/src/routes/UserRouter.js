@@ -11,4 +11,5 @@ router.get('/get-all-user', UserController.getAllUser)
 router.post('/refresh-token', UserController.refreshToken)
 router.post('/logout-refresh-token', UserController.logoutRefreshToken)
 router.get('/detail-user/:idUser', UserController.detailUser)
+router.get('/profile-user', UserController.ProfileUser)
 module.exports = router

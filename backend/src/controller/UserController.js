@@ -175,4 +175,8 @@ const logoutRefreshToken = (req, res, next) => {
     }
 
 }
-module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken}
+
+const ProfileUser = (req, res, next) => {
+    res.send('Profile User')
+}
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken, ProfileUser}

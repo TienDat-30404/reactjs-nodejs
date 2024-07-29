@@ -32,7 +32,6 @@ const logoutUser = async () => {
         credentials: 'include' // Để gửi cookie từ client đến server
     })
     Cookies.remove('accessToken', { path: '' });
-    window.location.reload()
 }
 
 export { setCookieForToken, useSaveTokenOnRedux, logoutUser }

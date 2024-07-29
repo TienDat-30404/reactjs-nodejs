@@ -10,10 +10,10 @@ const Body = () => {
                     <Left />
                     <Right />
                 </div>
-<Login />
+                <Login />
             </div>
         </div>
-  )
+    )
 }
 
 export default Body
