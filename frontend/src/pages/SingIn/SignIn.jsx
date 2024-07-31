@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useCallback } from 'react';
 import {InputComponent} from '../../components/InputComponent';
 import { ErrorMessageInput } from '../../components/InputComponent';
+import { signInService } from '../../services/UserService';
 const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -11,16 +12,8 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
   const handleClickSignIn = useCallback(async () => {
     const userData = { name, email, password, confirm_password };
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-in`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      const data = await response.json();
-
+      const data = await signInService(userData)
+      console.log(data)
       if (data.errors) {
 
         setErrors(data.errors);

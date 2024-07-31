@@ -1,0 +1,14 @@
+import React from 'react'
+import InformationBasicProfile from './InformationBasicProfile'
+import InformationSecurityProfile from './InformationSecurityProfile'
+export default function InformationGeneralProfile() {
+    return (
+        <div className='col-9 d-flex row'>
+            <div className='col-12'>
+                <p style={{ fontSize: '20px', marginTop: '34px', marginBottom: '16px' }} className="text-capitalize">Thông tin tài khoản</p>
+            </div>
+            <InformationBasicProfile />
+            <InformationSecurityProfile />
+        </div>
+    )
+}

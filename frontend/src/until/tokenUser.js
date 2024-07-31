@@ -3,16 +3,15 @@ import { loginSuccess } from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
 
 const setCookieForToken = (token) => {
-    const timeExistTokenCookie = new Date(new Date().getTime() + 30 * 1000);
+    const timeExistTokenCookie = new Date(new Date().getTime() + 10 * 1000);
     Cookies.set('accessToken', token, { expires: timeExistTokenCookie, secure: true, sameSite: 'strict' });
 }
 
 const useSaveTokenOnRedux = () => {
     const dispatch = useDispatch();
-
-    const saveTokenOnRedux = (token) => {
+    const saveTokenOnRedux = (dataLogin) => {
         dispatch(loginSuccess({
-            dataLogin: token
+            dataLogin : dataLogin
         }));
     };
 

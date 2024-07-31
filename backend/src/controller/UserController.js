@@ -22,6 +22,12 @@ const loginUser = async(req, res, next) => {
     const payloadToken = {
         idUser: isCheckUser.idUser,
         name: isCheckUser.name,
+        email : isCheckUser.email,
+        password : isCheckUser.password,
+        address : isCheckUser.address,
+        phone : isCheckUser.phone,
+        sex : isCheckUser.sex,
+        date_of_birth : isCheckUser.date_of_birth,
         idRole: isCheckUser.idRole
     };
 
@@ -44,8 +50,13 @@ const updateUser = async (req, res, next) => {
     try
     {
         const idUser = req.params.idUser
+        const isCheckPassword = await User.findOne({idUser})
         const newData = req.body
-        newData.password = hashPassword(newData.password)
+        if (newData.password != isCheckPassword.password) {
+            newData.password = hashPassword(newData.password);
+        } else {
+            delete newData.password; 
+        }
         await User.updateOne({idUser : idUser}, newData)
         res.status(200).json({
             message : "Update successfully",
@@ -176,7 +187,7 @@ const logoutRefreshToken = (req, res, next) => {
 
 }
 
-const ProfileUser = (req, res, next) => {
-    res.send('Profile User')
+const refreshTokenWhenUpdateUser = (req, res, next) => {
+    
 }
-module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken, ProfileUser}
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken}

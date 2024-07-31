@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
 import { InputComponent, ErrorMessageInput } from '../../components/InputComponent';
 import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
+import { jwtDecode } from 'jwt-decode';
+import { loginService } from '../../services/UserService';
 function LoginModal({ show, handleClose, switchSignIn }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const dataLogin = { email, password }
   const [errors, setErrors] = useState({})
   const saveTokenOnRedux = useSaveTokenOnRedux();
-
   const handleClickLogin = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataLogin),
-        credentials: 'include' // Để gửi cookie từ client đến server
-      })
-      const userData = await response.json()
+      const userData = await loginService(dataLogin)
+      console.log(userData)
       if (userData.errors) {
         setErrors(userData.errors)  
         return
@@ -30,7 +24,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
         handleClose()
         alert("Đăng nhập thành công")
         setCookieForToken(userData.token)
-        saveTokenOnRedux(userData.token)
+        saveTokenOnRedux(jwtDecode(userData.token))
       }
     }
     catch (error) {

@@ -4,7 +4,7 @@ const InputComponent = ({ className, type, placeholder, ...rest }) => {
     return (
         <input
             className={className}
-            type="search"
+            type={type}
             placeholder={placeholder}
             {...rest}
         />

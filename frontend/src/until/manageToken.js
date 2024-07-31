@@ -1,7 +1,9 @@
 import { setCookieForToken, useSaveTokenOnRedux } from "./tokenUser";
 import Cookies from 'js-cookie'
+import { jwtDecode } from "jwt-decode";
 import { loginSuccess } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
+import { refreshTokenService } from "../services/UserService";
 export const useAuthHandler = () => {
     const dispatch = useDispatch();
     const saveTokenOnRedux = useSaveTokenOnRedux();
@@ -9,28 +11,21 @@ export const useAuthHandler = () => {
     const checkAndUpdateToken = async () => {
         const accessToken = Cookies.get('accessToken');
         if (accessToken) {
-            dispatch(loginSuccess({ dataLogin: accessToken }));
+            dispatch(loginSuccess({ dataLogin: jwtDecode(accessToken) }));
         } else {
             await handleRefreshToken();
         }
     };
-
+    
     const handleRefreshToken = async () => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/refresh-token`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include', // Để gửi cookie từ client đến server
-            });
-
-            const refreshToken = await response.json();
-            console.log(refreshToken.tokenNew);
+            const refreshToken = await refreshTokenService()
             if (refreshToken.success) {
                 setCookieForToken(refreshToken.tokenNew);
-                saveTokenOnRedux(refreshToken.tokenNew);
+                saveTokenOnRedux(jwtDecode(refreshToken.tokenNew));
             }
+            
+
         } catch (error) {
             console.log(error);
         }

@@ -60,9 +60,13 @@ const validateLogin = async (req, res, next) => {
         errors.email = "Email không chính xác"
     }
     else {
-        const comparePassword = bcrypt.compareSync(password, isCheckUser.password);
-        if (!comparePassword) {
-            errors.password = "Mật khẩu không chính xác"
+        const regexHashPassword =  /^\$2[ayb]\$[0-9]{2}\$.{53}$/;
+        if(!regexHashPassword.test(password))
+        {  
+            const comparePassword = bcrypt.compareSync(password, isCheckUser.password);
+            if (!comparePassword) {
+                errors.password = "Mật khẩu không chính xác"
+            }  
         }
     }
     if (email == "") {
@@ -82,7 +86,7 @@ const validateUpdateUser = async (req, res, next) => {
         const countNameUser = await User.countDocuments({ name })
         const countEmailUser = await User.countDocuments({ email })
         const isCheckUser = await User.findOne({ idUser: idUser })
-        if (!validateNameUser(name)) {
+        if (name == "") {
             return res.status(200).json({
                 message: "Tên người dùng không được rỗng"
             })
@@ -96,7 +100,7 @@ const validateUpdateUser = async (req, res, next) => {
         if (!validateEmail(email)) {
             return res.status(400).json({ message: "Email không hợp lệ" })
         }
-        if (!validatePassword(password)) {
+        if (password.length < 6) {
             return res.status(400).json({ message: "Mật khẩu tối thiểu 6 kí tự" })
         }
         next()

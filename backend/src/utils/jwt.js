@@ -18,9 +18,15 @@ const refreshToken = async (token) => {
                 return reject(err);
             }
             const accessToken = generateRefreshToken({
-                id : user.id,
+                idUser : user.idUser,
                 name : user.name,
-                idRole : user.idRole
+                email : user.email,
+                password : user.password,
+                idRole : user.idRole,
+                sex : user.sex,
+                address : user.address,
+                phone : user.phone,
+                date_of_birth : user.date_of_birth
             })
             resolve(accessToken)
         });
