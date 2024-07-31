@@ -12,7 +12,6 @@ function LoginModal({ show, handleClose, switchSignIn }) {
   const handleClickLogin = async () => {
     try {
       const userData = await loginService(dataLogin)
-      console.log(userData)
       if (userData.errors) {
         setErrors(userData.errors)  
         return
@@ -38,6 +37,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
     setErrors({})
     handleClose()
   }
+  console.log(errors)
   return (
     <div className={`modal bg- ${show ? 'd-block' : 'd-none'}  modal-display`} >
       <div className='modal_base'>

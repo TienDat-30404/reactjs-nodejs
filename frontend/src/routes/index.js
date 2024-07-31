@@ -26,6 +26,6 @@ export const routes = [
         path : '/profile-user',
         page : ProfileUser,
         isShowHeader : true
-    }
+    },
 ]
      

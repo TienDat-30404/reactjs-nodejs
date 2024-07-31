@@ -13,7 +13,6 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
     const userData = { name, email, password, confirm_password };
     try {
       const data = await signInService(userData)
-      console.log(data)
       if (data.errors) {
 
         setErrors(data.errors);

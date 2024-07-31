@@ -4,32 +4,34 @@ import { InputComponent } from '../../components/InputComponent';
 import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
 import { jwtDecode } from 'jwt-decode';
 import { loginService, updateUserService } from '../../services/UserService';
+import { ErrorMessageInput } from '../../components/InputComponent';
 export default function InformationBasicProfile() {
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
-    const [datasUpdate, setDatasUpdate] = useState({
+    const [dataUser, setDataUser] = useState({
         name: '',
         address: '',
         date_of_birth: '',
         sex: ' '
     })
-    const [data, setData] = useState(null);
+    const [errors, setErrors] = useState({})
+    const [dataUpdate, setDataUpdate] = useState(null);
     const saveTokenOnRedux = useSaveTokenOnRedux()
-
+    
     const displayDefaultInformation = useCallback(() => {
         if (isAuthenticated && userData?.dataLogin) {
-            const {name, address, date_of_birth, sex} = userData.dataLogin
-            setDatasUpdate({
+            const { name, address, date_of_birth, sex } = userData.dataLogin
+            setDataUser({
                 name,
                 address,
                 date_of_birth,
                 sex
             })
         } else {
-            setDatasUpdate({
-                name : '',
-                address : '',
-                date_of_birth : '',
-                sex : ''
+            setDataUser({
+                name: '',
+                address: '',
+                date_of_birth: '',
+                sex: ''
             })
         }
     }, [isAuthenticated, userData])
@@ -40,37 +42,38 @@ export default function InformationBasicProfile() {
 
     useEffect(() => {
         if (isAuthenticated) {
-            const {email , password, phone} = userData.dataLogin
-            setData({
-                ...datasUpdate,
+            const { email, password, phone } = userData.dataLogin
+            setDataUpdate({
+                ...dataUser,
                 email,
                 password,
                 phone
             })
         } else {
-            setData(null);
+            setDataUpdate(null);
         }
-    }, [isAuthenticated, userData, datasUpdate]);
+    }, [isAuthenticated, userData, dataUser]);
 
     const fetchApiUpdateUser = async (id, data) => {
         try {
             const resultUpdate = await updateUserService(id, data)
-            console.log(resultUpdate)
+            if (resultUpdate.errors) {
+                setErrors(resultUpdate.errors)
+                return
+            }
+
+            if (resultUpdate.message) {
+                alert("Chỉnh sửa thành công")
+                setErrors({})
+                // window.location.reload()
+            }
+
+
             const refreshTokenWhenUpdate = {
                 email: userData.dataLogin.email,
                 password: userData.dataLogin.password
             }
-
-            if (resultUpdate.message) {
-                console.log('Cập nhật thành công:', resultUpdate);
-                alert("Chỉnh sửa thành công")
-                // window.location.reload()
-            } else {
-                console.log('Lỗi khi cập nhật:', resultUpdate);
-            }
-            
             const resultTokenUpdate = await loginService(refreshTokenWhenUpdate)
-            console.log(resultTokenUpdate.token)
             setCookieForToken(resultTokenUpdate.token)
             saveTokenOnRedux(jwtDecode(resultTokenUpdate.token))
         } catch (error) {
@@ -79,14 +82,14 @@ export default function InformationBasicProfile() {
     };
 
     const handleSaveChanges = () => {
-        if (data) {
-            fetchApiUpdateUser(userData.dataLogin.idUser, data);
+        if (dataUpdate) {
+            fetchApiUpdateUser(userData.dataLogin.idUser, dataUpdate);
         }
     };
 
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
-        setDatasUpdate(prevInfor => ({
+        setDataUser(prevInfor => ({
             ...prevInfor,
             [name]: value
         }));
@@ -106,20 +109,21 @@ export default function InformationBasicProfile() {
                         <div className='d-flex align-items-center'>
                             <p style={{ width: '85px' }} className='text-nowrap me-2'>Họ & tên</p>
                             <InputComponent
-                                name = 'name'
-                                value={datasUpdate.name}
+                                name='name'
+                                value={dataUser.name}
                                 onChange={handleChangeInput}
                                 style={{ height: '35px' }}
                                 type="text"
-                                className="form-control flex-grow-1"
+                                className={`form-control flex-grow-1 ${errors.name ? 'is-invalid' : ''}`}
                                 aria-describedby="passwordHelpBlock"
                             />
                         </div>
+                        {errors.name && <ErrorMessageInput errors={errors} field="name" />}
                         <div className='d-flex align-items-center mt-4'>
                             <p style={{ width: '85px' }} className='text-nowrap me-2'>Địa chỉ</p>
                             <InputComponent
-                                name = 'address'
-                                value={datasUpdate.address}
+                                name='address'
+                                value={dataUser.address}
                                 onChange={handleChangeInput}
                                 style={{ height: '35px' }}
                                 type="text"
@@ -132,8 +136,8 @@ export default function InformationBasicProfile() {
                 <div className='d-flex align-items-center mt-4'>
                     <p className='me-2 text-nowrap'>Ngày sinh</p>
                     <InputComponent
-                        name = 'date_of_birth'
-                        value={datasUpdate.date_of_birth}
+                        name='date_of_birth'
+                        value={dataUser.date_of_birth}
                         onChange={handleChangeInput}
                         type="date"
                         className="form-control"
@@ -143,9 +147,9 @@ export default function InformationBasicProfile() {
                     <p>Giới tính</p>
                     <div className="form-check ms-3">
                         <InputComponent
-                            name = 'sex'
-                            checked={datasUpdate.sex === 'Nam'}
-                            onChange={() => setDatasUpdate(preInfor => ({...preInfor, sex : 'Nam'}))}
+                            name='sex'
+                            checked={dataUser.sex === 'Nam'}
+                            onChange={() => setDataUser(preInfor => ({ ...preInfor, sex: 'Nam' }))}
                             className="form-check-input"
                             type="radio"
                             id="flexRadioDefault1"
@@ -156,9 +160,9 @@ export default function InformationBasicProfile() {
                     </div>
                     <div className="form-check ms-5">
                         <InputComponent
-                            name = 'sex'
-                            checked={datasUpdate.sex === 'Nữ'}
-                            onChange={() => setDatasUpdate(prevInfor => ({...prevInfor, sex : 'Nữ'}))}
+                            name='sex'
+                            checked={dataUser.sex === 'Nữ'}
+                            onChange={() => setDataUser(prevInfor => ({ ...prevInfor, sex: 'Nữ' }))}
                             className="form-check-input"
                             type="radio"
                             id="flexRadioDefault2"
@@ -169,9 +173,9 @@ export default function InformationBasicProfile() {
                     </div>
                     <div className="form-check ms-5">
                         <InputComponent
-                            name = 'sex'
-                            checked={datasUpdate.sex === 'Khác'}
-                            onChange={() => setDatasUpdate(prevInfor => ({...prevInfor, sex : 'Khác'}))}
+                            name='sex'
+                            checked={dataUser.sex === 'Khác'}
+                            onChange={() => setDataUser(prevInfor => ({ ...prevInfor, sex: 'Khác' }))}
                             className="form-check-input"
                             type="radio"
                             id="flexRadioDefault3"

@@ -60,13 +60,12 @@ const validateLogin = async (req, res, next) => {
         errors.email = "Email không chính xác"
     }
     else {
-        const regexHashPassword =  /^\$2[ayb]\$[0-9]{2}\$.{53}$/;
-        if(!regexHashPassword.test(password))
-        {  
+        const regexHashPassword = /^\$2[ayb]\$[0-9]{2}\$.{53}$/;
+        if (!regexHashPassword.test(password)) {
             const comparePassword = bcrypt.compareSync(password, isCheckUser.password);
             if (!comparePassword) {
                 errors.password = "Mật khẩu không chính xác"
-            }  
+            }
         }
     }
     if (email == "") {
@@ -81,28 +80,50 @@ const validateLogin = async (req, res, next) => {
 // validate update user
 const validateUpdateUser = async (req, res, next) => {
     try {
-        const { name, email, password } = req.body
+        const { name, email, password, phone, oldPassword, confirmPassword } = req.body
         const idUser = req.params.idUser
+        const phoneRegex = /^09\d{8,9}$/;
         const countNameUser = await User.countDocuments({ name })
         const countEmailUser = await User.countDocuments({ email })
         const isCheckUser = await User.findOne({ idUser: idUser })
+        const errors = {}
         if (name == "") {
-            return res.status(200).json({
-                message: "Tên người dùng không được rỗng"
-            })
+            errors.name = "Tên không được để trống"
         }
         if (countNameUser == 1 && name !== isCheckUser.name) {
-            return res.status(400).json({ message: "Tên người dùng đã tồn tại" })
+            errors.name = "Tên người dùng đã tốn tại"
         }
         if (countEmailUser == 1 && email !== isCheckUser.email) {
-            return res.status(400).json({ message: "Email đã tồn tại" })
+            errors.email = "Email đã tồn tại"
         }
         if (!validateEmail(email)) {
-            return res.status(400).json({ message: "Email không hợp lệ" })
+            errors.email = "Email không hợp lê"
         }
+        if(oldPassword === "")
+        {
+            errors.oldPassword = "Vui lòng nhập mật khẩu hiện tại"
+        }
+        if (oldPassword) {
+            const compareOldPassword = bcrypt.compareSync(oldPassword, isCheckUser.password)
+            if (compareOldPassword) {
+                errors.oldPassword = "Mật khẩu hiện tại không chính xác"
+            }
+        }
+
         if (password.length < 6) {
-            return res.status(400).json({ message: "Mật khẩu tối thiểu 6 kí tự" })
+            errors.password = "Mật khẩu tối thiểu 6 kí tự"
         }
+        if (!phoneRegex.test(phone) && phone != "") {
+            errors.phone = "Số điện thoại không hợp lệ"
+        }
+        if (password == confirmPassword) {
+            errors.confirmPassword = "Mật khẩu không trùng khớp"
+        }
+        
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({ errors })
+        }
+
         next()
     }
     catch (error) {
