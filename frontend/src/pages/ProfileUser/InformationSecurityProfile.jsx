@@ -147,10 +147,9 @@ export default function InformationSecurityProfile() {
                 <div className='d-flex'>
                     <i className="bi bi-envelope me-2"></i>
                     <p className='me-2'>Đổi mật khẩu</p>
-                    <i style = {{ cursor : 'pointer' }} onClick={handleDisplayUpdatePassword} className="bi bi-pencil-square"></i>
                     <UpdatePassword show = {showModal} closeModal = {handleCloseUpdatePassword} />
                 </div>
-                <button style={{ color: 'blue' }} className='btn border-primary'>Cập nhật</button>
+                <button onClick={handleDisplayUpdatePassword} style={{ color: 'blue' }} className='btn border-primary'>Cập nhật</button>
             </div>
             <div className='d-flex justify-content-between mt-4'>
                 <div className='d-flex'>

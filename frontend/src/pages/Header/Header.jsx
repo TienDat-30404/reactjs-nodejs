@@ -84,7 +84,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                     {isAuthenticated ? (
                                                         <>
                                                             <ImageComponent
-                                                                src="https://imgt.taimienphi.vn/cf/Images/np/2020/1/3/top-anh-dai-dien-dep-chat-24.jpg"
+                                                                src={localStorage.getItem('avatar') ? localStorage.getItem('avatar')  : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
                                                                 width="30px"
                                                                 height="30px"
                                                                 borderRadius="5px"

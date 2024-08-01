@@ -17,6 +17,16 @@ export default function UpdatePassword({ show, closeModal }) {
         confirmPassword: ''
     })
 
+    const handleCloseModal = () => {
+        setDataPassword({
+            oldPassword : '',
+            password : '',
+            confirmPassword : ''
+        })
+        closeModal()
+        setErrors({})
+    }
+
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
         setDataPassword(prevInfor => ({
@@ -27,27 +37,26 @@ export default function UpdatePassword({ show, closeModal }) {
 
     useEffect(() => {
         if (isAuthenticated) {
-            const { name, email, address, phone, date_of_birth, sex } = userData.dataLogin
+            const { name, email, address, phone, sex } = userData.dataLogin
             setDataUpdate({
-                confirmPassword: dataPassword.confirmPassword,
-                oldPassword: dataPassword.oldPassword,
-                password: dataPassword.password,
                 name,
                 email,
                 address,
                 phone,
-                date_of_birth,
-                sex
+                sex,
+                oldPassword: dataPassword.oldPassword,
+                password: dataPassword.password,
+                confirmPassword: dataPassword.confirmPassword,
             })
         } else {
             setDataUpdate(null);
         }
-    }, [isAuthenticated, userData, dataPassword.password]);
+    }, [isAuthenticated, userData, dataPassword.oldPassword, dataPassword.password, dataPassword.confirmPassword]);
 
     const fetchApiUpdateUser = async (id, data) => {
         try {
             const resultUpdate = await updateUserService(id, data)
-            console.log(resultUpdate.errors)
+            console.log(resultUpdate)
             if (resultUpdate.errors) {
                 setErrors(resultUpdate.errors)
                 return
@@ -121,7 +130,7 @@ export default function UpdatePassword({ show, closeModal }) {
                         {errors.confirmPassword && <ErrorMessageInput errors={errors} field="confirmPassword" />}
                     </div>
                     <div className="modal-footer d-flex justify-content-between">
-                        <button onClick={closeModal} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button onClick={handleCloseModal} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button onClick={handleSaveChanges} type="button" className="btn btn-primary">Save changes</button>
                     </div>
                 </div>

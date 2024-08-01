@@ -11,27 +11,30 @@ export default function InformationBasicProfile() {
         name: '',
         address: '',
         date_of_birth: '',
-        sex: ' '
+        sex: '',
+        avatar : '',
     })
     const [errors, setErrors] = useState({})
     const [dataUpdate, setDataUpdate] = useState(null);
     const saveTokenOnRedux = useSaveTokenOnRedux()
-    
+
     const displayDefaultInformation = useCallback(() => {
         if (isAuthenticated && userData?.dataLogin) {
-            const { name, address, date_of_birth, sex } = userData.dataLogin
+            const { name, address, date_of_birth, sex, avatar } = userData.dataLogin
             setDataUser({
                 name,
                 address,
                 date_of_birth,
-                sex
+                sex,
+                avatar
             })
         } else {
             setDataUser({
                 name: '',
                 address: '',
                 date_of_birth: '',
-                sex: ''
+                sex: '',
+                avatar : ''
             })
         }
     }, [isAuthenticated, userData])
@@ -67,8 +70,6 @@ export default function InformationBasicProfile() {
                 setErrors({})
                 // window.location.reload()
             }
-
-
             const refreshTokenWhenUpdate = {
                 email: userData.dataLogin.email,
                 password: userData.dataLogin.password
@@ -94,6 +95,22 @@ export default function InformationBasicProfile() {
             [name]: value
         }));
     };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64Image = reader.result;
+                setDataUser(prevInfor => ({
+                    ...prevInfor,
+                    avatar: reader.result
+                }));
+                localStorage.setItem('avatar', base64Image); // Lưu ảnh mới vào localStorage
+            };
+            reader.readAsDataURL(file);
+        }
+    };
     return (
         <div style={{ borderRight: '1px solid #ccc' }} className='col-6 bg-white '>
             <div className=' px-3'>
@@ -102,7 +119,7 @@ export default function InformationBasicProfile() {
                     <div style={{ border: '4px solid rgb(194, 225, 255)', width: "100px", padding: '24px', borderRadius: '70px' }}>
                         <img
                             width="45px"
-                            src="https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png" alt=""
+                            src={localStorage.getItem('avatar') ? localStorage.getItem('avatar')  : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
                         />
                     </div>
                     <div className='ms-3 flex-grow-1'>
@@ -133,6 +150,13 @@ export default function InformationBasicProfile() {
                         </div>
                     </div>
                 </div>
+
+                <InputComponent 
+                    onChange={handleImageChange}
+                    className = 'mt-3' 
+                    type="file" 
+                />
+
                 <div className='d-flex align-items-center mt-4'>
                     <p className='me-2 text-nowrap'>Ngày sinh</p>
                     <InputComponent
@@ -140,9 +164,10 @@ export default function InformationBasicProfile() {
                         value={dataUser.date_of_birth}
                         onChange={handleChangeInput}
                         type="date"
-                        className="form-control"
+                        className={`form-control flex-grow-1 ${errors.date_of_birth ? 'is-invalid' : ''}`}
                     />
                 </div>
+                {errors.date_of_birth && <ErrorMessageInput errors={errors} field="date_of_birth" />}
                 <div className='d-flex align-items-center mt-4'>
                     <p>Giới tính</p>
                     <div className="form-check ms-3">

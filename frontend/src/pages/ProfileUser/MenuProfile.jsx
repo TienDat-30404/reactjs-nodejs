@@ -1,10 +1,18 @@
 import React from 'react'
-
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 export default function MenuProfile() {
+  const { isAuthenticated, userData } = useSelector((state) => state.auth);
+
+
+  const navigate = useNavigate()
+  const switchToHomePage = () => {
+    navigate('/')
+  }
   return (
     <div className='col-3 px-'>
       <div className='d-flex mb-2'>
-        <p style={{ fontSize: '15px' }} className='fw-light me-2'>Trang chủ</p>
+        <p onClick = {switchToHomePage} style={{ fontSize: '15px', cursor : 'pointer' }} className='fw-light me-2 switch_homepage-profile'>Trang chủ</p>
         <i style={{ fontSize: '15px' }} className="bi bi-chevron-right me-2"></i>
         <p style={{ fontSize: '15px', color: 'rgb(56, 56, 61)', fontWeight: '300' }}>Thông tin tài khoản </p>
       </div>
@@ -12,7 +20,16 @@ export default function MenuProfile() {
         <img style={{ borderRadius: '10px' }} width="43px" height="43px" src="https://salt.tikicdn.com/desktop/img/avatar.png" alt="" />
         <div className='ms-3'>
           <p style={{ color: 'rgb(56, 56, 61)', fontWeight: '300' }} >Tài khoản của</p>
-          <p style={{ color: 'rgb(56, 56, 61)', fontWeight: '300', fontFamily: 'Inter,Helvetica,Arial,sans-serif' }}>Đặng Tiến Đạt </p>
+          {isAuthenticated ? (
+            <>
+              <p style={{ color: 'rgb(56, 56, 61)', fontWeight: '300', fontFamily: 'Inter,Helvetica,Arial,sans-serif' }}>{userData.dataLogin.name}</p>
+            </>
+          ) 
+          : 
+          (
+            <p style={{ color: 'rgb(56, 56, 61)', fontWeight: '300', fontFamily: 'Inter,Helvetica,Arial,sans-serif' }}></p>
+          )
+          } 
         </div>
       </div>
       <ul className="nav flex-column">

@@ -19,6 +19,7 @@ const createUser = async (req, res, next) => {
 const loginUser = async(req, res, next) => {
     const {email } = req.body
     const isCheckUser = await User.findOne({ email })
+    const avatar = isCheckUser.avatar
     const payloadToken = {
         idUser: isCheckUser.idUser,
         name: isCheckUser.name,
@@ -41,7 +42,9 @@ const loginUser = async(req, res, next) => {
         maxAge: 24 * 60 * 60 * 1000 // Thời gian sống của cookie (1 ngày trong ví dụ này)
     });
     return res.status(200).json({
-        token: accessToken
+        token: accessToken,
+        message : 'Đăng nhập thành công',
+        avatar : avatar
     })
 }
 

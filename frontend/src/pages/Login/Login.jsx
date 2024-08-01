@@ -24,6 +24,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
         alert("Đăng nhập thành công")
         setCookieForToken(userData.token)
         saveTokenOnRedux(jwtDecode(userData.token))
+        localStorage.setItem('avatar', userData.avatar)
       }
     }
     catch (error) {
@@ -37,7 +38,6 @@ function LoginModal({ show, handleClose, switchSignIn }) {
     setErrors({})
     handleClose()
   }
-  console.log(errors)
   return (
     <div className={`modal bg- ${show ? 'd-block' : 'd-none'}  modal-display`} >
       <div className='modal_base'>

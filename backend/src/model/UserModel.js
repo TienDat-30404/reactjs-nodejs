@@ -14,6 +14,7 @@ const UserSchema = new Schema(
         phone : {type : String, default : ''},
         date_of_birth : {type : String, default : ''},
         sex : {type : String, default : ''},
+        avatar : {type : String, default : ''},
         idRole : {type : Number, required : true, default : 0}
     },
     { timestamps: true });
