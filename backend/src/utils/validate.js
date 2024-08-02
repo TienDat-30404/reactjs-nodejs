@@ -1,4 +1,5 @@
 const Product = require('../model/ProductModel')
+const Category = require('../model/CategoryModel')
 const bcrypt = require('bcrypt')
 // Check email 
 const validateEmail = (email) => {
@@ -45,6 +46,13 @@ const validateNameProductWhenUpdate = async (id, name) => {
     return countNameProduct == 1 && (name != isCheckNameProduct.name)
 }
 
+// validate name category
+const isCheckExistNameCategory = async (name) => 
+    {
+        const existNameCategory = await Category.findOne({name})
+        return !existNameCategory
+    }
+
 module.exports = {validateEmail, hashPassword, validateNameProduct, validatePriceProduct, validateTypeQuantityProduct,
-    validateQuantityProductBiggerZero, validateNameProductWhenUpdate
+    validateQuantityProductBiggerZero, validateNameProductWhenUpdate, isCheckExistNameCategory
 }

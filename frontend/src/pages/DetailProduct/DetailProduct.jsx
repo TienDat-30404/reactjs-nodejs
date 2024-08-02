@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
-import { getDetailProduct } from '../services/ProductService'
+import { getDetailProduct } from '../../services/ProductService'
 export default function Detail() {
     const { id } = useParams();
     const [details, setDetail] = useState([])

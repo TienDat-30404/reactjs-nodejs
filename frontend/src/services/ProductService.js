@@ -1,4 +1,4 @@
-export const getAllProduct = async (page, idProduct, type, limit = null) => {
+export const getAllProduct = async (page, idProduct, type, limit = null, idCategory = null) => {
     const params = new URLSearchParams({
         page,
         soryBy: idProduct,
@@ -6,6 +6,9 @@ export const getAllProduct = async (page, idProduct, type, limit = null) => {
     });
     if (limit) {
         params.append('limit', limit);
+    }
+    if (idCategory) {
+        params.append('idCategory', idCategory);
     }
     const url = `${process.env.REACT_APP_API_URL}/get-all-product?${params.toString()}`;
 

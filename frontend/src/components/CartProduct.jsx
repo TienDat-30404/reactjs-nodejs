@@ -7,7 +7,7 @@ export default function CartProduct({id, image, name, price }) {
     }
     
     return (
-        <div onClick={switchDetailProduct} className="card column-1-5" >
+        <div style = {{ height : '380px' }} onClick={switchDetailProduct} className="card column-1-5" >
             <img src={image} className="card-img-top" alt="..." />
             <div className="mb-3">
                 <img width="90px" src="https://salt.tikicdn.com/ts/upload/0f/59/82/795de6da98a5ac81ce46fb5078b65870.png" alt="" />

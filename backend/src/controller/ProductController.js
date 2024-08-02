@@ -65,16 +65,21 @@ const getAllProduct = async (req, res, next) => {
         objectSort[sortBy] = type
 
         const objectFilter = {}
+        var totalProducts
         if(req.query.idCategory)
         {
             objectFilter.idCategory = req.query.idCategory
+            totalProducts = await Product.countDocuments({idCategory : req.query.idCategory})
+        }
+        else 
+        {
+            totalProducts = await Product.countDocuments({})
         }
         
         const products = await Product.find(objectFilter)
                                       .skip(startPage)
                                       .limit(limit)
                                       .sort(objectSort)
-        const totalProducts = await Product.countDocuments({})
         const totalPages = Math.ceil(totalProducts / limit)
         return res.status(200).json({
             products,

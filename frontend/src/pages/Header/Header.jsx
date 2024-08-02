@@ -35,12 +35,16 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     const navigateProfile = () => {
         navigate('/profile-user')
     }
+
+    const switchHomePage = () => {
+        navigate('/')
+    }
     return (
         <div className="bg-white">
             <div className="container d-flex header">
                 <div className="row col-12">
                     <div className="col-2 d-flex align-items-center">
-                        <a className="navbar-brand">
+                        <a onClick = {switchHomePage} className="navbar-brand">
                             <ImageComponent
                                 src="https://salt.tikicdn.com/ts/upload/0e/07/78/ee828743c9afa9792cf20d75995e134e.png"
                                 width="100px"

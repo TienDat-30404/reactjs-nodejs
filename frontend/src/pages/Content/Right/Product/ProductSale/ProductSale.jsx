@@ -32,7 +32,6 @@ export default function ProductSale() {
             setPage(page - 1)
         }
     }
-    console.log(products)
     return (
         <div className='mt-3 bg-white rounded-2 product-sale'>
             <div className='d-flex justify-content-between align-items-center ms-4 me-4 mb-2'>
@@ -69,3 +68,5 @@ export default function ProductSale() {
 
     )
 }
+
+

@@ -1,0 +1,10 @@
+const express = require('express')
+const router = express.Router()
+const CategoryController = require('../controller/CategoryController')
+const {validateAddCategory} = require('../middlewares/CategoryMiddleWare')
+router.post('/add-category', validateAddCategory, CategoryController.addCategory)
+// router.put('/update-product/:idProduct', validateUpdateProduct, ProductController.updateProduct)
+// router.delete('/delete-product/:idProduct', authencationMiddleWare, ProductController.deleteProduct)
+router.get('/get-all-category', CategoryController.getAllCategory)
+// router.get('/detail-product/:idProduct', ProductController.getDetailProduct)
+module.exports = router
