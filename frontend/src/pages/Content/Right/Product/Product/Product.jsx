@@ -83,9 +83,10 @@ export default function Product() {
                         products.map((product, index) => (
                             <CartProduct
                                 key={index}
+                                id = {product.idProduct}
                                 image={product.image}
                                 name={product.name}
-                                price={product.price}
+                                price={(product.price).toLocaleString('vi-VN')}
                             />
                         ))
                     }

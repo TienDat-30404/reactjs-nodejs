@@ -32,6 +32,7 @@ export default function ProductSale() {
             setPage(page - 1)
         }
     }
+    console.log(products)
     return (
         <div className='mt-3 bg-white rounded-2 product-sale'>
             <div className='d-flex justify-content-between align-items-center ms-4 me-4 mb-2'>
@@ -51,15 +52,16 @@ export default function ProductSale() {
                 {products.map((product, index) => (
                     <CartProduct
                         key={index}
+                        id={product.idProduct}
                         image={product.image}
                         name={product.name}
-                        price={product.price}
+                        price={(product.price).toLocaleString('vi-VN')}
                     />
                 ))
                 }
                 <div className='d-flex justify-content-center align-items-center mt-3'>
-                    <button disabled = {page == 1} onClick={handlePrevPage} type="button" class="btn btn-light me-3">Primary</button>
-                    <button disabled={page >= totalPage} onClick={handleNextPage} type="button" class="btn btn-light">Next</button>
+                    <button disabled = {page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
+                    <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
                 </div>
                 <span className='text-center mt-2'>Page {page} of {totalPage}</span>
             </div>

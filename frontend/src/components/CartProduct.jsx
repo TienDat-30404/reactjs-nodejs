@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getAllProduct } from '../services/ProductService'
-export default function CartProduct({ image, name, price }) {
+export default function CartProduct({id, image, name, price }) {
     const navigate = useNavigate()
     const switchDetailProduct = () => {
-        navigate('detail')
+        navigate(`/detail/${id}`)
     }
+    
     return (
         <div onClick={switchDetailProduct} className="card column-1-5" >
             <img src={image} className="card-img-top" alt="..." />
@@ -19,7 +19,7 @@ export default function CartProduct({ image, name, price }) {
                     <i style={{ fontSize: "11px", color: "orange" }} className="bi bi-star-fill"></i>
                     <i style={{ fontSize: "11px", color: "orange" }} className="bi bi-star-half"></i>
                 </div>
-                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">{price}</p>
+                <p style={{ fontSize: "16px" }} className="text-danger fw-bold">{price}đ</p>
                 <a className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
             </div>
         </div>
