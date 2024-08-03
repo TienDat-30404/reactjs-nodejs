@@ -9,4 +9,5 @@ router.put('/update-product/:idProduct', validateUpdateProduct, ProductControlle
 router.delete('/delete-product/:idProduct', authencationMiddleWare, ProductController.deleteProduct)
 router.get('/get-all-product', ProductController.getAllProduct)
 router.get('/detail-product/:idProduct', ProductController.getDetailProduct)
+router.get('/search', ProductController.searchProduct)
 module.exports = router

@@ -17,11 +17,6 @@ export default function Detail() {
         }
         fetchDataDetailProduct()
     }, [id])
-    // if (details && details.detailProduct) {
-    //     console.log(details.detailProduct.image);
-    // } else {
-    //     console.log('details hoặc details.detailProduct không có giá trị.');
-    // }
     return (
         <div className="container mt-3 detail">
             {details && details.detailProduct ? (
@@ -39,7 +34,7 @@ export default function Detail() {
                         <div className="nav ms-2 benefit">
                             <h6>Đặc điểm nổi bật</h6>
                             <div className='d-flex '>
-                                <i style = {{ width : '10px' }} className="bi bi-check-circle me-2"></i>
+                                <i style={{ width: '10px' }} className="bi bi-check-circle me-2"></i>
                                 {details.detailProduct.description}
                             </div>
                         </div>
@@ -137,7 +132,9 @@ export default function Detail() {
                     </div>
                 </div>
             ) : (
-                <p>Loading data...</p>
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
             )}
         </div>
     )

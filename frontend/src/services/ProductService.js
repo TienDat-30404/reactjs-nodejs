@@ -31,3 +31,13 @@ export const getDetailProduct = async (id) => {
     })
     return response.json()
 }   
+
+export const searchProduct = async(word) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/search?type=${word}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    return response.json()
+}

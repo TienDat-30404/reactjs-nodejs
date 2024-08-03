@@ -4,6 +4,7 @@ import Detail from "../pages/DetailProduct/DetailProduct";
 import Login from "../pages/Login/Login";
 import ProfileUser from "../pages/ProfileUser/ProfileUser";
 import CategoryByProduct from "../pages/Content/Right/CategoryByProduct/CategoryByProduct";
+import Search from "../pages/Search/Search";
 export const routes = [
     {
         path : '/',
@@ -39,6 +40,11 @@ export const routes = [
         isShowHeader : true,
         isShowProduct : false,
         isShowBody : true
+    },
+    {
+        path : '/search',
+        page : Search,
+        isShowHeader : true,
     }
 ]
      

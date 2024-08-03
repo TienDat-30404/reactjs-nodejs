@@ -6,18 +6,21 @@ import HeaderSupport from "./HeaderSupport";
 import { useNavigate } from "react-router-dom";
 import '../../public/css/header.css'
 import { useSelector, useDispatch } from 'react-redux';
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { logoutSuccess } from "../../redux/userSlice";
 import { logoutUser } from "../../until/tokenUser";
 const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
+    const [word, setWord] = useState('')
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const handleClickLogout = () => {
         logoutUser()
         dispatch(logoutSuccess())
         window.location.reload()
     };
+
+
 
     const avatarRef = useRef(null);
     useEffect(() => {
@@ -32,13 +35,29 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
         };
     }, [setStatusHiddenLogout]);
 
+    // handle Search Product
+    
+
     const navigateProfile = () => {
         navigate('/profile-user')
     }
-
     const switchHomePage = () => {
         navigate('/')
     }
+    const switchSerch = (e) => {
+        e.preventDefault()
+        navigate(`/search?type=${word}`)
+    }
+
+    // xử lí khi quay từ trang tìm kiếm về thì ô input = ""
+    useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const type = queryParams.get('type');
+        if (!type) {
+            setWord('');
+        } 
+    }, [window.location.search]);
+    console.log(word)
     return (
         <div className="bg-white">
             <div className="container d-flex header">
@@ -56,6 +75,8 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                     <div className="row col-10 d-flex align-items-center">
                         <form className="d-flex col-7" role="search">
                             <InputComponent
+                                value = {word}
+                                onChange = {e => setWord(e.target.value)}
                                 className='form-control me-2  flex-grow-1'
                                 type='search'
                                 placeholder='TÌm kiếm tại đây'
@@ -65,6 +86,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                 className='btn btn-outline-success'
                                 type='submit'
                                 content='Search'
+                                onClick = {switchSerch}
                             />
                         </form>
                         <div className="col-5 d-flex align-items-center">

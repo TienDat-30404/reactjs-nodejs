@@ -6,6 +6,7 @@ export default function Product() {
     const limit = 8
     const [totalPage, setTotalPage] = useState(1)
     const [products, setProducts] = useState([])
+
     const getDataProduct = async (page) => {
         const response = await getAllProduct(page, 'idProduct', 'asc', limit )
         setTotalPage(response.totalPages)
@@ -91,8 +92,8 @@ export default function Product() {
                         ))
                     }
                     <div className='d-flex justify-content-center align-items-center mt-3'>
-                        <button disabled={page == 1} onClick={handlePrevPage} type="button" class="btn btn-light me-3">Primary</button>
-                        <button disabled={page >= totalPage} onClick={handleNextPage} type="button" class="btn btn-light">Next</button>
+                        <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
+                        <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
                     </div>
                     <span className='text-center mt-2'>Page {page} of {totalPage}</span>
                 </div>
