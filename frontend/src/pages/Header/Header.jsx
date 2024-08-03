@@ -34,17 +34,16 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [setStatusHiddenLogout]);
-
-    // handle Search Product
     
-
     const navigateProfile = () => {
         navigate('/profile-user')
     }
     const switchHomePage = () => {
         navigate('/')
     }
-    const switchSerch = (e) => {
+
+    // Search Product
+    const switchSearch = (e) => {
         e.preventDefault()
         navigate(`/search?type=${word}`)
     }
@@ -86,7 +85,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                 className='btn btn-outline-success'
                                 type='submit'
                                 content='Search'
-                                onClick = {switchSerch}
+                                onClick = {switchSearch}
                             />
                         </form>
                         <div className="col-5 d-flex align-items-center">

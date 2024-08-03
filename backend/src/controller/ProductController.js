@@ -71,11 +71,16 @@ const getAllProduct = async (req, res, next) => {
             objectFilter.idCategory = req.query.idCategory
             totalProducts = await Product.countDocuments({idCategory : req.query.idCategory})
         }
+        else if(req.query.search)
+        {
+            objectFilter.name = new RegExp(req.query.search, 'i');
+            totalProducts = await Product.countDocuments({name : objectFilter.name})
+
+        }
         else 
         {
             totalProducts = await Product.countDocuments({})
         }
-        
         const products = await Product.find(objectFilter)
                                       .skip(startPage)
                                       .limit(limit)
@@ -117,12 +122,4 @@ const getDetailProduct = async (req, res, next) => {
     }
 }
 
-const searchProduct = async (req, res, next) => {
-    const wordSearch = req.query.type
-    const regexSearch = new RegExp(wordSearch, 'i'); // Tạo biểu thức chính quy để tìm kiếm không phân biệt chữ hoa chữ thường
-    const products = await Product.find({name : regexSearch})
-    return res.status(200).json({
-        products
-    })
-}
-module.exports = {addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, searchProduct}
+module.exports = {addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct}

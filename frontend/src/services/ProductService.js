@@ -1,4 +1,4 @@
-export const getAllProduct = async (page, idProduct, type, limit = null, idCategory = null) => {
+export const getAllProduct = async (page, idProduct, type, limit = null, idCategory = null, search = null) => {
     const params = new URLSearchParams({
         page,
         soryBy: idProduct,
@@ -7,6 +7,11 @@ export const getAllProduct = async (page, idProduct, type, limit = null, idCateg
     if (limit) {
         params.append('limit', limit);
     }
+    if(search)
+    {
+        params.append('search', search)
+    }
+    console.log(params.toString())
     if (idCategory) {
         params.append('idCategory', idCategory);
     }
