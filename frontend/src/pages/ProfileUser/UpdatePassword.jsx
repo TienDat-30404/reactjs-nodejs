@@ -85,7 +85,7 @@ export default function UpdatePassword({ show, closeModal }) {
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="modal-dialog update-user">
-                <div className="modal-content">
+                <div className=" modal-content">
                     <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Đổi mật khẩu</p>
                     <div className='px-4 py-2'>
                         <label style={{ fontSize: '14px' }} htmlFor="inputPassword5" className="form-label">Mật khẩu hiện tại</label>

@@ -21,4 +21,13 @@ const getAllCategory = async (req, res, next) => {
     })
 }
 
-module.exports = {addCategory, getAllCategory}
+// detail category 
+const detailCategory = async(req, res, next) => {
+    const idCategory = req.params.idCategory
+    const category = await Category.find({idCategory : idCategory})
+    return res.status(200).json({
+        category
+    })
+}
+
+module.exports = {addCategory, getAllCategory, detailCategory}

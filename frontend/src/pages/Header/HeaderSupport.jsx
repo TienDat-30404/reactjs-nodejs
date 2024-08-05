@@ -1,8 +1,7 @@
 const HeaderSupport = () => {
     return (
         <div className="container mt-1 mb-1">
-            <ul
-                className="nav header_support">
+            <ul className="nav header_support">
                 <li className="nav-item border-end">
                     <a className="nav-link fw-bold" aria-current="page" href="#">Cam kết</a>
                 </li>

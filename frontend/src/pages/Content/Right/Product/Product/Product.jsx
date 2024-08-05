@@ -32,6 +32,7 @@ export default function Product() {
             setPage(page - 1)
         }
     }
+    console.log(products)
     return (
         <div className='mt-2 bg-white rounded-2 product'>
             <p className="text-capitalize ms-4 pt-2 fw-bold">Gợi ý hôm nay</p>
@@ -96,6 +97,8 @@ export default function Product() {
                         <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
                     </div>
                     <span className='text-center mt-2'>Page {page} of {totalPage}</span>
+
+ 
                 </div>
             </div>
         </div>

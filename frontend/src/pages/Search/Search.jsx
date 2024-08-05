@@ -1,35 +1,36 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import queryString from 'query-string';
 import { useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
 import { getAllProduct } from '../../services/ProductService'
 import CartProduct from '../../components/CartProduct'
+import { detailCategory } from '../../services/CategoryService';
 export default function Search() {
     const navigate = useNavigate()
     const limit = 4
     const [page, setPage] = useState(1)
+    const [nameCategory, setNameCategory] = useState({})
     const [totalPage, setTotalPage] = useState(1)
+    const [sort, setSort] = useState('idProduct')
+    const [type, setType] = useState('asc')
     const [resultSearch, setResultSearch] = useState([])
-    const location = useLocation();
-    const queryParams = queryString.parse(location.search);
-    const wordSearch = queryParams.type;
-    const getDataSearchProduct = async (page, word) => {
-        const response = await getAllProduct(page, 'idProduct', 'asc', limit, null, word)
+    const params = new URLSearchParams(window.location.search)
+    const wordSearch = params.get('find') ? params.get('find') : null
+    const idCategory = params.get('idCategory') ? params.get('idCategory') : null
+    const priceFrom = params.get('priceFrom') ? params.get('priceFrom') : null
+    const priceTo = params.get('priceTo') ? params.get('priceTo') : null
+    const getDataSearchProduct = async (page, sort, type, limit, idCategory, word, priceFrom, priceTo) => {
+        const response = await getAllProduct(page, sort, type, limit, idCategory, word, priceFrom, priceTo)
+        console.log(response.products)   
         setTotalPage(response.totalPages)
         return response
     }
     useEffect(() => {
         const fetchDatasSearchProduct = async () => {
-            if (wordSearch.trim() === '') {
-                setResultSearch([]);
-                return;
-            }
-            const listSearchProduct = await getDataSearchProduct(page, wordSearch)
+            const listSearchProduct = await getDataSearchProduct(page, sort, type, limit, idCategory, wordSearch, priceFrom, priceTo)
             setResultSearch(listSearchProduct)
         }
         fetchDatasSearchProduct()
-    }, [page, wordSearch])
+    }, [page, sort, type, limit, idCategory, wordSearch, priceFrom, priceTo])
 
     const handleNextPage = () => {
         if (page < totalPage) {
@@ -42,18 +43,81 @@ export default function Search() {
             setPage(page - 1)
         }
     }
-
     useEffect(() => {
         setPage(1)
-    }, [wordSearch])
+    }, [wordSearch, idCategory, priceFrom, priceTo])
+
+    // get name category 
+    const getDataCategory = async (idCategory) => {
+        const response = await detailCategory(idCategory)
+        return response
+    }
+    useEffect(() => {
+        const fetchCategoryName = async () => {
+            if (idCategory) {
+                const category = await detailCategory(idCategory);
+                setNameCategory(category.category);
+            } else {
+                setNameCategory('');
+            }
+        };
+        fetchCategoryName();
+    }, [idCategory]);
+
+    // arrange price
+    const handleSortChange = (e) => {
+        if(e.target.value === "priceAsc")
+        {
+            setSort('price'); 
+            setType('asc')
+        }
+        else if(e.target.value === 'priceDesc')
+        {
+            setSort('price')
+            setType('desc')
+        }
+        else 
+        {
+            setSort('idProduct')
+            setType('asc')
+        }
+        setPage(1)
+    }
     return (
         <div className="container d-flex">
             <div className="row col-12 mt-2">
                 <div className='d-flex mb-2 align-items-center'>
                     <p onClick={() => navigate('/')} style={{ fontSize: '15px', cursor: 'pointer' }} className='fw-light me-2 switch_homepage-profile'>Trang chủ</p>
                     <i style={{ fontSize: '15px' }} className="bi bi-chevron-right me-2"></i>
-                    <p style={{ fontSize: '15px', color: 'rgb(56, 56, 61)', fontWeight: '400', marginRight: '5px' }}>Kết quả tìm kiếm</p>
-                    "<p style={{ fontSize: '15px' }}>a</p>"
+                    <p style={{ fontSize: '15px', color: 'rgb(56, 56, 61)', fontWeight: '400', marginRight: '5px' }}>Kết quả tìm kiếm : </p>
+                    {wordSearch
+                        ? <p style={{ color: 'red', fontWeight: '500', fontSize: '15px', marginRight: '6px' }}>{wordSearch}</p>
+                        : ''
+                    }
+                    {idCategory ?
+                        <>
+                            <span className='me-2'>, Thể loại : </span>
+                            <p style={{ color: 'red', fontWeight: '500', fontSize: '15px', marginRight: '6px' }}>
+                                {nameCategory.length > 0 ? (
+                                    nameCategory.map((category, index) => (
+                                        <span key={index}>{category.name}</span>
+                                    ))
+                                ) : (
+                                    <p>123</p>
+                                )}
+                            </p>
+                        </>
+                        : ''
+                    }
+                    {priceFrom ?
+                        <div className='d-flex align-items-center'>
+                            <p className='me-2'>, Giá từ</p>
+                            <p style={{ color: 'red', fontWeight: '500', fontSize: '16px', marginRight: '6px' }}>{parseFloat(priceFrom).toLocaleString('vi-VN')}đ</p>
+                            <p className='me-2'>đến</p>
+                            <p style={{ color: 'red', fontWeight: '500', fontSize: '16px', marginRight: '6px' }}>{parseFloat(priceTo).toLocaleString('vi-VN')}đ</p>
+                        </div>
+                        : ''
+                    }
                 </div>
                 <div className='d-flex align-items-center bg-white justify-content-between'>
                     <div className='d-flex align-items-center'>
@@ -73,10 +137,10 @@ export default function Search() {
                     </div>
                     <div className='d-flex align-items-center mt-2'>
                         <p style={{ fontSize: '16px', color: '#888', fontWeight: '400' }}>Sắp xếp</p>
-                        <select className='ms-3 rounded-3 py-1' name="" id="">
+                        <select className='ms-3 rounded-3 py-1' name="" id="" value={`${sort}${type === 'asc' ? 'Asc' : 'Desc'}`} onChange={handleSortChange}>
                             <option value="">Phổ biến</option>
-                            <option value="">Giá thấp đến cao</option>
-                            <option value="">Giá cao đến thấp</option>
+                            <option value="priceAsc">Giá thấp đến cao</option>
+                            <option value="priceDesc">Giá cao đến thấp</option>
                         </select>
                     </div>
                 </div>
@@ -91,26 +155,36 @@ export default function Search() {
                                         width="300px"
                                         name={product.name}
                                         image={product.image}
-                                        price={product.price}
+                                        price={(product.price).toLocaleString('vi-VN')}
                                     />
                                 ))}
                             </div>
-                            <div className='d-flex justify-content-center align-items-center mt-3'>
-                                <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
-                                <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
-                            </div>
-                            <div  className='d-flex justify-content-center align-items-center mt-2'>
-                                <span>Page {page} of {totalPage}</span>
-                            </div>
+                            {resultSearch.products.length > 0 ? (
+                                <div>
+
+                                    <div className='d-flex justify-content-center align-items-center mt-3'>
+                                        <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
+                                        <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
+                                    </div>
+                                    <div className='d-flex justify-content-center align-items-center mt-2'>
+                                        <span>Page {page} of {totalPage}</span>
+                                    </div>
+                                </div>
+                            ) :
+                                <div className='d-flex justify-content-center align-items-center'>
+                                    <img width="200px" src="https://w7.pngwing.com/pngs/658/622/png-transparent-page-not-found-illustration.png" alt="" />
+                                    <h2 className='text-danger'>Không tìm thấy sản phẩm</h2>
+                                </div>
+                            }
                         </div>
                     ) :
-                        <div class="loading">
-                            <div class="spinner"></div>
+                        <div className="loading">
+                            <div className="spinner"></div>
                         </div>
                     }
 
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

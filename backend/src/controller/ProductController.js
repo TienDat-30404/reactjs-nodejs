@@ -59,28 +59,27 @@ const getAllProduct = async (req, res, next) => {
         const limit = parseInt(req.query.limit) || 5
         const startPage = (page - 1) * limit
         
-        const sortBy = req.query.sortBy || "idProduct"
+        const sortBy = req.query.sortBy 
         const type = req.query.type === "asc" ? 1 : -1  // nếu là 1 thì sắp xếp tăng dần và ngược lại
         const objectSort = {}
         objectSort[sortBy] = type
-
         const objectFilter = {}
-        var totalProducts
-        if(req.query.idCategory)
-        {
-            objectFilter.idCategory = req.query.idCategory
-            totalProducts = await Product.countDocuments({idCategory : req.query.idCategory})
+        if (req.query.idCategory) {
+            objectFilter.idCategory = req.query.idCategory;
         }
-        else if(req.query.search)
-        {
+    
+        if (req.query.search) {
             objectFilter.name = new RegExp(req.query.search, 'i');
-            totalProducts = await Product.countDocuments({name : objectFilter.name})
-
         }
-        else 
-        {
-            totalProducts = await Product.countDocuments({})
+    
+        if (req.query.priceFrom && req.query.priceTo) {
+            const priceFrom = parseFloat(req.query.priceFrom);
+            const priceTo = parseFloat(req.query.priceTo);
+            objectFilter.price = { $gte: priceFrom, $lte: priceTo };
         }
+        const totalProducts = Object.keys(objectFilter).length === 0 
+                                ? await Product.countDocuments({}) 
+                                : await Product.countDocuments(objectFilter);
         const products = await Product.find(objectFilter)
                                       .skip(startPage)
                                       .limit(limit)
@@ -99,6 +98,24 @@ const getAllProduct = async (req, res, next) => {
         next(error)
     }
 }
+
+/*
+    $eq : so sánh bằng - { field: { $eq: value } }
+    $ne : so sánh không bằng - { field: { $ne: value } }
+    $gt : so sánh lớn hơn - { field: { $gt: value } }
+    $gte : so sánh lớn hơn hoặc bằng - { field: { $gte: value } }
+    $lt : so sánh nhỏ hơn - { field: { $lt: value } }
+    $lte : so sánh nhỏ hơn - { field: { $lte: value } }
+    $in: So sánh nếu giá trị có trong một mảng - { field: { $in: [value1, value2, ...] } }
+    $nin: So sánh nếu giá trị không có trong một mảng - { field: { $nin: [value1, value2, ...] } }
+    $exists: Kiểm tra sự tồn tại của trường - { field: { $exists: true } }
+    $type: Kiểm tra kiểu dữ liệu của trường - { field: { $type: "string" } }
+    $regex: So sánh với biểu thức chính quy - { field: { $regex: /pattern/, $options: 'i' } }
+    $or: Toán tử logic OR - { $or: [ { field1: value1 }, { field2: value2 } ] }
+    $and: Toán tử logic AND - { $and: [ { field1: value1 }, { field2: value2 } ] }
+    $not: Toán tử logic NOT - { field: { $not: { $regex: /pattern/ } } }
+    $nor: Toán tử logic NOR - { $nor: [ { field1: value1 }, { field2: value2 } ] }
+*/
 
 // [GET] /detail-product/:idProduct
 const getDetailProduct = async (req, res, next) => {
@@ -122,4 +139,13 @@ const getDetailProduct = async (req, res, next) => {
     }
 }
 
-module.exports = {addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct}
+const getPrice = async(req, res, next) => {
+    const priceFrom = req.query.priceFrom
+    const priceTo = req.query.priceTo
+    const result = await Product.find({price : {$gte : priceFrom, $lte : priceTo} })
+    const g = await Product.countDocuments({price : {$gte : priceFrom, $lte : priceTo}})
+    return res.status(200).json({
+        result
+    })
+}
+module.exports = {addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, getPrice}

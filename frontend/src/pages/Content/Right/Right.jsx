@@ -6,7 +6,7 @@ import Product from './Product/Product/Product'
 import Category from './CategoryByProduct/CategoryByProduct'
 function Right() {
   return (
-    <div className='col-9-5'>
+    <div className='col-9-5' >
       <Banner />
       <Promotion />
       <ProductSale />
