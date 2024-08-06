@@ -9,7 +9,6 @@
   import { useEffect } from 'react';
   import { useAuthHandler } from './until/manageToken';
   import DefaultComponent from './components/DefaultComponent';
-  import Left from './pages/Content/Left/Left';
   import Right from './pages/Content/Right/Right';
   import Body from './pages/Content/Body';
   import CategoryByProduct from './pages/Content/Right/CategoryByProduct/CategoryByProduct';

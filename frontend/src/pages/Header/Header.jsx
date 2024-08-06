@@ -34,10 +34,10 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (avatarRef.current && !avatarRef.current.contains(event.target) ) {
+            if (avatarRef.current && !avatarRef.current.contains(event.target)) {
                 setStatusHiddenLogout(false);
             }
-            if (modalRef.current && !modalRef.current.contains(event.target) ) {
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
                 setShowModal(false);
             }
         };
@@ -158,7 +158,12 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                 </li>
                                                 <li style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
                                                     <i className="bi bi-cart-check-fill"></i>
-                                                    <a className="nav-link">Giỏ hàng</a>
+                                                    <button class="btn position-relative">
+                                                        Giỏ hàng
+                                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                            99+
+                                                        </span>
+                                                    </button>
                                                 </li>
                                             </ul>
                                         </div>
