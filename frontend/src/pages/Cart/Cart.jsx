@@ -2,37 +2,52 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import CartProduct from '../../components/CartProduct'
 import { getAllProduct } from '../../services/ProductService'
+import { getAllCart } from '../../services/CartService'
+import { useParams } from 'react-router-dom'
 export default function Cart() {
-    const [page, setPage] = useState(1)
     const limit = 6
     const [totalPage, setTotalPage] = useState(1)
     const [products, setProducts] = useState([])
-
-    const getDataProduct = async (page) => {
-        const response = await getAllProduct(page, 'idProduct', 'asc', limit)
-        setTotalPage(response.totalPages)
-        return response.products
-    }
-
+    
+    
+    const [page, setPage] = useState(1)
+    const [sortBy, setSortBy] = useState('idCart')
+    const [type, setType] = useState('asc')
+    const [carts, setCart] = useState([])
+    const {idUser} = useParams()
+    // data product
     useEffect(() => {
         const fetchDatasProduct = async () => {
-            const listProduct = await getDataProduct(page)
-            setProducts(listProduct)
+            const listProduct = await getAllProduct(page, 'idProduct', 'asc', limit)
+            setTotalPage(listProduct.totalPages)
+            setProducts(listProduct.products)
         }
         fetchDatasProduct()
     }, [page])
 
+    // handle pagination next page
     const handleNextPage = () => {
         if (page < totalPage) {
             setPage(page + 1)
         }
     }
 
+    // handle pagination prev page
     const handlePrevPage = () => {
         if (page > 1) {
             setPage(page - 1)
         }
     }
+
+    // data Cart
+    useEffect(() => {
+        const listCart = async () => {
+            const cart = await getAllCart(idUser, page, sortBy, type)
+            console.log(cart)
+            setCart(cart.listCart)
+        }
+        listCart()
+    }, [idUser])    
     return (
         <div className='col-12 container mt-4'>
             <h3 style={{ fontSize: '21px', fontWeight: '500', fontFamily: 'Georgia, serif', width: '100%' }}>GIỎ HÀNG</h3>
@@ -49,51 +64,29 @@ export default function Cart() {
                         <span className='col-2' style={{ fontSize: '14px', color: 'rgb(120, 120, 120)', fontWeight: '400' }}>Thành tiền</span>
                         <i className="col-2 bi bi-trash3"></i>
                     </div>
-                    <div className='col-12 d-flex align-items-center bg-white px-2 py-2'>
-                        <div className='d-flex align-items-center col-5'>
-                            <input style={{ width: '17px', height: '20px', marginRight: '8px' }} type="checkbox" name="" id="" />
-                            <img width="75px" src="https://salt.tikicdn.com/cache/w160/ts/product/5c/57/85/312c7a38df0312e7525a18f61c5a0fbc.jpg.webp" alt="" />
-                            <p>Điện thoại Nokia C30 (2GB/32GB) - Hàng chính hãng - Xanh</p>
+                    {carts.length > 0 ? (
+                        carts.map((cart, index) => (
+                            <div key={index} className='col-12 d-flex align-items-center bg-white px-2 py-2'>
+                                <div className='d-flex align-items-center col-5'>
+                                    <input style={{ width: '17px', height: '20px', marginRight: '8px' }} type="checkbox" name="" id="" />
+                                    <img width="75px" src={cart.image} alt="" />
+                                    <p>{cart.name}</p>
+                                </div>
+                                <span className='col-2 fw-bold'>{(cart.price).toLocaleString('vi-VN')}đ</span>
+                                <div className='col-2'>
+                                    <span style={{ border: '1px solid #ccc', padding: '1px 8px' }}>-</span>
+                                    <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>1</span>
+                                    <span style={{ border: '1px solid #ccc', padding: '1px 8px' }}>+</span>
+                                </div>
+                                <span className='col-2 text-danger fw-bold'>{(cart.price * cart.quantity).toLocaleString('vi-VN')}</span>
+                                <i className="col-2 bi bi-trash3"></i>
+                            </div>
+                        ))
+                    ) :
+                        <div class="loading">
+                            <div class="spinner"></div>
                         </div>
-                        <span className='col-2 fw-bold'>1.490.000đ</span>
-                        <div className='col-2'>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px' }}>-</span>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>1</span>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px' }}>+</span>
-                        </div>
-                        <span className='col-2 text-danger fw-bold'>1.490.000đ</span>
-                        <i className="col-2 bi bi-trash3"></i>
-                    </div>
-                    <div className='col-12 d-flex align-items-center bg-white px-2 py-2'>
-                        <div className='d-flex align-items-center col-5'>
-                            <input style={{ width: '17px', height: '20px', marginRight: '8px' }} type="checkbox" name="" id="" />
-                            <img width="75px" src="https://salt.tikicdn.com/cache/750x750/ts/product/18/54/2d/3919a15dcdb692041ddec9b93971e559.png.webp" alt="" />
-                            <p>Điện thoại Nokia C30 (2GB/32GB) - Hàng chính hãng - Xanh</p>
-                        </div>
-                        <span className='col-2 fw-bold'>1.490.000đ</span>
-                        <div className='col-2'>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px' }}>-</span>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>1</span>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px' }}>+</span>
-                        </div>
-                        <span className='col-2 text-danger fw-bold'>1.490.000đ</span>
-                        <i className="col-2 bi bi-trash3"></i>
-                    </div>
-                    <div className='col-12 d-flex align-items-center bg-white px-2 py-2'>
-                        <div className='d-flex align-items-center col-5'>
-                            <input style={{ width: '17px', height: '20px', marginRight: '8px' }} type="checkbox" name="" id="" />
-                            <img width="75px" src="https://salt.tikicdn.com/cache/750x750/ts/product/18/54/2d/3919a15dcdb692041ddec9b93971e559.png.webp" alt="" />
-                            <p>Điện thoại Nokia C30 (2GB/32GB) - Hàng chính hãng - Xanh</p>
-                        </div>
-                        <span className='col-2 fw-bold'>1.490.000đ</span>
-                        <div className='col-2'>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px' }}>-</span>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>1</span>
-                            <span style={{ border: '1px solid #ccc', padding: '1px 8px' }}>+</span>
-                        </div>
-                        <span className='col-2 text-danger fw-bold'>1.490.000đ</span>
-                        <i className="col-2 bi bi-trash3"></i>
-                    </div>
+                    }
 
                 </div>
                 <div className='col-4 px-3'>
@@ -125,29 +118,29 @@ export default function Cart() {
                     </div>
                 </div>
             </div>
-            <h3 style={{ fontSize: '21px', fontWeight: '500', fontFamily: 'Georgia, serif', width: '100%', marginTop : '20px' }}>Sản phẩm bạn quan tâm</h3>
-            <div className='d-flex mt-2  row'>
-                    {
-                        products.map((product, index) => (
-                            <CartProduct
-                                key={index}
-                                width = "210px"
-                                id={product.idProduct}
-                                image={product.image}
-                                name={product.name}
-                                price={(product.price).toLocaleString('vi-VN')}
-                            />
-                        ))
-                    }
-                    <div className='pagination-controls'>
-                        {page != 1 && (
-                            <i style={{ position: 'absolute', top: '100%', fontSize: '30px', left: '7%', cursor: 'pointer' }} onClick={handlePrevPage} className="bi bi-arrow-left-circle"></i>
-                        )}  
-                        {(totalPage > 1 && page != totalPage) && (
-                            <i style={{ position: 'absolute', top: '100%', fontSize: '30px', right: '7%', cursor: 'pointer' }} onClick={handleNextPage} className="bi bi-arrow-right-circle"></i>
-                        )}
-                    </div>
+            <h3 style={{ fontSize: '21px', fontWeight: '500', fontFamily: 'Georgia, serif', width: '100%', marginTop: '20px' }}>Sản phẩm bạn quan tâm</h3>
+            <div className='d-flex mt-2 row see_more-cart'>
+                {
+                    products.map((product, index) => (
+                        <CartProduct
+                            key={index}
+                            width="210px"
+                            id={product.idProduct}
+                            image={product.image}
+                            name={product.name}
+                            price={(product.price).toLocaleString('vi-VN')}
+                        />
+                    ))
+                }
+                <div className='pagination-controls'>
+                    {page != 1 && (
+                        <i style={{   fontSize: '30px', cursor: 'pointer' }} onClick={handlePrevPage} className="bi bi-arrow-left-circle"></i>
+                    )}
+                    {(totalPage > 1 && page != totalPage) && (
+                        <i style={{  fontSize: '30px', cursor: 'pointer' }} onClick={handleNextPage} className="bi bi-arrow-right-circle"></i>
+                    )}
                 </div>
+            </div>
         </div>
     )
 }

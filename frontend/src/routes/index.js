@@ -15,7 +15,7 @@ export const routes = [
         isShowBody : true
     }, 
     {
-        path : '/detail/:id',
+        path : '/detail/:idProduct',
         page : Detail,
         isShowHeader : true,
         isShowBody : false
@@ -48,7 +48,7 @@ export const routes = [
         isShowHeader : true,
     },
     {
-        path : '/cart',
+        path : '/cart/:idUser',
         page : Cart,
         isShowHeader : true
     }

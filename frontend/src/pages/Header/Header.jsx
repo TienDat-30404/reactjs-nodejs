@@ -9,7 +9,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logoutSuccess } from "../../redux/userSlice";
 import { logoutUser } from "../../until/tokenUser";
 import SearchAdvanced from "./SearchAdvanced";
-
 const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
     const [showModal, setShowModal] = useState(false);
     const displaySearchAdvanced = () => {
@@ -20,7 +19,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     const dispatch = useDispatch();
     const [word, setWord] = useState('');
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
-
+    const idUser = isAuthenticated && userData.dataLogin.idUser
     const handleClickLogout = () => {
         logoutUser();
         dispatch(logoutSuccess());
@@ -56,18 +55,6 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
         };
     }, [setStatusHiddenLogout]);
 
-    const navigateProfile = () => {
-        navigate('/profile-user');
-    };
-    const switchHomePage = () => {
-        navigate('/');
-    };
-
-    const switchSearch = (e) => {
-        e.preventDefault();
-        navigate(`/search?find=${word}`);
-    };
-
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
         const type = queryParams.get('type');
@@ -82,7 +69,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                 <div className="container d-flex header">
                     <div ref={headerRef} className="row col-12 bg-white" style={{ zIndex: '2' }}>
                         <div className="col-2 d-flex align-items-center">
-                            <a onClick={switchHomePage} className="navbar-brand">
+                            <a onClick={() => navigate('/')} className="navbar-brand">
                                 <ImageComponent
                                     src="https://salt.tikicdn.com/ts/upload/0e/07/78/ee828743c9afa9792cf20d75995e134e.png"
                                     width="100px"
@@ -106,7 +93,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                     className='btn btn-outline-success'
                                     type='submit'
                                     content='Search'
-                                    onClick={switchSearch}
+                                    onClick={(e) => {e.preventDefault(); navigate(`/search?find=${word}`)}}
                                 />
                             </form>
 
@@ -148,7 +135,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                     <div className={`info-avatar ${statusHiddenLogout ? 'd-block' : 'd-none'}`} style={{ zIndex: '3', boxShadow: '0px 0px 10px 0px', backgroundColor: 'white', position: 'absolute', left: '12%', top: '80%', width: '200px' }}>
                                                         <div className="d-flex align-items-center p-2 ">
                                                             <i className="bi bi-person-gear me-2"></i>
-                                                            <p onClick={navigateProfile}>Thông tin cá nhân</p>
+                                                            <p onClick={() => navigate('/profile-user')}>Thông tin cá nhân</p>
                                                         </div>
                                                         <div className="d-flex align-items-center p-2">
                                                             <i className="bi bi-box-arrow-right me-2"></i>
@@ -156,11 +143,11 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                         </div>
                                                     </div>
                                                 </li>
-                                                <li style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
+                                                <li onClick={() => navigate(`/cart/${idUser}`)} style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
                                                     <i className="bi bi-cart-check-fill"></i>
-                                                    <button class="btn position-relative">
+                                                    <button className="btn position-relative">
                                                         Giỏ hàng
-                                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                             99+
                                                         </span>
                                                     </button>

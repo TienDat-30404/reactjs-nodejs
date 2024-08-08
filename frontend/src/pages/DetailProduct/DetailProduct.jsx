@@ -2,21 +2,33 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { getDetailProduct } from '../../services/ProductService'
+import { addCart } from '../../services/CartService';
+import { useSelector } from 'react-redux';
 export default function Detail() {
-    const { id } = useParams();
+    const { idProduct } = useParams();
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+
     const [details, setDetail] = useState([])
-    const getDataDetailProduct = async (id) => {
-        const response = await getDetailProduct(id)
-        return response
-    }
 
     useEffect(() => {
         const fetchDataDetailProduct = async () => {
-            const detailProduct = await getDataDetailProduct(id)
+            const detailProduct = await getDetailProduct(idProduct)
             setDetail(detailProduct)
         }
         fetchDataDetailProduct()
-    }, [id])
+    }, [idProduct])
+
+    // add product on cart
+
+    const idUser= isAuthenticated && userData.dataLogin.idUser
+    console.log(idUser)
+    const handleAddCart = async () => {
+        await addCart({
+            idUser : idUser,
+            idProduct : idProduct,
+            quantity : 1
+        })
+    }
     return (
         <div className="container mt-3 detail">
             {details && details.detailProduct ? (
@@ -126,7 +138,7 @@ export default function Detail() {
                         <h4 className='mt-3 mb-0'>1.000.000₫</h4>
                         <div className='d-flex flex-column mt-3'>
                             <button type="button" className="btn btn-danger">Mua ngay</button>
-                            <button type="button" className="btn border-primary bg-white text-primary mt-2">Thêm vào giỏ</button>
+                            <button onClick={handleAddCart} type="button" className="btn border-primary bg-white text-primary mt-2">Thêm vào giỏ</button>
                             <button type="button" className="btn border-primary bg-white text-primary mt-2">Mua trước trả sau</button>
                         </div>
                     </div>

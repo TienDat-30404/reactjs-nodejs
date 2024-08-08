@@ -35,3 +35,17 @@
 {
     border : 1px solid #777
 }
+
+.see_more-cart 
+{
+    position: relative;
+}
+.pagination-controls
+{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    left: 0;
+}

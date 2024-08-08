@@ -5,7 +5,7 @@ export default function CartProduct({id, image, name, price, width, height }) {
     const switchDetailProduct = () => {
         navigate(`/detail/${id}`)
     }
-    
+
     return (
         <div style = {{ height : height, width : width }} onClick={switchDetailProduct} className="card column-1-5" >
             <img src={image} className="card-img-top" alt="..." />
@@ -20,7 +20,6 @@ export default function CartProduct({id, image, name, price, width, height }) {
                     <i style={{ fontSize: "11px", color: "orange" }} className="bi bi-star-half"></i>
                 </div>
                 <p style={{ fontSize: "16px" }} className="text-danger fw-bold">{price}đ</p>
-                <a className="btn btn-primary d-flex justify-content-center">Mua ngay</a>
             </div>
         </div>
     )

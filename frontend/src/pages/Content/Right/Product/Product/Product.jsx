@@ -7,16 +7,11 @@ export default function Product() {
     const [totalPage, setTotalPage] = useState(1)
     const [products, setProducts] = useState([])
 
-    const getDataProduct = async (page) => {
-        const response = await getAllProduct(page, 'idProduct', 'asc', limit )
-        setTotalPage(response.totalPages)
-        return response.products
-    }
-
     useEffect(() => {
         const fetchDatasProduct = async () => {
-            const listProduct = await getDataProduct(page)
-            setProducts(listProduct)
+            const listProduct = await getAllProduct(page, 'idProduct', 'asc',limit)
+            setProducts(listProduct.products)
+            setTotalPage(listProduct.totalPages)
         }
         fetchDatasProduct()
     }, [page])
@@ -32,7 +27,6 @@ export default function Product() {
             setPage(page - 1)
         }
     }
-    console.log(products)
     return (
         <div className='mt-2 bg-white rounded-2 product'>
             <p className="text-capitalize ms-4 pt-2 fw-bold">Gợi ý hôm nay</p>
@@ -81,16 +75,19 @@ export default function Product() {
                             </div>
                         </div>
                     </div>
-                    {
+                    {products.length > 0 ? (
                         products.map((product, index) => (
                             <CartProduct
                                 key={index}
-                                id = {product.idProduct}
+                                id={product.idProduct}
                                 image={product.image}
                                 name={product.name}
                                 price={(product.price).toLocaleString('vi-VN')}
                             />
-                        ))
+                        ))) :
+                        <div class="loading">
+                            <div class="spinner"></div>
+                        </div>
                     }
                     <div className='d-flex justify-content-center align-items-center mt-3'>
                         <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
@@ -98,7 +95,7 @@ export default function Product() {
                     </div>
                     <span className='text-center mt-2'>Page {page} of {totalPage}</span>
 
- 
+
                 </div>
             </div>
         </div>

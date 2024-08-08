@@ -1,7 +1,7 @@
-export const getAllProduct = async (page, sort='idProduct', type='asc', limit = null, idCategory = null, search = null, priceFrom = null, priceTo = null) => {
+export const getAllProduct = async (page, sortBy='idProduct', type='asc', limit = null, idCategory = null, search = null, priceFrom = null, priceTo = null) => {
     const params = new URLSearchParams({
         page,
-        sortBy: sort || 'idProduct',
+        sortBy: sortBy || 'idProduct',
         type : type || 'asc'
     });
     if (limit) {
@@ -20,7 +20,6 @@ export const getAllProduct = async (page, sort='idProduct', type='asc', limit = 
         params.append('priceTo', priceTo)
     }
     const url = `${process.env.REACT_APP_API_URL}/get-all-product?${params.toString()}`;
-    console.log(url)
     const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -40,12 +39,3 @@ export const getDetailProduct = async (id) => {
     return response.json()
 }
 
-export const searchProduct = async (word) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/search?type=${word}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-    return response.json()
-}

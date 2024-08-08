@@ -18,16 +18,12 @@ export default function Search() {
     const idCategory = params.get('idCategory') ? params.get('idCategory') : null
     const priceFrom = params.get('priceFrom') ? params.get('priceFrom') : null
     const priceTo = params.get('priceTo') ? params.get('priceTo') : null
-    const getDataSearchProduct = async (page, sort, type, limit, idCategory, word, priceFrom, priceTo) => {
-        const response = await getAllProduct(page, sort, type, limit, idCategory, word, priceFrom, priceTo)
-        console.log(response.products)   
-        setTotalPage(response.totalPages)
-        return response
-    }
+ 
     useEffect(() => {
         const fetchDatasSearchProduct = async () => {
-            const listSearchProduct = await getDataSearchProduct(page, sort, type, limit, idCategory, wordSearch, priceFrom, priceTo)
+            const listSearchProduct = await getAllProduct(page, sort, type, limit, idCategory, wordSearch, priceFrom, priceTo)
             setResultSearch(listSearchProduct)
+            setTotalPage(listSearchProduct.totalPages)
         }
         fetchDatasSearchProduct()
     }, [page, sort, type, limit, idCategory, wordSearch, priceFrom, priceTo])
@@ -48,10 +44,6 @@ export default function Search() {
     }, [wordSearch, idCategory, priceFrom, priceTo])
 
     // get name category 
-    const getDataCategory = async (idCategory) => {
-        const response = await detailCategory(idCategory)
-        return response
-    }
     useEffect(() => {
         const fetchCategoryName = async () => {
             if (idCategory) {

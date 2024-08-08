@@ -2,36 +2,37 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import CartProduct from '../../../../../components/CartProduct'
 import { getAllProduct } from '../../../../../services/ProductService'
+import { addCart } from '../../../../../services/CartService'
 export default function ProductSale() {
     const [products, setProducts] = useState([])
     const [page, setPage] = useState(1)
     const [totalPage, setTotalPage] = useState(1)
-    const getDataProduct = async (page) => {
-        const response = await getAllProduct(page, 'idProduct', 'asc')
-        setTotalPage(response.totalPages)
-        return response.products
-    }
 
-    getDataProduct(page)
+    // get all product
     useEffect(() => {
         const fetchDatasProduct = async () => {
-            const listProducts = await getDataProduct(page)
-            setProducts(listProducts)
+            const listProducts = await getAllProduct(page, 'idProduct', 'asc')
+            setProducts(listProducts.products)
+            setTotalPage(listProducts.totalPages)
         }
         fetchDatasProduct()
     }, [page])
 
+    // handle pagination next page
     const handleNextPage = () => {
         if (page < totalPage) {
             setPage(page + 1)
         }
     }
+
+    // handle pagination prev page
     const handlePrevPage = () => {
-        if(page > 1)
-        {
+        if (page > 1) {
             setPage(page - 1)
         }
     }
+
+
     return (
         <div className='mt-3 bg-white rounded-2 product-sale'>
             <div className='d-flex justify-content-between align-items-center ms-4 me-4 mb-2'>
@@ -48,18 +49,22 @@ export default function ProductSale() {
                 <p className='border rounded-5 px-3 py-1 ms-3'>Nhà Sách Tiki</p>
             </div>
             <div className='row pb-3 d-flex ms-3 product'>
-                {products.map((product, index) => (
-                    <CartProduct
-                        key={index}
-                        id={product.idProduct}
-                        image={product.image}
-                        name={product.name}
-                        price={(product.price).toLocaleString('vi-VN')}
-                    />
-                ))
+                {products.length > 0 ? (
+                    products.map((product, index) => (
+                        <CartProduct
+                            key={index}
+                            id={product.idProduct}
+                            image={product.image}
+                            name={product.name}
+                            price={(product.price).toLocaleString('vi-VN')}
+                        />
+                    ))) :
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
                 }
                 <div className='d-flex justify-content-center align-items-center mt-3'>
-                    <button disabled = {page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
+                    <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
                     <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
                 </div>
                 <span className='text-center mt-2'>Page {page} of {totalPage}</span>

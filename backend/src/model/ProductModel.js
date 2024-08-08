@@ -9,7 +9,7 @@ const ProductSchema = new Schema(
         quantity : {type : Number , required : true},
         idCategory : {type : Number, ref : 'Category', required : true},
         description : {type : String, required : true}
-    }, 
+    },
     {
         timestamps : true
     }
