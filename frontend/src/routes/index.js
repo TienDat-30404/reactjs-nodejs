@@ -6,6 +6,7 @@ import ProfileUser from "../pages/ProfileUser/ProfileUser";
 import CategoryByProduct from "../pages/Content/Right/CategoryByProduct/CategoryByProduct";
 import Cart from "../pages/Cart/Cart";
 import Search from "../pages/Search/Search";
+import Payment from "../pages/Payment/Payment.";
 export const routes = [
     {
         path : '/',
@@ -51,6 +52,11 @@ export const routes = [
         path : '/cart/:idUser',
         page : Cart,
         isShowHeader : true
+    },
+    {
+        path : '/payment',
+        page : Payment,
+        isShowHeader : false
     }
 ]
      

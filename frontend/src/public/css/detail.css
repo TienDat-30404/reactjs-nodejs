@@ -46,4 +46,9 @@
   left: 0;
 }
 
+.hover_quantity-cart:hover {
+  cursor: default;
+  background-color: #ccc;
+}
+
 /*# sourceMappingURL=detail.css.map */

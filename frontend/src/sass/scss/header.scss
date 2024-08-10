@@ -123,3 +123,13 @@ a
     z-index : 2;
     box-shadow: 0px 0px 10px 1px;
 }
+.border_paymeny-header
+{
+    position : absolute;
+    content : "";
+    width : 1px;
+    height : 35px;
+    background-color: rgb(26, 148, 255);
+    top : 30%;
+    left : 33%;
+}

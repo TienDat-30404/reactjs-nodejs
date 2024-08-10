@@ -63,6 +63,17 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
         }
     }, [window.location.search]);
 
+    const switchCart = () => {
+        console.log("123")
+        if(isAuthenticated)
+        {
+            navigate(`/cart/${idUser}`)
+        }
+        else 
+        {
+            alert("Vui lòng đăng nhập")
+        }
+    }
     return (
         <div>
             <div className="bg-white">
@@ -143,7 +154,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                         </div>
                                                     </div>
                                                 </li>
-                                                <li onClick={() => navigate(`/cart/${idUser}`)} style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
+                                                <li onClick={switchCart} style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
                                                     <i className="bi bi-cart-check-fill"></i>
                                                     <button className="btn position-relative">
                                                         Giỏ hàng

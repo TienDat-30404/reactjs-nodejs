@@ -25,3 +25,25 @@ export const getAllCart = async(idUser, page, sortBy='idCart', type='asc') => {
     })
     return response.json()
 }
+
+
+export const deleteCart = async(idCart) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-cart/${idCart}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    return response.json()
+}
+
+export const updateQuantityCart = async(idCart, quantity) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/update-quantity-cart/${idCart}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body : JSON.stringify({quantity})
+    })
+    return response.json()
+}
