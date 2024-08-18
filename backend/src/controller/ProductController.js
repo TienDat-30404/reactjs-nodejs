@@ -63,7 +63,6 @@ const getAllProduct = async (req, res, next) => {
         const type = req.query.type === "asc" ? 1 : -1  // nếu là 1 thì sắp xếp tăng dần và ngược lại
         const objectSort = {}
         objectSort[sortBy] = type
-        console.log(objectSort)
         const objectFilter = {}
         if (req.query.idCategory) {
             objectFilter.idCategory = req.query.idCategory;

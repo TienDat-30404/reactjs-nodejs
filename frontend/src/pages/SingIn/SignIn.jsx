@@ -14,7 +14,6 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
     try {
       const data = await signInService(userData)
       if (data.errors) {
-
         setErrors(data.errors);
       }
       else {
@@ -50,7 +49,7 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 type="text"
-                className={`form-control ${errors.name ? 'is-invalid' : ''} `} aria-describedby="passwordHelpBlock"
+                className={`form-control ${errors.name ? 'is-invalid' : ''} `} 
               />
               {errors.name && <ErrorMessageInput errors={errors} field="name" />}
             </div>

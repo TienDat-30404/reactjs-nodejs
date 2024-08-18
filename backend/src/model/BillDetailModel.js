@@ -5,13 +5,13 @@ const BillDetaiSchema = new Schema(
     {
         idBill : {type : Number, ref : 'Bill', required : true},
         idProduct : {type : Number, ref : 'Product', required : true},
-        quantity : {type : Number, required : true}
+        quantity : {type : Number}
     },
     { timestamps: true });
 
 
 // Thêm plugin AutoIncrement để tự động tăng giá trị của 'id'
-BillDetaiSchema.plugin(AutoIncrement, { inc_field: 'idCart' });
+BillDetaiSchema.plugin(AutoIncrement, { inc_field: 'idBillDetail' });
 
-const Cart = mongoose.model('Cart', BillDetaiSchema);
-module.exports = Cart;
+const BillDetail = mongoose.model('BillDetail', BillDetaiSchema);
+module.exports = BillDetail;

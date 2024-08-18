@@ -5,10 +5,9 @@ const addCart = async (req, res, next) => {
     try 
     {
         const {idUser, idProduct, quantity} = req.body
-        console.log(idUser)
         const newCart = new Cart({idUser, idProduct, quantity})
         await newCart.save()
-        return res.status(200).json(newCart)
+        return res.status(200).json({newCart})
     }
     catch(error)
     {
@@ -26,12 +25,10 @@ const getAllCart = async (req, res, next) => {
         const type = req.query.type === "asc" ? 1 : -1
         const objectSort = {}
         objectSort[sortBy] = type
-        console.log(objectSort)
         const cart = await Cart.find({ idUser: idUser })
                                .skip(startPage)
                                .limit(limit)
                                .sort(objectSort)
-        console.log(cart)
         const totalProductInCart = (await Cart.find({idUser : idUser})).length
         const totalPages = Math.ceil(totalProductInCart / limit)
         

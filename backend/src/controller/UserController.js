@@ -165,7 +165,6 @@ const refreshToken = async (req, res, next) => {
     }
     catch(error)
     {
-        console.log(error);
         if (error.name === 'TokenExpiredError') {
             res.status(401).json({ message: "Token has expired" });
         } else {
@@ -190,7 +189,4 @@ const logoutRefreshToken = (req, res, next) => {
 
 }
 
-const refreshTokenWhenUpdateUser = (req, res, next) => {
-    
-}
 module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken}

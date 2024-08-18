@@ -3,13 +3,18 @@ import ImageComponent from '../../components/ImageComponent'
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { InputComponent } from '../../components/InputComponent';
+import { ErrorMessageInput } from '../../components/InputComponent';
+import { addBill } from '../../services/BillService';
 export default function Payment() {
     const { isAuthenticated, userData } = useSelector(state => state.auth)
-
+    const idUser = isAuthenticated && userData.dataLogin.idUser
     const location = useLocation();
     const { cartsCheck } = location.state || {};
-    console.log(cartsCheck)
 
+    // total Price
+    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.price * cart.quantityCart), 0)
+
+    const [errors, setErrors] = useState({})
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
     const [wards, setWards] = useState([])
@@ -23,6 +28,7 @@ export default function Payment() {
         ward: '',
         address: ''
     })
+
     const [showPayment, setShowPayment] = useState('payLater')
     const displayDefaultInformation = useCallback(() => {
         if (isAuthenticated && userData?.dataLogin) {
@@ -59,7 +65,7 @@ export default function Payment() {
         }
         fetchDataProvince()
     }, [])
-
+   
     // fetch data district 
     useEffect(() => {
         const fetchDatasDistrict = async () => {
@@ -69,7 +75,6 @@ export default function Payment() {
         }
         fetchDatasDistrict()
     }, [informations.province])
-    console.log(informations)
     // fetch data ward
     useEffect(() => {
         const fetchDatasWard = async () => {
@@ -82,7 +87,7 @@ export default function Payment() {
 
     // fetch data Bank
     useEffect(() => {
-        const fetchDatasBank = async() => {
+        const fetchDatasBank = async () => {
             const response = await fetch('https://api.vietqr.io/v2/banks')
             const result = await response.json()
             setBanks(result.data)
@@ -98,7 +103,38 @@ export default function Payment() {
             [name]: value
         }));
     };
-
+    // handle button buy Product
+    const handleBuy = async () => {
+        const response = await addBill({
+            idUser,
+            totalPrice,
+            phone: informations.phone,
+            address : 
+                informations.province && informations.district && informations.ward
+                ?  ` ${provinces.find(province => province.id === informations.province).name}, ${districts.find(district => district.id === informations.district).name}, ${wards.find(ward => ward.id === informations.ward).name}, ${informations.address}`
+                : 
+                    "",
+            "paymentMethod": "credit_card",
+            "bankAccount": "1234567890",
+            "products": [
+                {
+                    "idProduct": 1,
+                    "quantity": 2,
+                    "price": 50000
+                },
+                {
+                    "idProduct": 2,
+                    "quantity": 1,
+                    "price": 50000
+                }
+            ]
+        })
+        if(response.errors)
+        {
+            setErrors(response.errors)
+        }
+        console.log(response)
+    }
     return (
         <div>
             <div className='w-100 bg-white'>
@@ -135,14 +171,18 @@ export default function Payment() {
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
                                 <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Số điện thoại</label>
-                                <InputComponent
-                                    name="phone"
-                                    value={informations.phone}
-                                    onChange={handleChangeInput}
-                                    type="text"
-                                    className='form-control'
-                                    style={{ width: '350px', height: '35px', border: '1px solid #ccc' }}
-                                />
+                                <div>
+                                    <InputComponent
+                                        name="phone"
+                                        value={informations.phone}
+                                        onChange={handleChangeInput}
+                                        type="text"
+                                        className={`form-control ${errors.phone ? 'is-invalid' : ''} `} 
+                                        style={{ width: '350px', height: '35px', border: '1px solid #ccc' }}
+                                    />
+                                    {errors.phone && <ErrorMessageInput errors={errors} field="phone" />}
+                                </div>
+
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
                                 <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Tỉnh/Thành phố</label>
@@ -218,26 +258,26 @@ export default function Payment() {
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center align-items-center'>
                                 <div class="form-check me-5">
-                                    <InputComponent 
+                                    <InputComponent
                                         value="payNow"
                                         onChange={(e) => setShowPayment(e.target.value)}
                                         checked={showPayment === 'payNow'}
-                                        style = {{ border : '1px solid #ccc' }} class="form-check-input" 
-                                        type="radio" 
-                                        name="flexRadioDefault" 
+                                        style={{ border: '1px solid #ccc' }} class="form-check-input"
+                                        type="radio"
+                                        name="flexRadioDefault"
                                     />
                                     <label class="form-check-label" for="flexRadioDefault1">
                                         Thanh toán ngay
                                     </label>
                                 </div>
-                                <div class="form-check">    
-                                    <InputComponent 
-                                        value="payLater"    
+                                <div class="form-check">
+                                    <InputComponent
+                                        value="payLater"
                                         onChange={(e) => setShowPayment(e.target.value)}
                                         checked={showPayment === 'payLater'}
-                                        style = {{ border : '1px solid #ccc' }} 
-                                        class="form-check-input" type="radio" 
-                                        name="flexRadioDefault"     
+                                        style={{ border: '1px solid #ccc' }}
+                                        class="form-check-input" type="radio"
+                                        name="flexRadioDefault"
                                     />
                                     <label class="form-check-label" for="flexRadioDefault2">
                                         Thanh toán khi đã nhận hàng
@@ -263,7 +303,7 @@ export default function Payment() {
                                                 <option disabled>Not Found</option>
                                             }
                                         </select>
-                                    </div>  
+                                    </div>
                                     <div className='col-auto mb-3 d-flex justify-content-center'>
                                         <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Số tài khoản</label>
                                         <InputComponent
@@ -287,6 +327,7 @@ export default function Payment() {
                                     Hủy bỏ
                                 </button>
                                 <button
+                                    onClick={handleBuy}
                                     type="button"
                                     style={{ border: '1px solid black' }}
                                     className="btn btn-info text-white ms-3">
@@ -300,3 +341,28 @@ export default function Payment() {
         </div>
     )
 }
+
+
+/*
+    {
+    "idUser": 1,
+    "idStaff": 2,
+    "totalPrice": 150000,
+    "phone" : "434242",
+    "address": "123 Đường ABC, Quận 1, TP.HCM",
+    "paymentMethod": "credit_card",
+    "bankAccount": "1234567890",
+    "products": [
+        {
+            "idProduct": 1,
+            "quantity": 2,
+            "price": 50000
+        },
+        {
+            "idProduct": 2,
+            "quantity": 1,
+            "price": 50000
+        }
+    ]
+}
+ */

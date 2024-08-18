@@ -2,7 +2,6 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import CartProduct from '../../../../../components/CartProduct'
 import { getAllProduct } from '../../../../../services/ProductService'
-import { addCart } from '../../../../../services/CartService'
 export default function ProductSale() {
     const [products, setProducts] = useState([])
     const [page, setPage] = useState(1)

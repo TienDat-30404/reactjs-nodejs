@@ -3,8 +3,8 @@ const Category = require('../model/CategoryModel')
 const addCategory = async (req, res, next) => {
     try 
     {
-        const {name} = req.body
-        const newCategory = new Category({name})
+        const {name, image} = req.body
+        const newCategory = new Category({name, image})
         await newCategory.save()
         return res.status(200).json(Category)
     }

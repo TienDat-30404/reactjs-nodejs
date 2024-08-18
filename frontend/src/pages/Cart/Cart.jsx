@@ -27,7 +27,6 @@ export default function Cart() {
                 getAllProduct(page, 'idProduct', 'asc', limit),
                 getAllCart(idUser, pageCart, sortBy, type)
             ])
-            console.log(cart)
             setProducts(listProduct.products)
             setTotalPage(listProduct.totalPages)
 
