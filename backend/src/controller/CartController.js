@@ -99,5 +99,10 @@ const updateQuantityCart = async(req, res, next) => {
     }
 }
 
+const getAllCartWhichNoPaginated = async(req, res, next) => {
+    const idUser = req.params.idUser;
+    const carts = await Cart.find({idUser : idUser})
+    return res.status(200).json({carts})
+}
 
-module.exports = {addCart, getAllCart, deleteCart, updateQuantityCart}
+module.exports = {addCart, getAllCart, deleteCart, updateQuantityCart, deleteCart, getAllCartWhichNoPaginated}

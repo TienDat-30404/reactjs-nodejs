@@ -1,19 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { InputComponent, ErrorMessageInput } from '../../components/InputComponent';
-import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
+import { setCookieForToken, useSaveTokenOnRedux, useSaveCartOnRedux } from '../../until/tokenUser';
 import { jwtDecode } from 'jwt-decode';
+import { useSelector, useDispatch } from 'react-redux';
+import { allCartOfUser } from '../../services/CartService';
 import { loginService } from '../../services/UserService';
 function LoginModal({ show, handleClose, switchSignIn }) {
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const dataLogin = { email, password }
   const [errors, setErrors] = useState({})
   const saveTokenOnRedux = useSaveTokenOnRedux();
+  const saveCartOnRedux = useSaveCartOnRedux();
+
+
   const handleClickLogin = async () => {
     try {
-      const userData = await loginService(dataLogin)
-      if (userData.errors) {
-        setErrors(userData.errors)  
+      const response = await loginService(dataLogin)
+      if (response.errors) {
+        setErrors(response.errors)
         return
       }
       else {
@@ -22,16 +28,18 @@ function LoginModal({ show, handleClose, switchSignIn }) {
         setPassword('')
         handleClose()
         alert("Đăng nhập thành công")
-        setCookieForToken(userData.token)
-        saveTokenOnRedux(jwtDecode(userData.token))
-        localStorage.setItem('avatar', userData.avatar)
+        setCookieForToken(response.token)
+        saveTokenOnRedux(jwtDecode(response.token))
+        localStorage.setItem('avatar', response.avatar)
+
+        const cartResponse = await allCartOfUser(jwtDecode(response.token).idUser);
+        saveCartOnRedux(cartResponse.carts, cartResponse.carts.length);
       }
     }
     catch (error) {
       console.error(error)
     }
   }
-
   const handleCloseModal = () => {
     setEmail('')
     setPassword('')

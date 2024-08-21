@@ -2,14 +2,20 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { getDetailProduct } from '../../services/ProductService'
-import { addCart } from '../../services/CartService';
+import { addCart, allCartOfUser } from '../../services/CartService';
 import { useSelector } from 'react-redux';
 export default function Detail() {
     const { idProduct } = useParams();
+
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idUser = isAuthenticated && userData.dataLogin.idUser
 
+    const [show, setShow] = useState({
+        display : false,
+        status : 'success',
+    })
     const [details, setDetail] = useState([])
-
+    const [carts, setCarts] = useState([])
     useEffect(() => {
         const fetchDataDetailProduct = async () => {
             const detailProduct = await getDetailProduct(idProduct)
@@ -18,19 +24,87 @@ export default function Detail() {
         fetchDataDetailProduct()
     }, [idProduct])
 
-    // add product on cart
+    // get All Cart of User to handle add product on cart 
+    useEffect(() => {
+        const fetchDatasCart = async () => {
+            if (idUser) {
+                const response = await allCartOfUser(idUser);
+                setCarts(response.carts);
+            }
+        }
+        fetchDatasCart()
+    }, [idUser])
 
-    const idUser= isAuthenticated && userData.dataLogin.idUser
-    console.log(idUser)
+    // add product on cart
     const handleAddCart = async () => {
+        const isCheckExistCart = carts.find(cart => cart.idProduct == idProduct)
+        console.log(isCheckExistCart)
+        if (isCheckExistCart) {
+            setShow({
+                display : true,
+                status : 'fail'
+            })
+            setTimeout(() => {
+            setShow({
+                display : false,
+                status : 'success',
+            }); // Bắt đầu mờ dần sau 3 giây
+        }, 2000);
+            return
+        }
         await addCart({
-            idUser : idUser,
-            idProduct : idProduct,
-            quantity : 1
+            idUser: idUser,
+            idProduct: idProduct,
+            quantity: 1
         })
+        setCarts(prev => [
+            ...prev,
+            {
+                idUser: idUser,
+                idProduct: idProduct,
+                quantity: 1
+            }
+        ])
+
+        setShow({
+            display : true,
+            status : 'success'
+        })
+        setTimeout(() => {
+            setShow({
+                display : false,
+                status : 'success',
+            }); // Bắt đầu mờ dần sau 3 giây
+        }, 2000);
+        console.log(carts)
     }
+
+
     return (
         <div className="container mt-3 detail">
+
+            <div className={`toast toast_add-cart ${show.display ? 'd-block' : 'd-none'} ${show.status == 'success' ? 'bg-success' : 'bg-danger'}`} role="alert" aria-live="assertive" aria-atomic="true">
+                <div className="toast-header">
+                    {show.status == 'success' ? (
+
+                        <i style = {{ fontSize : '15px' }} className="bi bi-check-circle me-2"></i>
+                    ) : 
+                        <i class="bi bi-x-circle me-2"></i>
+                    }
+
+                    {show.status == 'success' ? (
+                        <strong className="me-auto">Congratulation</strong>
+                    ): 
+                        <strong className="me-auto">Error</strong>
+                    }
+                    <small>View to Cart</small>
+                    <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div className="toast-body bg-white">
+                    {show.status == 'success' ? 'Thêm sản phẩm vào giỏ hàng thành công' : 'Sản phẩm đã được thêm vào giỏ hàng'}
+                </div>
+            </div>
+
             {details && details.detailProduct ? (
 
                 <div style={{ marginLeft: '10px', marginRight: '10px' }} className="row col-12 rounded-3">
@@ -144,8 +218,8 @@ export default function Detail() {
                     </div>
                 </div>
             ) : (
-                <div class="loading">
-                    <div class="spinner"></div>
+                <div className="loading">
+                    <div className="spinner"></div>
                 </div>
             )}
         </div>

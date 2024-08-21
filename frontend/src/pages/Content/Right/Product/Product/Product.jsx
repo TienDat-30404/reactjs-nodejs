@@ -85,8 +85,8 @@ export default function Product() {
                                 price={(product.price).toLocaleString('vi-VN')}
                             />
                         ))) :
-                        <div class="loading">
-                            <div class="spinner"></div>
+                        <div className="loading">
+                            <div className="spinner"></div>
                         </div>
                     }
                     <div className='d-flex justify-content-center align-items-center mt-3'>

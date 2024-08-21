@@ -70,3 +70,33 @@ p
 {
     padding-top : 0;
 }
+.toast_add-cart {
+    position: absolute;
+    top: 15%;
+    right: 0;
+    z-index: 2;
+    opacity: 1;
+    animation: slideAdd ease 0.7s, fadeAdd linear 1.2s 1s forwards;
+
+}
+
+@keyframes slideAdd
+{
+    from 
+    {
+        opacity: 0;
+        transform : translateX(calc(100% + 20px))
+    }
+    to 
+    {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+@keyframes fadeAdd 
+{
+    to 
+    {
+        opacity : 0
+    }
+}

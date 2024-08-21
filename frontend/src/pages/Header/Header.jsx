@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logoutSuccess } from "../../redux/userSlice";
 import { logoutUser } from "../../until/tokenUser";
 import SearchAdvanced from "./SearchAdvanced";
+import { allCartOfUser } from "../../services/CartService";
 const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
     const [showModal, setShowModal] = useState(false);
     const displaySearchAdvanced = () => {
@@ -18,7 +19,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [word, setWord] = useState('');
-    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const { isAuthenticated, userData, dataCart } = useSelector((state) => state.auth);
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const handleClickLogout = () => {
         logoutUser();
@@ -64,7 +65,6 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     }, [window.location.search]);
 
     const switchCart = () => {
-        console.log("123")
         if(isAuthenticated)
         {
             navigate(`/cart/${idUser}`)
@@ -74,6 +74,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
             alert("Vui lòng đăng nhập")
         }
     }
+
     return (
         <div>
             <div className="bg-white">
@@ -159,7 +160,10 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                     <button className="btn position-relative">
                                                         Giỏ hàng
                                                         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                            99+
+                                                            {/* {dataCart.length > 0 ? (
+                                                                dataCart.length
+                                                            ) : '0'
+                                                            } */}
                                                         </span>
                                                     </button>
                                                 </li>

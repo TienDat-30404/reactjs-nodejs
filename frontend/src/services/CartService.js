@@ -9,6 +9,7 @@ export const addCart = async (data) => {
     return response.json()
 }
 
+// lấy sp có phân trang
 export const getAllCart = async(idUser, page, sortBy='idCart', type='asc') => {
     const params = new URLSearchParams({
         idUser,
@@ -44,6 +45,17 @@ export const updateQuantityCart = async(idCart, quantity) => {
             'Content-Type': 'application/json',
         },
         body : JSON.stringify({quantity})
+    })
+    return response.json()
+}
+
+// lấy sp ko phân trang
+export const allCartOfUser = async(idUser) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get-cart-no-paginated/${idUser}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
     })
     return response.json()
 }

@@ -9,7 +9,6 @@ export default function Cart() {
     const limit = 6
     const [totalPage, setTotalPage] = useState(1)
     const [products, setProducts] = useState([])
-
     const [page, setPage] = useState(1)
     const [pageCart, setPageCart] = useState(1)
     const [totalPageCart, setTotalPageCart] = useState(1)
@@ -33,6 +32,7 @@ export default function Cart() {
             setCart(cart.listCart)
             setTotalPageCart(cart.totalPages)
             setTotalProductInCart(cart.totalProductInCart)
+
         }
         fetchDatas()
     }, [page, pageCart, idUser, sortBy, type])
@@ -142,9 +142,10 @@ export default function Cart() {
     // switch payment
     const switchPayment = () => {
         if (cartsCheck.length > 0) {
-            navigate('/payment', {state: { cartsCheck }})
+            navigate('/payment', { state: { cartsCheck } })
         }
     }
+    console.log(carts)
     return (
         <div className='col-12 container mt-4'>
             <h3 style={{ fontSize: '21px', fontWeight: '500', fontFamily: 'Georgia, serif', width: '100%' }}>GIỎ HÀNG</h3>
@@ -167,6 +168,7 @@ export default function Cart() {
                                 <div key={index} className='col-12 d-flex align-items-center bg-white px-2 py-2'>
                                     <div className='d-flex align-items-center col-5'>
                                         <input
+                                            checked={cartsCheck.some(item => item.idCart === cart.idCart)}
                                             onChange={() => handleChangeCheckInput(cart)}
                                             style={{ width: '17px', height: '20px', marginRight: '8px' }}
                                             type="checkbox" name="" id=""
@@ -246,7 +248,7 @@ export default function Cart() {
                                 <p style={{ fontSize: '14px' }}>Vui lòng chọn sản phẩm nếu có</p>
                             }
                         </div>
-                        <button disabled = {cartsCheck <= 0} onClick={switchPayment} className='btn btn-danger col-12 mt-1 mb-3'>Mua hàng
+                        <button disabled={cartsCheck <= 0} onClick={switchPayment} className='btn btn-danger col-12 mt-1 mb-3'>Mua hàng
                             <span style={{ color: 'white', paddingLeft: '3px' }}>({cartsCheck.length})</span>
                         </button>
                     </div>

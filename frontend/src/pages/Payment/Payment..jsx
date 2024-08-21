@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import ImageComponent from '../../components/ImageComponent'
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { InputComponent } from '../../components/InputComponent';
 import { ErrorMessageInput } from '../../components/InputComponent';
 import { addBill } from '../../services/BillService';
 export default function Payment() {
+    const nagigate = useNavigate()
     const { isAuthenticated, userData } = useSelector(state => state.auth)
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const location = useLocation();
     const { cartsCheck } = location.state || {};
-
     // total Price
     const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.price * cart.quantityCart), 0)
 
@@ -26,7 +26,9 @@ export default function Payment() {
         province: '',
         district: '',
         ward: '',
-        address: ''
+        address: '',
+        paymentMethod : '',
+        bankAccount : ''
     })
 
     const [showPayment, setShowPayment] = useState('payLater')
@@ -39,7 +41,9 @@ export default function Payment() {
                 province: '',
                 district: '',
                 ward: '',
-                address: ''
+                address: '',
+                paymentMethod : '',
+                bankAccount : ''
             })
         } else {
             setInformations({
@@ -48,7 +52,9 @@ export default function Payment() {
                 province: '',
                 district: '',
                 ward: '',
-                address: ''
+                address: '',
+                paymentMethod : '',
+                bankAccount : ''
             })
         }
     }, [isAuthenticated, userData])
@@ -94,7 +100,6 @@ export default function Payment() {
         }
         fetchDatasBank()
     }, [])
-
     // set value Input
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
@@ -105,35 +110,30 @@ export default function Payment() {
     };
     // handle button buy Product
     const handleBuy = async () => {
+        
         const response = await addBill({
             idUser,
             totalPrice,
             phone: informations.phone,
             address : 
-                informations.province && informations.district && informations.ward
+                informations.province && informations.district && informations.ward && informations.address
                 ?  ` ${provinces.find(province => province.id === informations.province).name}, ${districts.find(district => district.id === informations.district).name}, ${wards.find(ward => ward.id === informations.ward).name}, ${informations.address}`
                 : 
-                    "",
-            "paymentMethod": "credit_card",
-            "bankAccount": "1234567890",
-            "products": [
-                {
-                    "idProduct": 1,
-                    "quantity": 2,
-                    "price": 50000
-                },
-                {
-                    "idProduct": 2,
-                    "quantity": 1,
-                    "price": 50000
-                }
-            ]
+                    "", 
+            paymentMethod : informations.paymentMethod ? 
+                banks.find(bank => bank.id === parseInt(informations.paymentMethod)).name : 'Thanh toán sau khi nhận hàng',
+                
+            bankAccount : informations.bankAccount,
+            products : cartsCheck
+
         })
         if(response.errors)
         {
             setErrors(response.errors)
+            return
         }
-        console.log(response)
+        alert("Đặt hàng thành công")
+        nagigate('/')
     }
     return (
         <div>
@@ -186,75 +186,87 @@ export default function Payment() {
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
                                 <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Tỉnh/Thành phố</label>
-                                <select
-                                    name="province"
-                                    value={informations.province}
-                                    onChange={handleChangeInput}
-                                    className='form-control'
-                                    style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
-                                >
-                                    <option value="">Chọn tỉnh/Thành phố</option>
-                                    {provinces && provinces.length > 0 ?
-                                        (
-                                            provinces.map((province, index) => (
-                                                <option value={province.id} key={index}>{province.name}</option>
-                                            ))
-                                        ) :
-                                        <option></option>
-                                    }
-                                </select>
+                                <div>
+
+                                    <select
+                                        name="province"
+                                        value={informations.province}
+                                        onChange={handleChangeInput}
+                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `} 
+                                        style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
+                                    >
+                                        <option value="">Chọn tỉnh/Thành phố</option>
+                                        {provinces && provinces.length > 0 ?
+                                            (
+                                                provinces.map((province, index) => (
+                                                    <option value={province.id} key={index}>{province.name}</option>
+                                                ))
+                                            ) :
+                                            <option></option>
+                                        }
+                                    </select>
+                                    {informations.province === "" && <ErrorMessageInput errors={errors} field="address" />}
+                                </div>
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
                                 <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Quận/Huyện</label>
-                                <select
-                                    name="district"
-                                    value={informations.district}
-                                    onChange={handleChangeInput}
-                                    className='form-control'
-                                    style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
-                                >
-                                    <option value="">Chọn Quận/Huyện</option>
-                                    {districts && districts.length > 0 ?
-                                        (
-                                            districts.map((district, index) => (
-                                                <option value={district.id} key={index}>{district.name}</option>
-                                            ))
-                                        ) :
-                                        <option disabled>Not Found</option>
-                                    }
-                                </select>
+                                <div>
+                                    <select
+                                        name="district"
+                                        value={informations.district}
+                                        onChange={handleChangeInput}
+                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `} 
+                                        style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
+                                    >
+                                        <option value="">Chọn Quận/Huyện</option>
+                                        {districts && districts.length > 0 ?
+                                            (
+                                                districts.map((district, index) => (
+                                                    <option value={district.id} key={index}>{district.name}</option>
+                                                ))
+                                            ) :
+                                            <option disabled>Not Found</option>
+                                        }
+                                    </select>
+                                    {informations.district === "" && <ErrorMessageInput errors={errors} field="address" />}
+                                </div>
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
                                 <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Phường/Xã</label>
-                                <select
-                                    name="ward"
-                                    value={informations.ward}
-                                    onChange={handleChangeInput}
-                                    className='form-control'
-                                    style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
-                                >
-                                    <option value="">Chọn Phường/Xã</option>
-                                    {wards && wards.length > 0 ?
-                                        (
-                                            wards.map((ward, index) => (
-                                                <option value={ward.id} key={index}>{ward.name}</option>
-                                            ))
-                                        ) :
-                                        <option disabled>Not Found</option>
-                                    }
-                                </select>
+                                <div>
+                                    <select
+                                        name="ward"
+                                        value={informations.ward}
+                                        onChange={handleChangeInput}
+                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `} 
+                                        style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
+                                    >
+                                        <option value="">Chọn Phường/Xã</option>
+                                        {wards && wards.length > 0 ?
+                                            (
+                                                wards.map((ward, index) => (
+                                                    <option value={ward.id} key={index}>{ward.name}</option>
+                                                ))
+                                            ) :
+                                            <option disabled>Not Found</option>
+                                        }
+                                    </select>
+                                    {informations.ward === "" && <ErrorMessageInput errors={errors} field="address" />}
+                                </div>
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
                                 <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Địa chỉ</label>
-
-                                <textarea
-                                    name="address"
-                                    value={informations.address}
-                                    onChange={handleChangeInput}
-                                    style={{ width: '350px', height: '55px', border: '1px solid #ccc' }}
-                                    className='form-control'
-                                >
-                                </textarea>
+                                <div>
+                                    <textarea
+                                        name="address"
+                                        value={informations.address}
+                                        onChange={handleChangeInput}
+                                        style={{ width: '350px', height: '55px', border: '1px solid #ccc' }}
+                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `} 
+                                    >
+                                    </textarea>
+                                    {informations.address === "" && <ErrorMessageInput errors={errors} field="address" />}
+                                </div>
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center align-items-center'>
                                 <div class="form-check me-5">
@@ -290,6 +302,9 @@ export default function Payment() {
                                     <div className='col-auto mb-3 d-flex justify-content-center'>
                                         <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Phương thức thanh toán</label>
                                         <select
+                                            name="paymentMethod"
+                                            value={informations.paymentMethod}
+                                            onChange={handleChangeInput}
                                             className='form-control'
                                             style={{ width: '350px', height: '40px', border: '1px solid #cccc' }}
                                         >
@@ -307,8 +322,8 @@ export default function Payment() {
                                     <div className='col-auto mb-3 d-flex justify-content-center'>
                                         <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Số tài khoản</label>
                                         <InputComponent
-                                            name="phone"
-                                            value={informations.phone}
+                                            name="bankAccount"
+                                            value={informations.bankAccount}
                                             onChange={handleChangeInput}
                                             type="text"
                                             className='form-control'

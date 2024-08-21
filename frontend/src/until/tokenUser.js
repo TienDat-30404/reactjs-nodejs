@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import { loginSuccess } from '../redux/userSlice';
+import { loginSuccess, setCartRedux } from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
 
 const setCookieForToken = (token) => {
@@ -14,12 +14,19 @@ const useSaveTokenOnRedux = () => {
             dataLogin : dataLogin
         }));
     };
-
     return saveTokenOnRedux;
 };
 
-
-
+const useSaveCartOnRedux = () => { // tên đặt phải bắt buộc phải viết use đầu hoặc ghi hoa
+    const dispatch = useDispatch();
+    const saveCartOnRedux = (carts, length) => {
+        dispatch(setCartRedux({
+            dataCart : carts,
+            length : length
+        }))
+    }
+    return saveCartOnRedux
+}
 
 
 const logoutUser = async () => {
@@ -34,4 +41,4 @@ const logoutUser = async () => {
     localStorage.removeItem('avatar')
 }
 
-export { setCookieForToken, useSaveTokenOnRedux, logoutUser }
+export { setCookieForToken, useSaveTokenOnRedux, logoutUser, useSaveCartOnRedux }
