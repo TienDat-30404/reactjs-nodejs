@@ -1,9 +1,8 @@
 import { setCookieForToken, useSaveTokenOnRedux, useSaveCartOnRedux } from "./tokenUser";
 import Cookies from 'js-cookie'
 import { jwtDecode } from "jwt-decode";
-import { loginSuccess, setCartRedux } from "../redux/userSlice";
+import { loginSuccess } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
 import { refreshTokenService } from "../services/UserService";
 import { allCartOfUser } from "../services/CartService";
 import { useState } from "react";

@@ -5,7 +5,12 @@ import { getAllProduct } from '../../services/ProductService'
 import { getAllCart, deleteCart, updateQuantityCart } from '../../services/CartService'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux';
+import { useSaveCartOnRedux } from '../../until/tokenUser'
+import { resetCartRedux } from '../../redux/userSlice'
 export default function Cart() {
+    const dispatch = useDispatch()
+    const saveCartOnRedux = useSaveCartOnRedux()
     const limit = 6
     const [totalPage, setTotalPage] = useState(1)
     const [products, setProducts] = useState([])
@@ -73,7 +78,8 @@ export default function Cart() {
 
             const updateCart = carts.filter(cart => cart.idCart != idCart)
             setCart(updateCart)
-
+            // dispatch(resetCartRedux())
+            saveCartOnRedux(updateCart, updateCart.length)
             setTotalProductInCart(totalProductInCart - 1)
 
             const updateTotalPrice = cartsCheck.filter(cart => cart.idCart != idCart)
@@ -145,7 +151,6 @@ export default function Cart() {
             navigate('/payment', { state: { cartsCheck } })
         }
     }
-    console.log(carts)
     return (
         <div className='col-12 container mt-4'>
             <h3 style={{ fontSize: '21px', fontWeight: '500', fontFamily: 'Georgia, serif', width: '100%' }}>GIỎ HÀNG</h3>

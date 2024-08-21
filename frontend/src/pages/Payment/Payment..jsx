@@ -5,12 +5,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { InputComponent } from '../../components/InputComponent';
 import { ErrorMessageInput } from '../../components/InputComponent';
 import { addBill } from '../../services/BillService';
+import { useSaveCartOnRedux } from '../../until/tokenUser';
 export default function Payment() {
+    const saveCartOnRedux = useSaveCartOnRedux()
     const nagigate = useNavigate()
-    const { isAuthenticated, userData } = useSelector(state => state.auth)
+    let { isAuthenticated, userData, dataCart } = useSelector(state => state.auth)
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const location = useLocation();
-    const { cartsCheck } = location.state || {};
+    let { cartsCheck } = location.state || {};
     // total Price
     const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.price * cart.quantityCart), 0)
 
@@ -27,8 +29,8 @@ export default function Payment() {
         district: '',
         ward: '',
         address: '',
-        paymentMethod : '',
-        bankAccount : ''
+        paymentMethod: '',
+        bankAccount: ''
     })
 
     const [showPayment, setShowPayment] = useState('payLater')
@@ -42,8 +44,8 @@ export default function Payment() {
                 district: '',
                 ward: '',
                 address: '',
-                paymentMethod : '',
-                bankAccount : ''
+                paymentMethod: '',
+                bankAccount: ''
             })
         } else {
             setInformations({
@@ -53,8 +55,8 @@ export default function Payment() {
                 district: '',
                 ward: '',
                 address: '',
-                paymentMethod : '',
-                bankAccount : ''
+                paymentMethod: '',
+                bankAccount: ''
             })
         }
     }, [isAuthenticated, userData])
@@ -71,7 +73,7 @@ export default function Payment() {
         }
         fetchDataProvince()
     }, [])
-   
+
     // fetch data district 
     useEffect(() => {
         const fetchDatasDistrict = async () => {
@@ -110,28 +112,30 @@ export default function Payment() {
     };
     // handle button buy Product
     const handleBuy = async () => {
-        
+
         const response = await addBill({
             idUser,
             totalPrice,
             phone: informations.phone,
-            address : 
+            address:
                 informations.province && informations.district && informations.ward && informations.address
-                ?  ` ${provinces.find(province => province.id === informations.province).name}, ${districts.find(district => district.id === informations.district).name}, ${wards.find(ward => ward.id === informations.ward).name}, ${informations.address}`
-                : 
-                    "", 
-            paymentMethod : informations.paymentMethod ? 
+                    ? ` ${provinces.find(province => province.id === informations.province).name}, ${districts.find(district => district.id === informations.district).name}, ${wards.find(ward => ward.id === informations.ward).name}, ${informations.address}`
+                    :
+                    "",
+            paymentMethod: informations.paymentMethod ?
                 banks.find(bank => bank.id === parseInt(informations.paymentMethod)).name : 'Thanh toán sau khi nhận hàng',
-                
-            bankAccount : informations.bankAccount,
-            products : cartsCheck
+
+            bankAccount: informations.bankAccount,
+            products: cartsCheck
 
         })
-        if(response.errors)
-        {
+        if (response.errors) {
             setErrors(response.errors)
             return
         }
+        const idProductCartCheck = new Set(cartsCheck.map(item => item.idProduct));
+        dataCart = dataCart.carts.filter(item => !idProductCartCheck.has(item.idProduct));
+        saveCartOnRedux(dataCart, dataCart.length)
         alert("Đặt hàng thành công")
         nagigate('/')
     }
@@ -177,7 +181,7 @@ export default function Payment() {
                                         value={informations.phone}
                                         onChange={handleChangeInput}
                                         type="text"
-                                        className={`form-control ${errors.phone ? 'is-invalid' : ''} `} 
+                                        className={`form-control ${errors.phone ? 'is-invalid' : ''} `}
                                         style={{ width: '350px', height: '35px', border: '1px solid #ccc' }}
                                     />
                                     {errors.phone && <ErrorMessageInput errors={errors} field="phone" />}
@@ -192,7 +196,7 @@ export default function Payment() {
                                         name="province"
                                         value={informations.province}
                                         onChange={handleChangeInput}
-                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `} 
+                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `}
                                         style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
                                     >
                                         <option value="">Chọn tỉnh/Thành phố</option>
@@ -215,7 +219,7 @@ export default function Payment() {
                                         name="district"
                                         value={informations.district}
                                         onChange={handleChangeInput}
-                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `} 
+                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `}
                                         style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
                                     >
                                         <option value="">Chọn Quận/Huyện</option>
@@ -238,7 +242,7 @@ export default function Payment() {
                                         name="ward"
                                         value={informations.ward}
                                         onChange={handleChangeInput}
-                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `} 
+                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `}
                                         style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
                                     >
                                         <option value="">Chọn Phường/Xã</option>
@@ -262,7 +266,7 @@ export default function Payment() {
                                         value={informations.address}
                                         onChange={handleChangeInput}
                                         style={{ width: '350px', height: '55px', border: '1px solid #ccc' }}
-                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `} 
+                                        className={`form-control ${errors.address ? 'is-invalid' : ''} `}
                                     >
                                     </textarea>
                                     {informations.address === "" && <ErrorMessageInput errors={errors} field="address" />}

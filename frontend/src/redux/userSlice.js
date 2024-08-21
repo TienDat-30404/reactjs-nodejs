@@ -2,7 +2,10 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
     isAuthenticated: false,
     userData: null,
-    dataCart : null
+    dataCart: {
+      carts: [],
+      length: 0
+  }
 }
 export const userSlice = createSlice({
   name: 'auth',
@@ -14,7 +17,15 @@ export const userSlice = createSlice({
     },
     setCartRedux : (state, action) => {
       state.isAuthenticated = true;
-      state.dataCart = action.payload
+      state.dataCart = {
+        carts: action.payload.carts,
+        length: action.payload.length
+    };
+    },
+
+    resetCartRedux : (state, action) => {
+      state.isAuthenticated = true;
+      state.dataCart = null
     },
 
     logoutSuccess : (state) => {
@@ -25,6 +36,6 @@ export const userSlice = createSlice({
   }
 })
 
-export const { loginSuccess, logoutSuccess, setCartRedux} = userSlice.actions
+export const { loginSuccess, logoutSuccess, setCartRedux, resetCartRedux} = userSlice.actions
 
 export default userSlice.reducer

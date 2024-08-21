@@ -21,7 +21,7 @@ const useSaveCartOnRedux = () => { // tên đặt phải bắt buộc phải vi�
     const dispatch = useDispatch();
     const saveCartOnRedux = (carts, length) => {
         dispatch(setCartRedux({
-            dataCart : carts,
+            carts : carts,
             length : length
         }))
     }

@@ -65,12 +65,10 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     }, [window.location.search]);
 
     const switchCart = () => {
-        if(isAuthenticated)
-        {
+        if (isAuthenticated) {
             navigate(`/cart/${idUser}`)
         }
-        else 
-        {
+        else {
             alert("Vui lòng đăng nhập")
         }
     }
@@ -105,7 +103,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                     className='btn btn-outline-success'
                                     type='submit'
                                     content='Search'
-                                    onClick={(e) => {e.preventDefault(); navigate(`/search?find=${word}`)}}
+                                    onClick={(e) => { e.preventDefault(); navigate(`/search?find=${word}`) }}
                                 />
                             </form>
 
@@ -160,10 +158,11 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                     <button className="btn position-relative">
                                                         Giỏ hàng
                                                         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                            {/* {dataCart.length > 0 ? (
+                                                            { dataCart ? (
                                                                 dataCart.length
-                                                            ) : '0'
-                                                            } */}
+                                                            ) : 
+                                                            0
+                                                            }
                                                         </span>
                                                     </button>
                                                 </li>

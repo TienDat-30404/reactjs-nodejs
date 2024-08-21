@@ -2,12 +2,14 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { getDetailProduct } from '../../services/ProductService'
-import { addCart, allCartOfUser } from '../../services/CartService';
+import { addCart } from '../../services/CartService';
 import { useSelector } from 'react-redux';
+import { useSaveCartOnRedux } from '../../until/tokenUser';
 export default function Detail() {
+    const saveCartOnRedux = useSaveCartOnRedux()
     const { idProduct } = useParams();
 
-    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const { isAuthenticated, userData, dataCart} = useSelector((state) => state.auth);
     const idUser = isAuthenticated && userData.dataLogin.idUser
 
     const [show, setShow] = useState({
@@ -27,29 +29,32 @@ export default function Detail() {
     // get All Cart of User to handle add product on cart 
     useEffect(() => {
         const fetchDatasCart = async () => {
-            if (idUser) {
-                const response = await allCartOfUser(idUser);
-                setCarts(response.carts);
+            if (dataCart) {
+                setCarts(dataCart.carts);
             }
         }
         fetchDatasCart()
-    }, [idUser])
+    }, [dataCart])
+
+    const toastAddProduct = (status) =>
+    {
+        setShow({
+            display : true,
+            status : status
+        })
+        setTimeout(() => {
+        setShow({
+            display : false,
+            status : 'success',
+        }); 
+    }, 2000);
+    }
 
     // add product on cart
     const handleAddCart = async () => {
         const isCheckExistCart = carts.find(cart => cart.idProduct == idProduct)
-        console.log(isCheckExistCart)
         if (isCheckExistCart) {
-            setShow({
-                display : true,
-                status : 'fail'
-            })
-            setTimeout(() => {
-            setShow({
-                display : false,
-                status : 'success',
-            }); // Bắt đầu mờ dần sau 3 giây
-        }, 2000);
+            toastAddProduct('fail')
             return
         }
         await addCart({
@@ -57,28 +62,17 @@ export default function Detail() {
             idProduct: idProduct,
             quantity: 1
         })
-        setCarts(prev => [
-            ...prev,
-            {
-                idUser: idUser,
-                idProduct: idProduct,
-                quantity: 1
-            }
-        ])
+       
+        const newCart = {
+            idUser: idUser,
+            idProduct: parseInt(idProduct),
+            quantity: 1
+        }
+        const allCartWhenAdd = [...carts, newCart]
+        saveCartOnRedux(allCartWhenAdd, allCartWhenAdd.length)
 
-        setShow({
-            display : true,
-            status : 'success'
-        })
-        setTimeout(() => {
-            setShow({
-                display : false,
-                status : 'success',
-            }); // Bắt đầu mờ dần sau 3 giây
-        }, 2000);
-        console.log(carts)
+        toastAddProduct('success')
     }
-
 
     return (
         <div className="container mt-3 detail">
