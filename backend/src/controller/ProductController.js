@@ -1,12 +1,19 @@
 const Product = require('../model/ProductModel')
+const cloudinary = require('../config/cloudinary');
+
 // [GET] /add-product
+
 const addProduct = async (req, res, next) => {
     try 
     {
-        const {name, image, price, quantity, idCategory, description } = req.body
-        const newProduct = new Product({name, image, price, quantity, idCategory, description})
+        const {name, price, quantity, idCategory, description } = req.body
+        const result = await cloudinary.uploader.upload(req.file.path);
+        if (!req.file) {
+            return res.status(400).json({ error: "File image is required." });
+        }
+        const newProduct = new Product({name, image : result.secure_url , price, quantity, idCategory, description})
         await newProduct.save()
-        return res.status(200).json(Product)
+        return res.status(200).json({newProduct})
     }
     catch(error)
     {
@@ -55,8 +62,8 @@ const deleteProduct = async (req, res, next) => {
 const getAllProduct = async (req, res, next) => {
     try 
     {
-        const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 5
+        const page = parseInt(req.query.page) || null;
+        const limit = parseInt(req.query.limit) || null;
         const startPage = (page - 1) * limit
         
         const sortBy = req.query.sortBy || 'idProduct'
@@ -80,11 +87,20 @@ const getAllProduct = async (req, res, next) => {
         const totalProducts = Object.keys(objectFilter).length === 0 
                                 ? await Product.countDocuments({}) 
                                 : await Product.countDocuments(objectFilter);
-        const products = await Product.find(objectFilter)
-                                      .skip(startPage)
-                                      .limit(limit)
-                                      .sort(objectSort)
-        const totalPages = Math.ceil(totalProducts / limit)
+        let products
+        if(page)
+        {
+            products = await Product.find(objectFilter)
+                                          .skip(startPage)
+                                          .limit(limit)
+                                          .sort(objectSort)
+        }
+        else 
+        {
+            products = await Product.find(objectFilter)
+                                    .sort(objectSort)
+        }
+        const totalPages = page ? Math.ceil(totalProducts / limit) : 'all'
         return res.status(200).json({
             products,
             page,   
@@ -148,4 +164,7 @@ const getPrice = async(req, res, next) => {
         result
     })
 }
+
+
+
 module.exports = {addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, getPrice}

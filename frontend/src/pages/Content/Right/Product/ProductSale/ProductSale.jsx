@@ -6,11 +6,11 @@ export default function ProductSale() {
     const [products, setProducts] = useState([])
     const [page, setPage] = useState(1)
     const [totalPage, setTotalPage] = useState(1)
-
+    const limit = 5;
     // get all product
     useEffect(() => {
         const fetchDatasProduct = async () => {
-            const listProducts = await getAllProduct(page, 'idProduct', 'asc')
+            const listProducts = await getAllProduct(page, 'idProduct', 'asc', limit)
             setProducts(listProducts.products)
             setTotalPage(listProducts.totalPages)
         }

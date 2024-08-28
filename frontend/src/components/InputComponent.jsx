@@ -1,15 +1,16 @@
-import React from 'react'
+import React, { forwardRef } from 'react'
 
-const InputComponent = ({ className, type, placeholder, ...rest }) => {
+const InputComponent = forwardRef(({ className, type, placeholder, ...rest }, ref) => {
     return (
         <input
             className={className}
             type={type}
             placeholder={placeholder}
             {...rest}
+            ref={ref}
         />
     )
-}
+})
 
 const ErrorMessageInput = ({errors, field}) => {
     return(

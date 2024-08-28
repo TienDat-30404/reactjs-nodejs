@@ -1,0 +1,76 @@
+.admin {
+  width: 100%;
+}
+
+.admin_left {
+  width: 17%;
+  background-color: #1a1aff;
+  position: fixed;
+  height: 100%;
+}
+
+.admin_left-content li p {
+  font-family: "Times New Roman", Times, serif;
+  color: white;
+  font-weight: 500;
+  font-size: 17px;
+}
+
+.admin_left-content li i {
+  padding-left: 20px;
+  color: white;
+}
+
+.admin_left-content li {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+
+.admin_left-content li:hover {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.admin_right {
+  width: 83%;
+  margin-left: 17%;
+}
+
+.product {
+  font-family: "Times New Roman", Times, serif;
+}
+
+.product h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+.product table thead tr th {
+  font-family: "Times New Roman", Times, serif;
+  color: #555;
+}
+
+.product table tbody tr {
+  border-bottom: 2px solid #ccc;
+}
+
+.add_product {
+  display: flex;
+  background-color: white;
+  width: 1000px;
+  height: 480px;
+  padding: 0px 0px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.add_product label {
+  width: 30%;
+}
+
+/*# sourceMappingURL=admin.css.map */

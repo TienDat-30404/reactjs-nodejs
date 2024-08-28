@@ -1,6 +1,6 @@
-export const getAllProduct = async (page, sortBy='idProduct', type='asc', limit = null, idCategory = null, search = null, priceFrom = null, priceTo = null) => {
+export const getAllProduct = async (page=null, sortBy='idProduct', type='asc', limit = null, idCategory = null, search = null, priceFrom = null, priceTo = null) => {
     const params = new URLSearchParams({
-        page,
+        page: page || null,
         sortBy: sortBy || 'idProduct',
         type : type || 'asc'
     });
@@ -37,5 +37,13 @@ export const getDetailProduct = async (id) => {
         },
     })
     return response.json()
+}
+
+export const addProduct = async(data) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/add-product`, {
+        method: 'POST',
+        body: data
+    })
+    return response
 }
 

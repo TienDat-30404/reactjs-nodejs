@@ -2,7 +2,7 @@ const Product = require('../model/ProductModel')
 const {validateNameProduct, validatePriceProduct, validateTypeQuantityProduct, validateQuantityProductBiggerZero, 
 validateNameProductWhenUpdate} = require('../utils/validate')
 const validateAddProduct = async (req, res, next) => {
-    const {name, image, price, quantity, idCategory, description} = req.body
+    const {name, price, quantity, idCategory, description, image} = req.body
     const isCheckExistNameProduct = await validateNameProduct(name)
     if(!isCheckExistNameProduct)
     {

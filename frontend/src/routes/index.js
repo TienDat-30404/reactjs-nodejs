@@ -7,56 +7,84 @@ import CategoryByProduct from "../pages/Content/Right/CategoryByProduct/Category
 import Cart from "../pages/Cart/Cart";
 import Search from "../pages/Search/Search";
 import Payment from "../pages/Payment/Payment.";
+import Admin from "../pages/Admin/Admin";
+import User from "../pages/Admin/Right/User";
+import DashBoard from "../pages/Admin/Right/DashBoard";
+import Product from "../pages/Admin/Right/Product/Product";
 export const routes = [
     {
-        path : '/',
-        page : Body,
-        isShowHeader : true,
-        isShowProduct : true,
-        isShowBody : true
-    }, 
-    {
-        path : '/detail/:idProduct',
-        page : Detail,
-        isShowHeader : true,
-        isShowBody : false
-
-    },  
-    {
-        path : '*',
-        page : NotFoundPage
+        path: '/',
+        page: Body,
+        isShowHeader: true,
+        isShowProduct: true,
+        isShowBody: true,
+        isPageUser : true,
     },
     {
-        path : 'login',
-        page : Login
+        path: '/detail/:idProduct',
+        page: Detail,
+        isShowHeader: true,
+        isPageUser : true,
     },
     {
-        path : '/profile-user',
-        page : ProfileUser,
-        isShowHeader : true,
-        isShowBody : false
+        path: '*',
+        page: NotFoundPage,
+        isPageUser : true,
     },
     {
-        path : '/category/:idCategory',
-        page : CategoryByProduct,
-        isShowHeader : true,
-        isShowProduct : false,
-        isShowBody : true
+        path: 'login',
+        page: Login,
+        isPageUser : true,
     },
     {
-        path : '/search',
-        page : Search,
-        isShowHeader : true,
+        path: '/profile-user',
+        page: ProfileUser,
+        isShowHeader: true,
+        isPageUser : true,
     },
     {
-        path : '/cart/:idUser',
-        page : Cart,
-        isShowHeader : true
+        path: '/category/:idCategory',
+        page: CategoryByProduct,
+        isShowHeader: true,
+        isShowProduct: false,
+        isShowBody: true,
+        isPageUser : true,
     },
     {
-        path : '/payment',
-        page : Payment,
-        isShowHeader : false
+        path: '/search',
+        page: Search,
+        isShowHeader: true,
+        isPageUser : true,
+    },
+    {
+        path: '/cart/:idUser',
+        page: Cart,
+        isShowHeader: true,
+        isPageUser : true,
+    },
+    {
+        path: '/payment',
+        page: Payment,
+        isShowHeader: false,
+        isPageUser : true,
+    },
+    {
+        path: '/admin',
+        page: Admin,
+    },
+    {
+        path : '/admin/dashboard',
+        page : DashBoard,
+        isShowLeftAdmin : true
+    },
+    {
+        path: '/admin/user',
+        page: User,
+        isShowLeftAdmin: true
+    },
+    {
+        path : '/admin/product',
+        page : Product,
+        isShowLeftAdmin : true
     }
 ]
-     
