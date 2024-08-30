@@ -104,11 +104,12 @@ export default function Detail() {
                 <div style={{ marginLeft: '10px', marginRight: '10px' }} className="row col-12 rounded-3">
 
                     <div className="col-3 row d-flex align-items-center bg-white rounded-3 me-3">
-                        <div className='' style={{ padding: '10px' }}>
+                        <div style={{ padding: '10px' }}>
                             <img
+                                style = {{ objectFit : 'contain' }}
+                                height="300px"
+                                width="100%"
                                 src={details.detailProduct.image}
-                                alt="Bootstrap"
-                                className="img-fluid border rounded-3"
                             />
                         </div>
                         <div className="nav ms-2 benefit">

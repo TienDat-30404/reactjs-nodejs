@@ -34,11 +34,6 @@ const validateTypeQuantityProduct = (quantity) => {
     return isCheckTypeOfQuantity
 }
 
-// validate Quantity Product > 0
-const validateQuantityProductBiggerZero = (quantity) => {
-    const quantityProductBiggerZero = Number(quantity) >= 0
-    return quantityProductBiggerZero
-}
 
 // validate Name Product When handle update
 const validateNameProductWhenUpdate = async (id, name) => {
@@ -68,5 +63,5 @@ const isCheckExistNameCategory = async (name) => {
 // const upload = multer({ storage: storage });
 module.exports = {
     validateEmail, hashPassword, validateNameProduct, validatePriceProduct, validateTypeQuantityProduct,
-    validateQuantityProductBiggerZero, validateNameProductWhenUpdate, isCheckExistNameCategory
+ validateNameProductWhenUpdate, isCheckExistNameCategory
 }

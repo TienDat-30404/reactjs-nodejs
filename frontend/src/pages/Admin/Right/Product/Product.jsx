@@ -5,21 +5,33 @@ import AddProduct from './AddProduct'
 export default function Product() {
   const [products, setProducts] = useState([])
   const [showAdd, setShowAdd] = useState(false)
+
   // get ALl Product 
+  const fetchDatasProduct = async () => {
+    const [allProduct] = await Promise.all([
+      getAllProduct(null, 'idProduct', 'asc', null)
+    ]);
+    setProducts(allProduct.products);
+  };
+
+  
   useEffect(() => {
-    const fetchDatasProduct = async () => {
-      const response = await getAllProduct(null, 'idProduct', 'asc', null)
-      setProducts(response.products)
-    }
-    fetchDatasProduct()
-  }, [])
+    fetchDatasProduct();
+  }, []);
+
+  // handle display product immediately after add product
+  const handleAddProductSuccess = () => {
+    fetchDatasProduct(); 
+  };
+
+
   console.log(products)
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
         <div className='d-flex align-items-center'>
           <h3>Product</h3>
-          <h6 className='ms-3'>(30 product found)</h6>
+          <h6 className='ms-3'>({products.length} product found)</h6>
           <button onClick={() => setShowAdd(true)} type="button" className="btn btn-outline-success ms-3">Tạo sản phẩm</button>
         </div>
         <div className='d-flex align-items-center'>
@@ -81,7 +93,7 @@ export default function Product() {
 
         </tbody>
       </table>
-      <AddProduct show={showAdd} close={() => setShowAdd(false)} />
+      <AddProduct show={showAdd} close={() => setShowAdd(false)} onSuccess={handleAddProductSuccess} />
     </div>
   )
 }

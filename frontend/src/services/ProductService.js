@@ -44,6 +44,6 @@ export const addProduct = async(data) => {
         method: 'POST',
         body: data
     })
-    return response
+    return response.json()
 }
 

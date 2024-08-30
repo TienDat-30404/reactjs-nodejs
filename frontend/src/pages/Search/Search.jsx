@@ -145,6 +145,8 @@ export default function Search() {
                                         id={product.idProduct}
                                         ket={index}
                                         width="300px"
+                                        widthImage="300px"
+                                        heightImage="300px"
                                         name={product.name}
                                         image={product.image}
                                         price={(product.price).toLocaleString('vi-VN')}

@@ -5,11 +5,9 @@ import { getAllProduct } from '../../services/ProductService'
 import { getAllCart, deleteCart, updateQuantityCart } from '../../services/CartService'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux';
+import {  useDispatch } from 'react-redux';
 import { useSaveCartOnRedux } from '../../until/tokenUser'
-import { resetCartRedux } from '../../redux/userSlice'
 export default function Cart() {
-    const dispatch = useDispatch()
     const saveCartOnRedux = useSaveCartOnRedux()
     const limit = 6
     const [totalPage, setTotalPage] = useState(1)

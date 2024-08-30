@@ -56,6 +56,8 @@ export default function ProductSale() {
                             image={product.image}
                             name={product.name}
                             price={(product.price).toLocaleString('vi-VN')}
+                            widthImage="100px"
+                            heightImage="200px"
                         />
                     ))) :
                     <div className="loading">

@@ -35,4 +35,9 @@ const createQueryStringForSearch = (nameSearch, idCategory, priceFrom, priceTo) 
     }
     return params.toString()
 }
+
+
+const validateAddProduct = () => {
+    
+}
 export {validateSearchAdvanced, createQueryStringForSearch}
