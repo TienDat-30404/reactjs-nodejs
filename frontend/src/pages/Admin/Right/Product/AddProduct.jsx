@@ -91,7 +91,7 @@ export default function AddProduct({ show, close, onSuccess }) {
             name: '',
             price: '',
             quantity: '',
-            idCategory: '',
+            idCategory: 0,
             description: ''
         })
         setFileInputKey(Date.now());
@@ -99,10 +99,10 @@ export default function AddProduct({ show, close, onSuccess }) {
     }
     const validateInput = (name, value) => {
         switch (name) {
-            case 'price':
-                return !isNaN(value) && value > 0;
-            case 'quantity':
-                return !isNaN(value) && value > 0;
+            // case 'price':
+            //     return !isNaN(value) && value > 0;
+            // case 'quantity':
+            //     return !isNaN(value) && value > 0;
             default:
                 return value.trim() !== '';
         }
@@ -175,11 +175,12 @@ export default function AddProduct({ show, close, onSuccess }) {
                         <label style={{ fontSize: '14px' }} className="form-label">Thể loại</label>
                         <div style = {{ width : '100%' }}>
                             <select 
+                                value = {product.idCategory}
                                 name="idCategory" 
                                 className={`form-control ${errors.idCategory ? 'is-invalid' : ''} `} 
                                 onChange={handleChangeInput}
                             >
-                                <option value="0">Chọn thể loại</option>
+                                <option value="0" checked>Chọn thể loại</option>
                                 {category.length > 0 ? (
                                     category.map((category, index) => (
                                         <option value={category.idCategory}>{category.name}</option>

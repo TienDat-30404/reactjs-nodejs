@@ -51,7 +51,6 @@ export const addProduct = async (data) => {
 
 export const deleteProduct = async (id) => {
     const token = Cookies.get('accessToken')
-    console.log(token)
     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-product/${id}`, {
         method: 'DELETE',
         headers: {
@@ -61,3 +60,12 @@ export const deleteProduct = async (id) => {
     return response.json()
 }
 
+
+export const updateProduct = async(id, data) => {
+    // const token = Cookies.get('accessToken')
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/update-product/${id}`, {
+        method: 'PUT',
+        body : data
+    })
+    return response.json()
+}

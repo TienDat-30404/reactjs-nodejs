@@ -4,19 +4,17 @@ const cloudinary = require('../config/cloudinary');
 // [GET] /add-product
 
 const addProduct = async (req, res, next) => {
-    try 
-    {
-        const {name, price, quantity, idCategory, description } = req.body
+    try {
+        const { name, price, quantity, idCategory, description } = req.body
         const result = await cloudinary.uploader.upload(req.file.path);
         if (!req.file) {
             return res.status(400).json({ error: "File image is required." });
         }
-        const newProduct = new Product({name, image : result.secure_url , price, quantity, idCategory, description})
+        const newProduct = new Product({ name, image: result.secure_url, price, quantity, idCategory, description })
         await newProduct.save()
-        return res.status(200).json({newProduct})
+        return res.status(200).json({ newProduct })
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 }
@@ -24,48 +22,60 @@ const addProduct = async (req, res, next) => {
 // [PUT] /update-product/:idProduct
 const updateProduct = async (req, res, next) => {
     const idProduct = req.params.idProduct
-    const newData = req.body
-    await Product.updateOne({idProduct : idProduct}, newData)
+    const { name, price, quantity, idCategory, description } = req.body
+    const fileImage = await cloudinary.uploader.upload(req.file.path);
+    console.log(fileImage)
+    const newData = {
+        name: name,
+        price: price,
+        quantity: quantity,
+        idCategory: idCategory,
+        description: description,
+    };
+    if (!req.file) {
+        return res.status(400).json({ error: "File image is required." });
+    }
+    else 
+    {
+        newData.image = fileImage.secure_url
+    }
+    await Product.updateOne({ idProduct: idProduct }, newData)
     return res.status(200).json({
-        message : "Update Successfully"
+        newData,
+        message: "Update Successfully"
     })
 
 }
 
 // [DELETE] /delete-product/:idProduct
 const deleteProduct = async (req, res, next) => {
-    try
-    {
+    try {
         const idProduct = req.params.idProduct
-        const delProduct = await Product.deleteOne({idProduct : idProduct})
-        if(delProduct.deletedCount > 0)
-        {
+        const delProduct = await Product.deleteOne({ idProduct: idProduct })
+        if (delProduct.deletedCount > 0) {
             return res.status(200).json({
-                message : "Delete Product Successfully"
+                message: "Delete Product Successfully"
             })
         }
-        else 
-        {
+        else {
             return res.status(400).json({
-                message : "Delete product Fail"
+                message: "Delete product Fail"
             })
         }
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
-    
+
 }
 
 // [GET] /get-all-product
 const getAllProduct = async (req, res, next) => {
-    try 
-    {
+    try {
         const page = parseInt(req.query.page) || null;
         const limit = parseInt(req.query.limit) || null;
         const startPage = (page - 1) * limit
-        
+
         const sortBy = req.query.sortBy || 'idProduct'
         const type = req.query.type === "asc" ? 1 : -1  // nếu là 1 thì sắp xếp tăng dần và ngược lại
         const objectSort = {}
@@ -74,43 +84,40 @@ const getAllProduct = async (req, res, next) => {
         if (req.query.idCategory) {
             objectFilter.idCategory = req.query.idCategory;
         }
-    
+
         if (req.query.search) {
             objectFilter.name = new RegExp(req.query.search, 'i');
         }
-    
+
         if (req.query.priceFrom && req.query.priceTo) {
             const priceFrom = parseFloat(req.query.priceFrom);
             const priceTo = parseFloat(req.query.priceTo);
             objectFilter.price = { $gte: priceFrom, $lte: priceTo };
         }
-        const totalProducts = Object.keys(objectFilter).length === 0 
-                                ? await Product.countDocuments({}) 
-                                : await Product.countDocuments(objectFilter);
+        const totalProducts = Object.keys(objectFilter).length === 0
+            ? await Product.countDocuments({})
+            : await Product.countDocuments(objectFilter);
         let products
-        if(page)
-        {
+        if (page) {
             products = await Product.find(objectFilter)
-                                          .skip(startPage)
-                                          .limit(limit)
-                                          .sort(objectSort)
+                .skip(startPage)
+                .limit(limit)
+                .sort(objectSort)
         }
-        else 
-        {
+        else {
             products = await Product.find(objectFilter)
-                                    .sort(objectSort)
+                .sort(objectSort)
         }
         const totalPages = page ? Math.ceil(totalProducts / limit) : 'all'
         return res.status(200).json({
             products,
-            page,   
+            page,
             totalProducts,
             totalPages,
             objectSort
         })
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 }
@@ -135,31 +142,28 @@ const getAllProduct = async (req, res, next) => {
 
 // [GET] /detail-product/:idProduct
 const getDetailProduct = async (req, res, next) => {
-    try
-    {
+    try {
         const idProduct = req.params.idProduct
-        const detailProduct = await Product.findOne({idProduct : idProduct})
-        if(detailProduct == null)
-        {
+        const detailProduct = await Product.findOne({ idProduct: idProduct })
+        if (detailProduct == null) {
             return res.status(400).json({
-                message : "Fail Detail Product"
+                message: "Fail Detail Product"
             })
         }
         return res.status(200).json({
             detailProduct
         })
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 }
 
-const getPrice = async(req, res, next) => {
+const getPrice = async (req, res, next) => {
     const priceFrom = req.query.priceFrom
     const priceTo = req.query.priceTo
-    const result = await Product.find({price : {$gte : priceFrom, $lte : priceTo} })
-    const g = await Product.countDocuments({price : {$gte : priceFrom, $lte : priceTo}})
+    const result = await Product.find({ price: { $gte: priceFrom, $lte: priceTo } })
+    const g = await Product.countDocuments({ price: { $gte: priceFrom, $lte: priceTo } })
     return res.status(200).json({
         result
     })
@@ -167,4 +171,4 @@ const getPrice = async(req, res, next) => {
 
 
 
-module.exports = {addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, getPrice}
+module.exports = { addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, getPrice }

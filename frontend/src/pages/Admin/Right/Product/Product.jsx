@@ -7,6 +7,7 @@ export default function Product() {
   const [products, setProducts] = useState([])
   const [showAdd, setShowAdd] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
+  const [idProduct, setIdProduct] = useState(null)
   // get ALl Product 
   const fetchDatasProduct = async () => {
     const [allProduct] = await Promise.all([
@@ -15,7 +16,10 @@ export default function Product() {
     setProducts(allProduct.products);
   };
 
-  
+  const handleSwitchPageEdit = (id) => {
+    setShowEdit(true)
+    setIdProduct(id)
+  }
 
   // handle display product immediately after add product
   const handleAddProductSuccess = () => {
@@ -26,6 +30,10 @@ export default function Product() {
   const handleDeleteProduct = async(id) => {
     const response = await deleteProduct(id)
     console.log(response)
+  }
+
+  const handleEditProductSuccess = async() => {
+    console.log("123")
   }
 
   useEffect(() => {
@@ -85,7 +93,12 @@ export default function Product() {
                 <td className='text-center'>{product.idCategory}</td>
                 <td style={{ width: '25%' }}>{product.description}</td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button type="button" className="btn btn-outline-primary">Edit</button>
+                  <button 
+                    onClick={() => handleSwitchPageEdit(product.idProduct)}
+                    type="button" 
+                    className="btn btn-outline-primary">
+                    Edit
+                  </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
                   <button onClick={() => handleDeleteProduct(product.idProduct)} type="button" className="btn btn-outline-danger">Delete</button>
@@ -101,6 +114,7 @@ export default function Product() {
         </tbody>
       </table>
       <AddProduct show={showAdd} close={() => setShowAdd(false)} onSuccess={handleAddProductSuccess} />
+      <EditProduct show={showEdit} close={() => setShowEdit(false)} onSuccess={handleEditProductSuccess} idProduct = {idProduct} />
     </div>
   )
 }
