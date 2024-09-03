@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
-import { getAllProduct } from '../../../../services/ProductService'
+import { getAllProduct, deleteProduct } from '../../../../services/ProductService'
 import AddProduct from './AddProduct'
+import EditProduct from './EditProduct'
 export default function Product() {
   const [products, setProducts] = useState([])
   const [showAdd, setShowAdd] = useState(false)
-
+  const [showEdit, setShowEdit] = useState(false)
   // get ALl Product 
   const fetchDatasProduct = async () => {
     const [allProduct] = await Promise.all([
@@ -15,17 +16,23 @@ export default function Product() {
   };
 
   
-  useEffect(() => {
-    fetchDatasProduct();
-  }, []);
 
   // handle display product immediately after add product
   const handleAddProductSuccess = () => {
     fetchDatasProduct(); 
   };
 
+  // handle delete product
+  const handleDeleteProduct = async(id) => {
+    const response = await deleteProduct(id)
+    console.log(response)
+  }
 
-  console.log(products)
+  useEffect(() => {
+    fetchDatasProduct();
+  }, [handleDeleteProduct]);
+
+
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
@@ -81,7 +88,7 @@ export default function Product() {
                   <button type="button" className="btn btn-outline-primary">Edit</button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button type="button" className="btn btn-outline-danger">Delete</button>
+                  <button onClick={() => handleDeleteProduct(product.idProduct)} type="button" className="btn btn-outline-danger">Delete</button>
                 </td>
               </tr>
             ))

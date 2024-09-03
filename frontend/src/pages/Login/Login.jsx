@@ -5,8 +5,9 @@ import { jwtDecode } from 'jwt-decode';
 import { useSelector, useDispatch } from 'react-redux';
 import { allCartOfUser } from '../../services/CartService';
 import { loginService } from '../../services/UserService';
+import { useNavigate } from 'react-router-dom';
 function LoginModal({ show, handleClose, switchSignIn }) {
-
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const dataLogin = { email, password }
@@ -34,6 +35,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
 
         const cartResponse = await allCartOfUser(jwtDecode(response.token).idUser);
         saveCartOnRedux(cartResponse.carts, cartResponse.carts.length);
+        navigate('./admin/product')
       }
     }
     catch (error) {

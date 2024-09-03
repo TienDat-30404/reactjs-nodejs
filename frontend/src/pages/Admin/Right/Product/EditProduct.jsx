@@ -4,7 +4,7 @@ import { ErrorMessageInput } from '../../../../components/InputComponent'
 import { addProduct } from '../../../../services/ProductService'
 import { getAllCategory } from '../../../../services/CategoryService'
 
-export default function AddProduct({ show, close, onSuccess }) {
+export default function EditProduct({ show, close, onSuccess }) {
     const [product, setProduct] = useState({
         name: '',
         price: '',

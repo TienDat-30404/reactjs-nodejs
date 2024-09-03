@@ -1,8 +1,10 @@
-export const getAllProduct = async (page=null, sortBy='idProduct', type='asc', limit = null, idCategory = null, search = null, priceFrom = null, priceTo = null) => {
+
+import Cookies from 'js-cookie';
+export const getAllProduct = async (page = null, sortBy = 'idProduct', type = 'asc', limit = null, idCategory = null, search = null, priceFrom = null, priceTo = null) => {
     const params = new URLSearchParams({
         page: page || null,
         sortBy: sortBy || 'idProduct',
-        type : type || 'asc'
+        type: type || 'asc'
     });
     if (limit) {
         params.append('limit', limit);
@@ -39,10 +41,22 @@ export const getDetailProduct = async (id) => {
     return response.json()
 }
 
-export const addProduct = async(data) => {
+export const addProduct = async (data) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/add-product`, {
         method: 'POST',
         body: data
+    })
+    return response.json()
+}
+
+export const deleteProduct = async (id) => {
+    const token = Cookies.get('accessToken')
+    console.log(token)
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-product/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`, 
+        }
     })
     return response.json()
 }
