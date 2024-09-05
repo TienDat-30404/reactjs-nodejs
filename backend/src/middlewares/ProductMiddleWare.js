@@ -47,20 +47,21 @@ const validateAddProduct = async (req, res, next) => {
 
 // validate update product
 const validateUpdateProduct = async (req, res, next) => {
+    const idProduct = req.params.idProduct
     const { name, price, quantity, idCategory, description } = req.body
-    
-    const isCheckExistNameProduct = await validateNameProduct(name)
+    const currentProduct = await Product.findOne({ idProduct: idProduct });
     const errors = {}
     if (name.trim() == "") {
         errors.name = "Vui lòng nhập tên sản phẩm"
     }
     else {
-        if (!isCheckExistNameProduct) {
-            errors.name = "Tên sản phẩm đã tồn tại"
+        if(name != currentProduct.name)
+            {
+            const isCheckExistNameProduct = await validateNameProduct(name)
+            if (!isCheckExistNameProduct) {
+                errors.name = "Tên sản phẩm đã tồn tại"
+            }
         }
-    }
-    if (!req.file) {
-        errors.image = "Vui lòng chọn ảnh"
     }
     if (price.trim() === "") {
         errors.price = "Vui lòng nhập giá sản phẩm"

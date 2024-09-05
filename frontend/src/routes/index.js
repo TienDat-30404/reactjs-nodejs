@@ -8,7 +8,7 @@ import Cart from "../pages/Cart/Cart";
 import Search from "../pages/Search/Search";
 import Payment from "../pages/Payment/Payment.";
 import Admin from "../pages/Admin/Admin";
-import User from "../pages/Admin/Right/User";
+import User from '../pages/Admin/Right/User/User'
 import DashBoard from "../pages/Admin/Right/DashBoard";
 import Product from "../pages/Admin/Right/Product/Product";
 export const routes = [

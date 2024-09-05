@@ -22,21 +22,19 @@ const addProduct = async (req, res, next) => {
 // [PUT] /update-product/:idProduct
 const updateProduct = async (req, res, next) => {
     const idProduct = req.params.idProduct
+    console.log(idProduct)
     const { name, price, quantity, idCategory, description } = req.body
-    const fileImage = await cloudinary.uploader.upload(req.file.path);
-    console.log(fileImage)
+    const product = await Product.findOne({idProduct : idProduct})
     const newData = {
         name: name,
+        image : product.image,  
         price: price,
         quantity: quantity,
         idCategory: idCategory,
         description: description,
     };
-    if (!req.file) {
-        return res.status(400).json({ error: "File image is required." });
-    }
-    else 
-    {
+    if (req.file) {
+        const fileImage = await cloudinary.uploader.upload(req.file.path);
         newData.image = fileImage.secure_url
     }
     await Product.updateOne({ idProduct: idProduct }, newData)

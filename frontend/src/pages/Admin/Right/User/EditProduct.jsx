@@ -9,7 +9,7 @@ export default function EditProduct({ show, close, onSuccess, idProduct }) {
         name: '',
         image : '',
         price: '',
-        quantity: '',
+        quantity: '',   
         idCategory: '',
         description: ''
     })
@@ -47,26 +47,25 @@ export default function EditProduct({ show, close, onSuccess, idProduct }) {
 
     // handle click add product
     const handleClickUpdateProduct = async () => {
-        if(idProduct)
-        {
-            inputFocusRef.current.focus()
-            var formData = new FormData()
-            formData.append('name', product.name)
-            formData.append('image', image)
-            formData.append('price', product.price)
-            formData.append('quantity', product.quantity)
-            formData.append('idCategory', product.idCategory)
-            formData.append('description', product.description)
-            const response = await updateProduct(idProduct, formData)
-            console.log(response)
-            if (response.errors) {
-                setErrors(response.errors)
-                return
-            }
-            else {
-                alert("Chỉnh sửa sản phẩm thành công")
-                onSuccess()
-            }
+        inputFocusRef.current.focus()
+
+        var formData = new FormData()
+        formData.append('name', product.name)
+        formData.append('image', image)
+        formData.append('price', product.price)
+        formData.append('quantity', product.quantity)
+        formData.append('idCategory', product.idCategory)
+        formData.append('description', product.description)
+        console.log(idProduct)
+        const response = await updateProduct(1, formData)
+        console.log(response)
+        if (response.errors) {
+            setErrors(response.errors)
+            return
+        }
+        else {
+            alert("Chỉnh sửa sản phẩm thành công")
+            onSuccess()
         }
     }
 
@@ -121,6 +120,7 @@ export default function EditProduct({ show, close, onSuccess, idProduct }) {
                 return value.trim() !== '';
         }
     };
+    console.log(product)
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="modal-dialog add_product">
