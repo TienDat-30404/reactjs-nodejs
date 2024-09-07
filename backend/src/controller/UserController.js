@@ -5,8 +5,8 @@ const refreshTokenJWT = require('../utils/jwt')
 // [POST] : /sign-in
 const createUser = async (req, res, next) => {
     try {
-        const { name, email, password, confirm_password } = req.body;
-        const newUser = new User({ name, email, password : hashPassword(password), confirm_password, idRole : 0 });
+        const { name, email, password, confirm_password, idRole } = req.body;
+        const newUser = new User({ name, email, password : hashPassword(password), confirm_password, idRole });
         await newUser.save();
         res.status(200).json(newUser);
     } catch (error) {
@@ -132,15 +132,15 @@ const getAllUser = async (req, res, next) => {
 const detailUser = async (req, res, next) => {
     try 
     {
-        const idUser = await User.findOne({idUser : req.params.idUser})
-        if(idUser == null)
+        const detailUser = await User.findOne({idUser : req.params.idUser})
+        if(detailUser == null)
         {
             return res.status(400).json({
                 mesage : "Fail Detail User"
             })
         }
         return res.status(200).json({
-            idUser
+            detailUser
         })
     }
     catch(error)

@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie'
 export const loginService = async (dataLogin) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up`, {
         method: 'POST',
@@ -41,5 +42,36 @@ export const updateUserService = async(id, data) => {
         },
         body: JSON.stringify(data),
     });
+    return response.json()
+}
+
+export const getAllUser = async() => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-user`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.json()
+}
+
+export const deleteUser = async (id) => {
+    const token = Cookies.get('accessToken')
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-user/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`, 
+        }
+    })
+    return response.json()
+}
+
+export const getDetailUser = async (id) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/detail-user/${id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
     return response.json()
 }

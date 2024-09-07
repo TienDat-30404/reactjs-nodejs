@@ -10,7 +10,7 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
   const [confirm_password, setConfirmPassword] = useState('')
   const [errors, setErrors] = useState({})
   const handleClickSignIn = useCallback(async () => {
-    const userData = { name, email, password, confirm_password };
+    const userData = { name, email, password, confirm_password, };
     try {
       const data = await signInService(userData)
       if (data.errors) {

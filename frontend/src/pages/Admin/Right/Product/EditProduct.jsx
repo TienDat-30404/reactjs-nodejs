@@ -4,7 +4,7 @@ import { ErrorMessageInput } from '../../../../components/InputComponent'
 import { updateProduct, getDetailProduct } from '../../../../services/ProductService'
 import { getAllCategory } from '../../../../services/CategoryService'
 
-export default function EditProduct({ show, close, onSuccess, idProduct }) {
+export default function EditProduct({ show, close, idProduct }) {
     const [product, setProduct] = useState({
         name: '',
         image : '',
@@ -65,7 +65,6 @@ export default function EditProduct({ show, close, onSuccess, idProduct }) {
             }
             else {
                 alert("Chỉnh sửa sản phẩm thành công")
-                onSuccess()
             }
         }
     }

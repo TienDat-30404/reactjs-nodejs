@@ -5,29 +5,29 @@ const { generateToken, generateRefreshToken } = require('../utils/jwt')
 // validate for sign in
 const validateSignIn = async (req, res, next) => {
     try {
-        const { name, email, password, confirm_password } = req.body
+        const { name, email, password, confirm_password, idRole } = req.body
         const existUser = await User.findOne({ name })
         const errors = {};
         const existEmail = await User.countDocuments({ email }) // i chang User.findOne, chỉ khác kiểu trả về
         if (name == "") {
             errors.name = "Tên người dùng không được để trống";
         }
-        if (existUser) {
+        else if (existUser && name != "") {
             errors.name = "Tên người dùng đã tồn tại";
         }
         if (email == "") {
             errors.email = "Email không được để trống"
         }
-        if (!validateEmail(email)) {
+        else if (!validateEmail(email) && email != "") {
             errors.email = "Email không hợp lệ";
         }
-        if (existEmail > 0) {
+        else if (existEmail > 0) {
             errors.email = "Email đã tồn tại";
         }
         if (password == "") {
             errors.password = "Mật khẩu không được để trống"
         }
-        if (password.length < 6) {
+        else if (password.length < 6 && password != "") {
             errors.password = "Mật khẩu tối thiểu 6 kí tự";
         }
         if (confirm_password == "") {
@@ -35,6 +35,10 @@ const validateSignIn = async (req, res, next) => {
         }
         if (password !== confirm_password) {
             errors.confirm_password = "Mật khẩu không trùng khớp";
+        }
+        if(idRole == 0)
+        {
+            errors.idRole = "Vui lòng chọn loại tài khoản"
         }
         if (Object.keys(errors).length > 0) {
             return res.status(400).json({ errors });

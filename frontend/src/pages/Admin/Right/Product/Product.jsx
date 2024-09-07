@@ -29,11 +29,6 @@ export default function Product() {
   // handle delete product
   const handleDeleteProduct = async(id) => {
     const response = await deleteProduct(id)
-    console.log(response)
-  }
-
-  const handleEditProductSuccess = async() => {
-    console.log("123")
   }
 
   useEffect(() => {
@@ -114,7 +109,7 @@ export default function Product() {
         </tbody>
       </table>
       <AddProduct show={showAdd} close={() => setShowAdd(false)} onSuccess={handleAddProductSuccess} />
-      <EditProduct show={showEdit} close={() => setShowEdit(false)} onSuccess={handleEditProductSuccess} idProduct = {idProduct} />
+      <EditProduct show={showEdit} close={() => setShowEdit(false)} idProduct = {idProduct} />
     </div>
   )
 }

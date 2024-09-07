@@ -1,53 +1,49 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
-import { getAllProduct, deleteProduct } from '../../../../services/ProductService'
-import AddProduct from './AddProduct'
-import EditProduct from './EditProduct'
-export default function Product() {
-  const [products, setProducts] = useState([])
+import { getAllUser } from '../../../../services/UserService'
+import AddUser from './AddUser'
+import { deleteUser } from '../../../../services/UserService'
+import EditUser from './EditUser'
+export default function User() {
+  const [users, setUsers] = useState([])
   const [showAdd, setShowAdd] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
-  const [idProduct, setIdProduct] = useState(null)
-  // get ALl Product 
-  const fetchDatasProduct = async () => {
-    const [allProduct] = await Promise.all([
-      getAllProduct(null, 'idProduct', 'asc', null)
+  const [idUser, setIdUser] = useState(null)
+  // get ALl User 
+  const fetchDatasUser = async () => {
+    const [allUser] = await Promise.all([
+      getAllUser()
     ]);
-    setProducts(allProduct.products);
+    setUsers(allUser);
   };
 
   const handleSwitchPageEdit = (id) => {
     setShowEdit(true)
-    setIdProduct(id)
+    setIdUser(id)
   }
 
-  // handle display product immediately after add product
-  const handleAddProductSuccess = () => {
-    fetchDatasProduct(); 
+  // handle display account immediately after add account
+  const handleAddUser = () => {
+    fetchDatasUser(); 
   };
 
-  // handle delete product
-  const handleDeleteProduct = async(id) => {
-    const response = await deleteProduct(id)
-    console.log(response)
+  // handle delete account
+  const handleDeleteUser = async(id) => {
+    const response = await deleteUser(id)
   }
-
-  const handleEditProductSuccess = async() => {
-    console.log("123")
-  }
-
+  
   useEffect(() => {
-    fetchDatasProduct();
-  }, [handleDeleteProduct]);
+    fetchDatasUser();
+  }, [handleDeleteUser]);
 
 
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
         <div className='d-flex align-items-center'>
-          <h3>Product</h3>
-          <h6 className='ms-3'>({products.length} product found)</h6>
-          <button onClick={() => setShowAdd(true)} type="button" className="btn btn-outline-success ms-3">Tạo sản phẩm</button>
+          <h3>User</h3>
+          <h6 className='ms-3'>({users.length} user found)</h6>
+          <button onClick={() => setShowAdd(true)} type="button" className="btn btn-outline-success ms-3">Tạo người dùng</button>
         </div>
         <div className='d-flex align-items-center'>
           <i className="bi bi-bell me-3"></i>
@@ -62,46 +58,57 @@ export default function Product() {
       </div>
       <table style={{ width: '100%', backgroundColor: 'white', marginTop: '30px' }} cellspacing="0" cellpading="10">
         <thead>
-
           <tr>
             <th>Id</th>
             <th>Name</th>
-            <th className='text-center'>Image</th>
-            <th className='text-center'>Price</th>
-            <th className='text-center'>Quantity</th>
-            <th className='text-center'>Category</th>
-            <th className='text-center'>Description</th>
+            <th className='text-center'>Email</th>
+            {/* <th className='text-center'>Password</th> */}
+            <th className='text-center'>Address</th>
+            <th className='text-center'>Phone</th>
+            <th className='text-center'>Date Of Birth</th>
+            <th className='text-center'>Sex</th>
+            <th className='text-center'>Avatar</th>
+            <th className='text-center'>Role</th>
             <th className='text-center' colSpan='2'>Action</th>
           </tr>
         </thead>
         <tbody>
-          {products.length > 0 ? (
-            products.map((product, index) => (
+          {users.length > 0 ? (
+            users.map((user, index) => (
               <tr key={index}>
-                <td style={{ width: '4%' }}>{product.idProduct}</td>
-                <td style={{ width: '20%' }}>{product.name}</td>
-                <td style={{ width: '10%' }} className='text-center'>
-                  <ImageComponent
-                    src={product.image} alt=""
-                    width="70px"
-                    height="50px"
-                    borderRadius="5px"
-                  />
+                <td style={{ width: '4%' }}>{user.idUser}</td>
+                <td style={{ width: '8%' }}>{user.name}</td>
+
+                <td style={{ width: '15%' }} className='text-center'>{user.email}</td>
+                {/* <td style={{ width: '5%' }} className='text-center'>{user.password}</td> */}
+                <td style={{ width: '15%' }} className='text-center'>{user.address}</td>
+                <td className='text-center' style={{ width: '15%' }}>{user.phone}</td>
+                <td className='text-center' style={{ width: '10%' }}>{user.date_of_birth}</td>
+                <td className='text-center' style={{ width: '5%' }}>{user.sex}</td>
+                <td className='text-center'>
+                  {user.avatar != "" ? (
+                    <ImageComponent
+                      src={user.avatar} alt=""
+                      width="70px"
+                      height="50px"
+                      borderRadius="5px"
+                    />
+                  ) : 
+                    <p>null</p>
+                  }
                 </td>
-                <td className='text-center'>{product.price}</td>
-                <td className='text-center'>{product.quantity}</td>
-                <td className='text-center'>{product.idCategory}</td>
-                <td style={{ width: '25%' }}>{product.description}</td>
+                <td className='text-center' >{user.idRole}</td>
+
                 <td style={{ width: '6%' }} className='text-center'>
                   <button 
-                    onClick={() => handleSwitchPageEdit(product.idProduct)}
+                    onClick={() => handleSwitchPageEdit(user.idUser)}
                     type="button" 
                     className="btn btn-outline-primary">
                     Edit
                   </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button onClick={() => handleDeleteProduct(product.idProduct)} type="button" className="btn btn-outline-danger">Delete</button>
+                  <button onClick={() => handleDeleteUser(user.idUser)} type="button" className="btn btn-outline-danger">Delete</button>
                 </td>
               </tr>
             ))
@@ -113,8 +120,8 @@ export default function Product() {
 
         </tbody>
       </table>
-      <AddProduct show={showAdd} close={() => setShowAdd(false)} onSuccess={handleAddProductSuccess} />
-      <EditProduct show={showEdit} close={() => setShowEdit(false)} onSuccess={handleEditProductSuccess} idProduct = {idProduct} />
+      <AddUser show={showAdd} close={() => setShowAdd(false)} onSuccess={handleAddUser} />
+      <EditUser show={showEdit} close={() => setShowEdit(false)} idUser = {idUser} />
     </div>
   )
 }
