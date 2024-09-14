@@ -86,7 +86,6 @@ export default function AddUser({ show, close, onSuccess }) {
         }
     };
 
-    console.log(errors)
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="modal-dialog add_product">

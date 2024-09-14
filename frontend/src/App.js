@@ -14,6 +14,7 @@ import Right from './pages/Content/Right/Right';
 import Body from './pages/Content/Body';
 import CategoryByProduct from './pages/Content/Right/CategoryByProduct/CategoryByProduct';
 import Admin from './pages/Admin/Admin';
+// import Component from './pages/Component';
 function App() {
   const { checkAndUpdateToken } = useAuthHandler();
 
@@ -37,6 +38,7 @@ function App() {
             return (
               <Route key={route.path} path={route.path} element={
                 <Layout>
+                  {/* <Component /> */}
                   {isCheckPage ? (
                     isCheckBody ? (
                       <ShowBody right={<Content />} />

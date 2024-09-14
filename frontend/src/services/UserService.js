@@ -34,13 +34,10 @@ export const refreshTokenService = async() => {
     return response.json()
 }
 
-export const updateUserService = async(id, data) => {
+export const updateUser = async(id, data) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/update-user/${id}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body : data
     });
     return response.json()
 }

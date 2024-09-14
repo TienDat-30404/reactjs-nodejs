@@ -114,43 +114,7 @@ const validateUpdateUser = async (req, res, next) => {
         if (!phoneRegex.test(phone) && phone != "") {
             errors.phone = "Số điện thoại không hợp lệ"
         }
-        if(oldPassword !== undefined)
-        {
-            if (oldPassword == "") {
-                errors.oldPassword = "Vui lòng nhập mật khẩu hiện tại"
-            } 
-            else 
-            {
-                const compareOldPassword = bcrypt.compareSync(oldPassword, isCheckUser.password)
-                if (!compareOldPassword) {
-                    errors.oldPassword = "Mật khẩu hiện tại không chính xác"
-                }
-            }
-        }
-       
-        if(password == "")
-        {
-            errors.password = "Vui lòng nhập mật khẩu"
-        }
-        else 
-        {
-            if (password.length < 6) {
-                errors.password = "Mật khẩu tối thiểu 6 kí tự"
-            }
-        }
-        if(confirmPassword != undefined)
-        {
-            if(confirmPassword == "")
-            {
-                errors.confirmPassword = "Vui lòng xác nhận mật khẩu"
-            }
-            else 
-            {
-                if (password != confirmPassword) {
-                    errors.confirmPassword = "Mật khẩu không trùng khớp"
-                }
-            }
-        }
+        
         if (Object.keys(errors).length > 0) {
             return res.status(400).json({ errors })
         }

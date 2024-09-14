@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { InputComponent, ErrorMessageInput } from '../../components/InputComponent';
 import { useSelector } from 'react-redux';
-import { updateUserService, loginService } from '../../services/UserService';
+import { updateUser, loginService } from '../../services/UserService';
 import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
 import { jwtDecode } from 'jwt-decode';
 // import bcrypt from 'bcrypt'
@@ -55,7 +55,7 @@ export default function UpdatePassword({ show, closeModal }) {
 
     const fetchApiUpdateUser = async (id, data) => {
         try {
-            const resultUpdate = await updateUserService(id, data)
+            const resultUpdate = await updateUser(id, data)
             console.log(resultUpdate)
             if (resultUpdate.errors) {
                 setErrors(resultUpdate.errors)

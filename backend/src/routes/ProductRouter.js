@@ -8,7 +8,7 @@ const {validateAddProduct, validateUpdateProduct} = require('../middlewares/Prod
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        return cb(null, './src/routes/uploads/images');
+        return cb(null, './src/utils/uploads/images');
     },
     filename: function (req, file, cb) {
         return cb(null, Date.now() + path.extname(file.originalname));

@@ -1,12 +1,13 @@
 const User = require('../model/UserModel')
+const cloudinary = require('../config/cloudinary');
 const { generateToken, generateRefreshToken } = require('../utils/jwt')
-const {hashPassword} = require('../utils/validate')
+const { hashPassword } = require('../utils/validate')
 const refreshTokenJWT = require('../utils/jwt')
 // [POST] : /sign-in
 const createUser = async (req, res, next) => {
     try {
         const { name, email, password, confirm_password, idRole } = req.body;
-        const newUser = new User({ name, email, password : hashPassword(password), confirm_password, idRole });
+        const newUser = new User({ name, email, password: hashPassword(password), confirm_password, idRole });
         await newUser.save();
         res.status(200).json(newUser);
     } catch (error) {
@@ -16,19 +17,19 @@ const createUser = async (req, res, next) => {
 }
 
 // [POST] : /sign-up
-const loginUser = async(req, res, next) => {
-    const {email } = req.body
+const loginUser = async (req, res, next) => {
+    const { email } = req.body
     const isCheckUser = await User.findOne({ email })
     const avatar = isCheckUser.avatar
     const payloadToken = {
         idUser: isCheckUser.idUser,
         name: isCheckUser.name,
-        email : isCheckUser.email,
-        password : isCheckUser.password,
-        address : isCheckUser.address,
-        phone : isCheckUser.phone,
-        sex : isCheckUser.sex,
-        date_of_birth : isCheckUser.date_of_birth,
+        email: isCheckUser.email,
+        password: isCheckUser.password,
+        address: isCheckUser.address,
+        phone: isCheckUser.phone,
+        sex: isCheckUser.sex,
+        date_of_birth: isCheckUser.date_of_birth,
         idRole: isCheckUser.idRole
     };
 
@@ -43,50 +44,56 @@ const loginUser = async(req, res, next) => {
     });
     return res.status(200).json({
         token: accessToken,
-        message : 'Đăng nhập thành công',
-        avatar : avatar
+        message: 'Đăng nhập thành công',
+        avatar: avatar
     })
 }
 
 // [PUT] : /update-user/:id
 const updateUser = async (req, res, next) => {
-    try
-    {
+    try {
         const idUser = req.params.idUser
-        const isCheckPassword = await User.findOne({idUser})
-        const newData = req.body
-        if (newData.password != isCheckPassword.password) {
-            newData.password = hashPassword(newData.password);
-        } else {
-            delete newData.password; 
+        console.log(idUser)
+        const { name, email, address, phone, date_of_birth, sex, idRole } = req.body
+        console.log(name)
+        const user = await User.findOne({ idUser: idUser })
+        const newData = {
+            name: name,
+            email : email,
+            address: address,
+            phone: phone,
+            date_of_birth: date_of_birth,
+            sex: sex,
+            avatar: user.avatar,
+            idRole : idRole
+        };
+        if (req.file) {
+            const fielAvatar = await cloudinary.uploader.upload(req.file.path);
+            newData.avatar = fielAvatar.secure_url
         }
-        await User.updateOne({idUser : idUser}, newData)
-        res.status(200).json({
-            message : "Update successfully",
-            newData
+        await User.updateOne({ idUser: idUser }, newData)
+        return res.status(200).json({
+            newData,
+            message: "Update Successfully"
         })
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 };
 
 const deleteUser = async (req, res, next) => {
-    try 
-    {
+    try {
         const idUser = req.params.idUser
-        const delUser = await User.deleteOne({idUser : idUser}) 
-        if(delUser.deletedCount > 0)
-        {
+        const delUser = await User.deleteOne({ idUser: idUser })
+        if (delUser.deletedCount > 0) {
             return res.status(200).json({
-                message : "Delete Successfully",
+                message: "Delete Successfully",
             })
         }
-        else 
-        {
+        else {
             return res.status(400).json({
-                message : "Delete Fail",
+                message: "Delete Fail",
             })
         }
         /* 
@@ -115,10 +122,9 @@ const deleteUser = async (req, res, next) => {
             await User.updateMany({id : {$lt : 62}}, {password : "11223344"})
         - Cập nhật một tài liệu dựa trên điều kiện nhất định.
             await User.updateOne({id : idUser}, {name : "Muller"})
-        */ 
+        */
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 }
@@ -130,41 +136,35 @@ const getAllUser = async (req, res, next) => {
 
 
 const detailUser = async (req, res, next) => {
-    try 
-    {
-        const detailUser = await User.findOne({idUser : req.params.idUser})
-        if(detailUser == null)
-        {
+    try {
+        const detailUser = await User.findOne({ idUser: req.params.idUser })
+        if (detailUser == null) {
             return res.status(400).json({
-                mesage : "Fail Detail User"
+                mesage: "Fail Detail User"
             })
         }
         return res.status(200).json({
             detailUser
         })
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 }
 
 const refreshToken = async (req, res, next) => {
-    try
-    {
+    try {
         const token = req.cookies.refreshToken
-        if(!token)
-        {
+        if (!token) {
             return res.status(401)
         }
         const tokenNew = await refreshTokenJWT.refreshToken(token)
         return res.status(200).json({
-            success : "Success",
+            success: "Success",
             tokenNew
         })
     }
-    catch(error)
-    {
+    catch (error) {
         if (error.name === 'TokenExpiredError') {
             res.status(401).json({ message: "Token has expired" });
         } else {
@@ -175,18 +175,16 @@ const refreshToken = async (req, res, next) => {
 
 
 const logoutRefreshToken = (req, res, next) => {
-    try 
-    {
+    try {
         res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
         return res.status(200).json({
-            message : "Success"
+            message: "Success"
         })
     }
-    catch(error)
-    {
+    catch (error) {
         next(error)
     }
 
 }
 
-module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken}
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken }

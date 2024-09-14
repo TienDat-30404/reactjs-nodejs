@@ -1,10 +1,9 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
-import { updateProduct, getDetailProduct } from '../../../../services/ProductService'
-import { getAllCategory } from '../../../../services/CategoryService'
 import { getAllRole } from '../../../../services/RoleService'
 import { getDetailUser } from '../../../../services/UserService'
+import { updateUser } from '../../../../services/UserService'
 export default function EditUser({ show, close, idUser }) {
     const [informations, setInformations] = useState({
         name: '',
@@ -16,7 +15,7 @@ export default function EditUser({ show, close, idUser }) {
         avatar : '',
         idRole : ''
     })
-    const [image, setImage] = useState(null);
+    const [avatar, setAvatar] = useState(null);
     const [fileInputKey, setFileInputKey] = useState(Date.now());
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
@@ -28,13 +27,10 @@ export default function EditUser({ show, close, idUser }) {
         }
         fetchDatasRole()
     }, [])
-
     useEffect(() => {
         const fetchData = async () => {
             if (idUser) {
                 const response = await getDetailUser(idUser);
-                console.log("123")
-                console.log(response)
                 if (show) {
                     setInformations({
                         name: response.detailUser.name,
@@ -54,28 +50,32 @@ export default function EditUser({ show, close, idUser }) {
             fetchData()
         }
     }, [show, idUser])
-
     // handle click add product
-    const handleClickUpdateProduct = async () => {
+    const handleClickUpdateUser = async () => {
         // inputFocusRef.current.focus()
-
-        // var formData = new FormData()
-        // formData.append('name', product.name)
-        // formData.append('image', image)
-        // formData.append('price', product.price)
-        // formData.append('quantity', product.quantity)
-        // formData.append('idCategory', product.idCategory)
-        // formData.append('description', product.description)
-        // console.log(idUser)
-        // const response = await updateProduct(1, formData)
-        // console.log(response)
-        // if (response.errors) {
-        //     setErrors(response.errors)
-        //     return
-        // }
-        // else {
-        //     alert("Chỉnh sửa sản phẩm thành công")
-        // }
+        if(idUser)
+        {
+            console.log(informations)
+            var formData = new FormData()
+            formData.append('name', informations.name)
+            formData.append('email', informations.email)
+            formData.append('address', informations.address)
+            formData.append('phone', informations.phone)
+            formData.append('date_of_birth', informations.date_of_birth)
+            formData.append('sex', informations.sex)
+            formData.append('avatar', avatar)
+            formData.append('idRole', informations.idRole)
+    
+            const response = await updateUser(idUser, formData)
+            console.log(response)
+            if (response.errors) {
+                setErrors(response.errors)
+                return
+            }
+            else {
+                alert("Chỉnh sửa người dùng thành công")
+            }
+        }
     }
 
     const handleChangeInput = (e) => {
@@ -98,10 +98,9 @@ export default function EditUser({ show, close, idUser }) {
             return newErrors;
         });
     };
-    console.log(informations)
     const handleChangeFile = (e) => {
         const selectedFileImage = e.target.files[0]
-        setImage(selectedFileImage);
+        setAvatar(selectedFileImage);
         setErrors(prevError => {
             const newError = { ...prevError }
             if (selectedFileImage) {
@@ -149,7 +148,7 @@ export default function EditUser({ show, close, idUser }) {
                                     ref={inputFocusRef}
                                     placeholder={errors.name ? errors.name : ""}
                                 />
-                                {/* {product.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />} */}
+                                {informations.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />}
                             </div>
                         </div>
 
@@ -160,11 +159,11 @@ export default function EditUser({ show, close, idUser }) {
                                     name="email"
                                     value={informations.email}
                                     onChange={handleChangeInput}
-                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    className={`form-control ${errors.email ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
-                                    placeholder={errors.name ? errors.name : ""}
+                                    placeholder={errors.email ? errors.email : ""}
                                 />
-                                {/* {product.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />} */}
+                                {informations.email != "" && errors.email && <ErrorMessageInput errors={errors} field="email" />}
                             </div>
                         </div>
 
@@ -175,11 +174,9 @@ export default function EditUser({ show, close, idUser }) {
                                     name="address"
                                     value={informations.address}
                                     onChange={handleChangeInput}
-                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    className={`form-control `}
                                     ref={inputFocusRef}
-                                    placeholder={errors.name ? errors.name : ""}
                                 />
-                                {/* {product.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />} */}
                             </div>
                         </div>
 
@@ -190,11 +187,10 @@ export default function EditUser({ show, close, idUser }) {
                                     name="phone"
                                     value={informations.phone}
                                     onChange={handleChangeInput}
-                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    className={`form-control ${errors.phone ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
-                                    placeholder={errors.name ? errors.name : ""}
                                 />
-                                {/* {product.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />} */}
+                                {informations.phone != "" && errors.phone && <ErrorMessageInput errors={errors} field="phone" />}
                             </div>
                         </div>
 
@@ -206,11 +202,10 @@ export default function EditUser({ show, close, idUser }) {
                                     name="date_of_birth"
                                     value={informations.date_of_birth}
                                     onChange={handleChangeInput}
-                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    className={`form-control ${errors.date_of_birth ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
-                                    placeholder={errors.name ? errors.name : ""}
                                 />
-                                {/* {product.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />} */}
+                                {informations.name != "" && errors.date_of_birth && <ErrorMessageInput errors={errors} field="date_of_birth" />}
                             </div>
                         </div>
                         <div className='px-4 py-2 d-flex align-items-center'>
@@ -236,7 +231,14 @@ export default function EditUser({ show, close, idUser }) {
                                         className={`form-control ${errors.image ? 'is-invalid' : ''} `}
                                         placeholder={errors.image ? errors.image : ""}
                                     />
-                                    <img width="60px" height="40px" src={informations.image} alt="" />
+                                    {informations.avatar ? (
+                                        <img width="60px" height="40px" src={informations.avatar} alt="" />
+                                    ) : 
+                                    (
+                                        <h6>Chưa có ảnh đại diện</h6>
+                                    )
+
+                                    }
                                 </div>
                                 {/* {errors.image && <ErrorMessageInput className errors={errors} field="image" />} */}
                             </div>
@@ -246,12 +248,12 @@ export default function EditUser({ show, close, idUser }) {
                             <label style={{ fontSize: '14px' }} className="form-label">Loại tài khoản</label>
                             <div style={{ width: '100%' }}>
                                 <select
-                                    value={roles.idRole}
+                                    value={informations.idRole}
                                     name="idRole"
                                     className={`form-control  ${errors.idRole ? 'is-invalid' : ''}  `}
                                     onChange={handleChangeInput}
                                 >
-                                    <option value="0" checked>Chọn loại tài khoản</option>
+                                    <option value="-1" checked>Chọn loại tài khoản</option>
                                     {roles.length > 0 ? (
                                         roles.map((role, index) => (
                                             <option key={index} value={role.idRole}>{role.name}</option>
@@ -264,7 +266,7 @@ export default function EditUser({ show, close, idUser }) {
 
                         <div className="modal-footer d-flex justify-content-between ">
                             <button onClick={() => closeModal()} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button onClick={handleClickUpdateProduct} type="button" className="btn btn-primary">Edit</button>
+                            <button onClick={handleClickUpdateUser} type="button" className="btn btn-primary">Edit</button>
                         </div>
                     </div>
                 ) : <p>123</p>}

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { InputComponent } from '../../components/InputComponent';
 import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
 import { jwtDecode } from 'jwt-decode';
-import { loginService, updateUserService } from '../../services/UserService';
+import { loginService, updateUser } from '../../services/UserService';
 import { ErrorMessageInput } from '../../components/InputComponent';
 export default function InformationBasicProfile() {
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -59,7 +59,7 @@ export default function InformationBasicProfile() {
 
     const fetchApiUpdateUser = async (id, data) => {
         try {
-            const resultUpdate = await updateUserService(id, data)
+            const resultUpdate = await updateUser(id, data)
             if (resultUpdate.errors) {
                 setErrors(resultUpdate.errors)
                 return

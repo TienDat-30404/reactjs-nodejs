@@ -200,7 +200,7 @@ export default function EditProduct({ show, close, idProduct }) {
                                     <option value="0">Chọn thể loại</option>
                                     {category.length > 0 ? (
                                         category.map((category, index) => (
-                                            <option value={category.idCategory}>{category.name}</option>
+                                            <option key ={index} value={category.idCategory}>{category.name}</option>
                                         ))
                                     ) : <option>Hiện không có thể loại sản phẩm nào</option>}
                                 </select>

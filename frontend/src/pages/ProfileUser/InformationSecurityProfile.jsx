@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { InputComponent, ErrorMessageInput } from '../../components/InputComponent'
-import { updateUserService, loginService } from '../../services/UserService';
+import { updateUser, loginService } from '../../services/UserService';
 import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
 import { jwtDecode } from 'jwt-decode';
 import UpdatePassword from './UpdatePassword';
@@ -62,7 +62,7 @@ export default function InformationSecurityProfile() {
 
     const fetchApiUpdateUser = async (id, data) => {
         try {
-            const resultUpdate = await updateUserService(id, data)
+            const resultUpdate = await updateUser(id, data)
             if (resultUpdate.errors) {
                 setErrors(resultUpdate.errors)
                 return
