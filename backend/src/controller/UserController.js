@@ -25,7 +25,6 @@ const loginUser = async (req, res, next) => {
         idUser: isCheckUser.idUser,
         name: isCheckUser.name,
         email: isCheckUser.email,
-        password: isCheckUser.password,
         address: isCheckUser.address,
         phone: isCheckUser.phone,
         sex: isCheckUser.sex,
@@ -59,13 +58,13 @@ const updateUser = async (req, res, next) => {
         const user = await User.findOne({ idUser: idUser })
         const newData = {
             name: name,
-            email : email,
+            email: email,
             address: address,
             phone: phone,
             date_of_birth: date_of_birth,
             sex: sex,
             avatar: user.avatar,
-            idRole : idRole
+            idRole: idRole
         };
         if (req.file) {
             const fielAvatar = await cloudinary.uploader.upload(req.file.path);
@@ -187,4 +186,50 @@ const logoutRefreshToken = (req, res, next) => {
 
 }
 
-module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken }
+
+
+const changePassword = async (req, res, next) => {
+    try {
+        const idUser = req.params.idUser
+        const { password } = req.body
+        const newPassword = hashPassword(password)
+        await User.updateOne({ idUser: idUser }, { $set: { password: newPassword } })
+        return res.status(200).json({
+            message: "Change Password Successful"
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+};
+
+const searchUser = async (req, res, next) => {
+    const { idUser, name, email, phone, idRole } = req.query
+    const searchParams = {}
+    if (idUser) {
+        searchParams.idUser = idUser
+    }
+    if (name) {
+        searchParams.name = { $regex: name, $options: 'i' }; // 'i' để tìm không phân biệt chữ hoa chữ thường
+    }
+    if (email) {
+        searchParams.email = { $regex: email};
+    }
+    if (phone) {
+        searchParams.phone = { $regex: phone}
+    }
+    if (idRole) {
+        searchParams.idRole = idRole
+    }
+    
+    try 
+    {
+        const users = await User.find(searchParams)
+        return res.status(200).json({users})
+    }
+    catch (error)
+    {
+        return res.status(400).json({message : error.message})
+    }
+}
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken, changePassword, searchUser }

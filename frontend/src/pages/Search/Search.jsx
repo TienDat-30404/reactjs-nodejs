@@ -21,7 +21,7 @@ export default function Search() {
  
     useEffect(() => {
         const fetchDatasSearchProduct = async () => {
-            const listSearchProduct = await getAllProduct(page, sort, type, limit, idCategory, wordSearch, priceFrom, priceTo)
+            const listSearchProduct = await getAllProduct(page, sort, type, limit, null, idCategory, wordSearch, priceFrom, priceTo)
             setResultSearch(listSearchProduct)
             setTotalPage(listSearchProduct.totalPages)
         }

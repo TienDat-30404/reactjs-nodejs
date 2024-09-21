@@ -25,5 +25,7 @@ router.get('/get-all-user', UserController.getAllUser)
 router.post('/refresh-token', UserController.refreshToken)
 router.post('/logout-refresh-token', UserController.logoutRefreshToken)
 router.get('/detail-user/:idUser', UserController.detailUser)
+router.put('/change-password/:idUser', UserController.changePassword)
+router.get('/search-user', UserController.searchUser)
 // router.post('/refresh-token-update-user', UserController.refreshTokenWhenUpdateUser)
 module.exports = router

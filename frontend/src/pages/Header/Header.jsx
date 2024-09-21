@@ -9,7 +9,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logoutSuccess } from "../../redux/userSlice";
 import { logoutUser } from "../../until/tokenUser";
 import SearchAdvanced from "./SearchAdvanced";
-import { allCartOfUser } from "../../services/CartService";
 const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
     const [showModal, setShowModal] = useState(false);
     const displaySearchAdvanced = () => {

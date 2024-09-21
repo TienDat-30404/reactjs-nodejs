@@ -21,4 +21,22 @@ const getAllRole = async(req, res, next) => {
         next(error)
     }
 }
-module.exports = {addRole, getAllRole}
+
+const detailRole = async (req, res, next) => {
+    try {
+        const idRole = req.params.idRole
+        const detailRole = await Role.findOne({ idRole: idRole })
+        if (detailRole == null) {
+            return res.status(400).json({
+                message: "Fail Detail Role"
+            })
+        }
+        return res.status(200).json({
+            detailRole
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = {addRole, getAllRole, detailRole}

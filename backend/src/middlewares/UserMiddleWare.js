@@ -36,7 +36,7 @@ const validateSignIn = async (req, res, next) => {
         if (password !== confirm_password) {
             errors.confirm_password = "Mật khẩu không trùng khớp";
         }
-        if(idRole == 0)
+        if(idRole == -1)
         {
             errors.idRole = "Vui lòng chọn loại tài khoản"
         }

@@ -79,6 +79,10 @@ const getAllProduct = async (req, res, next) => {
         const objectSort = {}
         objectSort[sortBy] = type
         const objectFilter = {}
+        if(req.query.idProduct)
+        {
+            objectFilter.idProduct = req.query.idProduct
+        }
         if (req.query.idCategory) {
             objectFilter.idCategory = req.query.idCategory;
         }
@@ -92,6 +96,13 @@ const getAllProduct = async (req, res, next) => {
             const priceTo = parseFloat(req.query.priceTo);
             objectFilter.price = { $gte: priceFrom, $lte: priceTo };
         }
+
+        if(req.query.quantity)
+        {
+            const quantity = parseInt(req.query.quantity)
+            objectFilter.quantity = {$lte : quantity }
+        }
+        console.log(objectFilter)
         const totalProducts = Object.keys(objectFilter).length === 0
             ? await Product.countDocuments({})
             : await Product.countDocuments(objectFilter);
@@ -167,6 +178,33 @@ const getPrice = async (req, res, next) => {
     })
 }
 
+const searchProduct = async (req, res, next) => {
+    const { idProduct, name, email, phone, idRole } = req.query
+    const searchParams = {}
+    if (idProduct) {
+        searchParams.idProduct = idProduct
+    }
+    if (name) {
+        searchParams.name = { $regex: name, $options: 'i' }; // 'i' để tìm không phân biệt chữ hoa chữ thường
+    }
+    if (email) {
+        searchParams.email = { $regex: email};
+    }
+    if (phone) {
+        searchParams.phone = { $regex: phone}
+    }
+    if (idRole) {
+        searchParams.idRole = idRole
+    }
+    try 
+    {
+        const users = await User.find(searchParams)
+        return res.status(200).json({users})
+    }
+    catch (error)
+    {
+        return res.status(400).json({message : error.message})
+    }
+}
 
-
-module.exports = { addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, getPrice }
+module.exports = { addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, getPrice, searchProduct }

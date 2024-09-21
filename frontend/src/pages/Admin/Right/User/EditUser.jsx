@@ -4,7 +4,7 @@ import { ErrorMessageInput } from '../../../../components/InputComponent'
 import { getAllRole } from '../../../../services/RoleService'
 import { getDetailUser } from '../../../../services/UserService'
 import { updateUser } from '../../../../services/UserService'
-export default function EditUser({ show, close, idUser }) {
+export default function EditUser({ show, close, idUser, onSuccess }) {
     const [informations, setInformations] = useState({
         name: '',
         email: '',
@@ -74,6 +74,7 @@ export default function EditUser({ show, close, idUser }) {
             }
             else {
                 alert("Chỉnh sửa người dùng thành công")
+                onSuccess()
             }
         }
     }

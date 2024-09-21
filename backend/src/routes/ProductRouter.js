@@ -22,4 +22,5 @@ router.delete('/delete-product/:idProduct', authencationMiddleWare, ProductContr
 router.get('/get-all-product', ProductController.getAllProduct)
 router.get('/detail-product/:idProduct', ProductController.getDetailProduct)
 router.get('/price', ProductController.getPrice)
+router.get('/search-product', ProductController.searchProduct)
 module.exports = router
