@@ -18,11 +18,10 @@ export const useAuthHandler = () => {
             dispatch(loginSuccess({ dataLogin: jwtDecode(accessToken) }));
             setIdUser(jwtDecode(accessToken).idUser)
         } else {
-            saveTokenOnCookieAfterDeleted(10000);
+            // saveTokenOnCookieAfterDeleted(10000);
             await handleRefreshToken();
         }
-        if(currentIdUser)
-        {
+        if (currentIdUser) {
             await fetchAllCart(idUser)
         }
     };
@@ -38,25 +37,24 @@ export const useAuthHandler = () => {
                 setCookieForToken(refreshToken.tokenNew);
                 saveTokenOnRedux(jwtDecode(refreshToken.tokenNew));
                 setIdUser(jwtDecode(refreshToken.tokenNew).idUser)
-                saveTokenOnCookieAfterDeleted(10000);
+                // saveTokenOnCookieAfterDeleted(10000);
             }
 
         } catch (error) {
             console.log(error);
         }
-    }; 
-    
-    const saveTokenOnCookieAfterDeleted = (delay) => {
-        setTimeout(async () => {
-            await handleRefreshToken();
-        }, delay);
     };
+
+    // const saveTokenOnCookieAfterDeleted = (delay) => {
+    //     setTimeout(async () => {
+    //         await handleRefreshToken();
+    //     }, delay);
+    // };
 
 
     const fetchAllCart = async (id) => {
-
-            const response = await allCartOfUser(id);
-            saveCartOnRedux(response.carts, response.carts.length);
+        const response = await allCartOfUser(id);
+        saveCartOnRedux(response.carts, response.carts.length);
     }
 
     return { checkAndUpdateToken };

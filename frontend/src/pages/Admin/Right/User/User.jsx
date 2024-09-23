@@ -8,6 +8,7 @@ import EditUser from './EditUser'
 import { getDetailRole } from '../../../../services/RoleService'
 import { InputComponent } from '../../../../components/InputComponent'
 import { getAllRole } from '../../../../services/RoleService'
+import { handleChangeInput } from '../../../../until/function'
 export default function User() {
   const [users, setUsers] = useState([])
   const [showAdd, setShowAdd] = useState(false)
@@ -74,7 +75,6 @@ export default function User() {
       await fetchUsersWithRoles(response.users);  // Lấy chi tiết role của các user trong kết quả tìm kiếm
     }
   }
-  console.log(users)
 
   // handle delete account
   const handleDeleteUser = async (id) => {
@@ -86,12 +86,10 @@ export default function User() {
 
   // switch modal change password
   const switchModalChangePassword = () => {
-    if(selectedId)
-    {
+    if (selectedId) {
       setShowChangePassword(true)
     }
-    else 
-    {
+    else {
       alert("Vui lòng chọn tài khoản muốn đổi tài khoản")
     }
   }
@@ -100,14 +98,7 @@ export default function User() {
     fetchDatasUser();
   }, []);
 
-  const handleChangeInput = (e) => {
-    const { name, value } = e.target;
-    setWordSearch(prevInfo => ({
-      ...prevInfo,
-      [name]: value
-    }));
 
-  };
 
 
   return (
@@ -137,9 +128,9 @@ export default function User() {
 
           {/* Id */}
           <div className="d-flex align-items-center" style={{ width: '10%', marginRight: '10px' }}>
-            <label htmlFor="inputId" className="me-2 col-form-label">Id</label>
+            <label className="me-2 col-form-label">Id</label>
             <InputComponent
-              onChange={handleChangeInput}
+              onChange={(e) => handleChangeInput(e, setWordSearch)}
               name="idUser"
               type="text"
               className="form-control"
@@ -151,7 +142,7 @@ export default function User() {
           <div className="d-flex align-items-center" style={{ width: '20%', marginRight: '10px' }}>
             <label htmlFor="inputName" className="me-2 col-form-label">Name</label>
             <InputComponent
-              onChange={handleChangeInput}
+              onChange={(e) => handleChangeInput(e, setWordSearch)}
               name="name"
               type="text"
               className="form-control"
@@ -163,7 +154,7 @@ export default function User() {
           <div className="d-flex align-items-center" style={{ width: '25%', marginRight: '10px' }}>
             <label htmlFor="inputEmail" className="me-2 col-form-label">Email</label>
             <InputComponent
-              onChange={handleChangeInput}
+              onChange={(e) => handleChangeInput(e, setWordSearch)}
               name="email"
               type="text"
               className="form-control"
@@ -175,7 +166,7 @@ export default function User() {
           <div className="d-flex align-items-center" style={{ width: '20%', marginRight: '10px' }}>
             <label htmlFor="inputPhone" className="me-2 col-form-label">Phone</label>
             <InputComponent
-              onChange={handleChangeInput}
+              onChange={(e) => handleChangeInput(e, setWordSearch)}
               name="phone"
               type="text"
               className="form-control"
@@ -186,7 +177,7 @@ export default function User() {
           {/* Role */}
           <div className="d-flex align-items-center" style={{ width: '15%' }}>
             <label htmlFor="inputRole" className="me-2 col-form-label">Role</label>
-            <select className='form-control' name="idRole" onChange={handleChangeInput}
+            <select className='form-control' name="idRole" onChange={(e) => handleChangeInput(e, setWordSearch)}
             >
               <option value="-1">Chọn quyền</option>
               {roles.length > 0 ? (

@@ -24,7 +24,6 @@ export default function EditProduct({ show, close, idProduct, onSuccess }) {
             {     
                 const response = await getAllCategory();
                 setCategory(response.categories)
-    
                 const responseDetailProduct = await getDetailProduct(idProduct);
                 if(show)
                 {

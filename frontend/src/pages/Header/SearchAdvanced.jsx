@@ -5,6 +5,7 @@ import { InputComponent } from '../../components/InputComponent';
 import { getAllCategory } from '../../services/CategoryService';
 import { ErrorMessageInput } from '../../components/InputComponent';
 import { validateSearchAdvanced, createQueryStringForSearch } from '../../until/validate';
+import { handleChangeInput } from '../../until/function';
 const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
     const navigate = useNavigate()
     const [categories, setCategories] = useState([])
@@ -27,15 +28,6 @@ const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
         }
         fetchData()
     }, [])
-
-    // change value for input
-    const handleChangeInput = (e) => {
-        const { name, value } = e.target;
-        setDataSearch(prevInfor => ({
-            ...prevInfor,
-            [name]: value
-        }));
-    };
 
     // reset all 
     useEffect(() => {
@@ -96,7 +88,7 @@ const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
                         <InputComponent
                             name="nameSearch"
                             value={show ? dataSearch.name : ''}
-                            onChange={handleChangeInput}
+                            onChange={(e) => handleChangeInput(e, setDataSearch)}
                             type="text"
                             style={{ width: '60%', height: '35px' }}
                         />
@@ -105,7 +97,7 @@ const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
                         <label style={{ width: '30%' }} htmlFor="staticEmail" className="col-sm-2 col-form-label text-nowrap me-3">Danh mục sản phẩm</label>
                         {categories.categories ? (
 
-                            <select style={{ width: '60%', height: '35px' }} value = {dataSearch.idCategory} name="idCategory" onChange={handleChangeInput} >
+                            <select style={{ width: '60%', height: '35px' }} value = {dataSearch.idCategory} name="idCategory" onChange={(e) => handleChangeInput(e, setDataSearch)} >
                                 <option value="0">Tất cả</option>
                                 {categories.categories.map((category, index) => (
                                     <>
@@ -127,7 +119,7 @@ const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
                                 <InputComponent
                                     name="priceFrom"
                                     value={dataSearch.priceFrom}
-                                    onChange={handleChangeInput}
+                                    onChange={(e) => handleChangeInput(e, setDataSearch)}
                                     type="text"
                                     style={{ width: '75%', height: '35px' }}
                                     className={`form-control ${errors.priceFrom ? 'is-invalid' : ''}`}
@@ -141,7 +133,7 @@ const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
                                 <InputComponent
                                     name="priceTo"
                                     value={dataSearch.priceTo}
-                                    onChange={handleChangeInput}
+                                    onChange={(e) => handleChangeInput(e, setDataSearch)}
                                     type="text"
                                     style={{ width: '75%', height: '35px' }}
                                     className={`form-control ${errors.priceTo ? 'is-invalid' : ''}`}

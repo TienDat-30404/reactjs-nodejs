@@ -55,7 +55,7 @@ export default function EditUser({ show, close, idUser, onSuccess }) {
         // inputFocusRef.current.focus()
         if(idUser)
         {
-            console.log(informations)
+            console.log("THông tin", informations.name)
             var formData = new FormData()
             formData.append('name', informations.name)
             formData.append('email', informations.email)
@@ -65,7 +65,6 @@ export default function EditUser({ show, close, idUser, onSuccess }) {
             formData.append('sex', informations.sex)
             formData.append('avatar', avatar)
             formData.append('idRole', informations.idRole)
-    
             const response = await updateUser(idUser, formData)
             console.log(response)
             if (response.errors) {
@@ -99,6 +98,7 @@ export default function EditUser({ show, close, idUser, onSuccess }) {
             return newErrors;
         });
     };
+    
     const handleChangeFile = (e) => {
         const selectedFileImage = e.target.files[0]
         setAvatar(selectedFileImage);
@@ -212,7 +212,7 @@ export default function EditUser({ show, close, idUser, onSuccess }) {
                         <div className='px-4 py-2 d-flex align-items-center'>
                             <label style={{ fontSize: '14px' }} className="form-label">Giới tính</label>
                             <div style={{ width: '100%' }}>
-                                <select name="" id="" className='form-control' value = {informations.sex}>
+                                <select onChange={handleChangeInput} name="sex" id="" className='form-control' value = {informations.sex}>
                                     <option value="Nam">Nam</option>
                                     <option value="Nữ">Nữ</option>
                                     <option value="Khác">Khác</option>

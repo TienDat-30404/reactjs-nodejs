@@ -1,23 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const multer = require('multer');
-const path = require('path');
+const {uploadImageProduct} = require('../utils/multerConfig')
 const authencationMiddleWare = require('../middlewares/authencationMiddleWare')
 const ProductController = require('../controller/ProductController')
 const {validateAddProduct, validateUpdateProduct} = require('../middlewares/ProductMiddleWare')
-
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        return cb(null, './src/utils/uploads/images');
-    },
-    filename: function (req, file, cb) {
-        return cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-const upload = multer({ storage: storage });
-
-router.post('/add-product', upload.single('image'), validateAddProduct, ProductController.addProduct)
-router.put('/update-product/:idProduct', upload.single('image'), validateUpdateProduct, ProductController.updateProduct)
+router.post('/add-product', uploadImageProduct.single('image'), validateAddProduct, ProductController.addProduct)
+router.put('/update-product/:idProduct', uploadImageProduct.single('image'), validateUpdateProduct, ProductController.updateProduct)
 router.delete('/delete-product/:idProduct', authencationMiddleWare, ProductController.deleteProduct)
 router.get('/get-all-product', ProductController.getAllProduct)
 router.get('/detail-product/:idProduct', ProductController.getDetailProduct)

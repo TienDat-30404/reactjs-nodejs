@@ -10,7 +10,6 @@ export default function InformationSecurityProfile() {
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const [dataUser, setDataUser] = useState({
         email: '',
-        password: '',
         phone: ''
     })
 
@@ -26,16 +25,14 @@ export default function InformationSecurityProfile() {
     const [errors, setErrors] = useState({})
     const displayDefaultInformation = useCallback(() => {
         if (isAuthenticated && userData?.dataLogin) {
-            const { email, password, phone } = userData.dataLogin
+            const { email, phone } = userData.dataLogin
             setDataUser({
                 email,
-                password,
                 phone
             })
         } else {
             setDataUser({
                 email: '',
-                password: '',
                 phone: ''
             })
         }
@@ -76,7 +73,6 @@ export default function InformationSecurityProfile() {
 
             const refreshTokenWhenUpdate = {
                 email: dataUser.email,
-                password: dataUser.password
             }
             const resultTokenUpdate = await loginService(refreshTokenWhenUpdate)
             setCookieForToken(resultTokenUpdate.token)
@@ -88,7 +84,10 @@ export default function InformationSecurityProfile() {
 
     const handleSaveChanges = () => {
         if (dataUpdate) {
-            fetchApiUpdateUser(userData.dataLogin.idUser, dataUpdate);
+            const formData = new FormData()
+            formData.append('phone', dataUpdate.phone)
+            formData.append('email', dataUpdate.email)
+            fetchApiUpdateUser(userData.dataLogin.idUser, formData);
         }
     };
 

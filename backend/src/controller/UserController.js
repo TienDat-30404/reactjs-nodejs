@@ -29,7 +29,8 @@ const loginUser = async (req, res, next) => {
         phone: isCheckUser.phone,
         sex: isCheckUser.sex,
         date_of_birth: isCheckUser.date_of_birth,
-        idRole: isCheckUser.idRole
+        idRole: isCheckUser.idRole,
+        avatar
     };
 
     const accessToken = generateToken(payloadToken)
@@ -54,7 +55,7 @@ const updateUser = async (req, res, next) => {
         const idUser = req.params.idUser
         console.log(idUser)
         const { name, email, address, phone, date_of_birth, sex, idRole } = req.body
-        console.log(name)
+        console.log(name, email, address, phone, date_of_birth, sex, idRole)
         const user = await User.findOne({ idUser: idUser })
         const newData = {
             name: name,

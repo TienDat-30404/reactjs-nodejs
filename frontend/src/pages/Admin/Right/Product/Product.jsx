@@ -6,6 +6,7 @@ import EditProduct from './EditProduct'
 import { detailCategory } from '../../../../services/CategoryService'
 import { InputComponent } from '../../../../components/InputComponent'
 import { getAllCategory } from '../../../../services/CategoryService'
+import { handleChangeInput } from '../../../../until/function'
 export default function Product() {
   const [products, setProducts] = useState([])
   const [showAdd, setShowAdd] = useState(false)
@@ -60,21 +61,13 @@ export default function Product() {
   // handle delete product
   const handleDeleteProduct = async (id) => {
     const response = await deleteProduct(id)
-    if(response)
-    {
+    if (response) {
       setProducts(products.filter(user => user.idProduct != id))
     }
   }
-  
 
-  const handleChangeInput = (e) => {
-    const { name, value } = e.target;
-    setWordSearch(prevInfo => ({
-      ...prevInfo,
-      [name]: value
-    }));
 
-  };
+
 
   const handleSearchProduct = async (e) => {
     e.preventDefault()
@@ -126,7 +119,7 @@ export default function Product() {
             <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
               <label style={{ width: '80px' }} htmlFor="inputId" className="me-2 col-form-label">Id</label>
               <InputComponent
-                onChange={handleChangeInput}
+                onChange={(e) => handleChangeInput(e, setWordSearch)}
                 name="idProduct"
                 type="text"
                 className="form-control"
@@ -138,7 +131,7 @@ export default function Product() {
             <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
               <label style={{ width: '80px' }} htmlFor="inputName" className="me-2 col-form-label">Name</label>
               <InputComponent
-                onChange={handleChangeInput}
+                onChange={(e) => handleChangeInput(e, setWordSearch)}
                 name="name"
                 type="text"
                 className="form-control"
@@ -151,7 +144,7 @@ export default function Product() {
               <div style={{ width: '50%' }} className='d-flex align-items-center me-3'>
                 <label style={{ width: '100px' }} htmlFor="inputEmail" className="me-2 col-form-label">Price</label>
                 <InputComponent
-                  onChange={handleChangeInput}
+                  onChange={(e) => handleChangeInput(e, setWordSearch)}
                   name="priceFrom"
                   type="text"
                   className="form-control"
@@ -163,7 +156,8 @@ export default function Product() {
 
               <div style={{ width: '50%' }} className='d-flex align-items-center ms-3'>
                 <InputComponent
-                  onChange={handleChangeInput}
+                  onChange={(e) => handleChangeInput(e, setWordSearch)}
+
                   name="priceTo"
                   type="text"
                   className="form-control"
@@ -176,7 +170,8 @@ export default function Product() {
             <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
               <label style={{ width: '80px' }} htmlFor="inputPhone" className="me-2 col-form-label">Quantity</label>
               <InputComponent
-                onChange={handleChangeInput}
+                onChange={(e) => handleChangeInput(e, setWordSearch)}
+
                 name="quantity"
                 type="text"
                 className="form-control"
@@ -187,7 +182,8 @@ export default function Product() {
             {/* Role */}
             <div className="d-flex align-items-center" style={{ width: '100%' }}>
               <label style={{ width: '80px' }} className="me-2 col-form-label">Category</label>
-              <select className='form-control' name="idCategory" onChange={handleChangeInput}>
+              <select className='form-control' name="idCategory" onChange={(e) => handleChangeInput(e, setWordSearch)}
+              >
                 <option value="-1">Chọn thể loại</option>
                 {categories.length > 0 ? (
                   categories.map((category, index) => (

@@ -18,7 +18,8 @@ function LoginModal({ show, handleClose, switchSignIn }) {
 
   const handleClickLogin = async () => {
     try {
-      const response = await loginService(dataLogin)
+      const response = await loginService(dataLogin, true)
+      console.log(response)
       if (response.errors) {
         setErrors(response.errors)
         return
@@ -31,8 +32,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
         alert("Đăng nhập thành công")
         setCookieForToken(response.token)
         saveTokenOnRedux(jwtDecode(response.token))
-        localStorage.setItem('avatar', response.avatar)
-
+        // localStorage.setItem('avatar', response.avatar)
         const cartResponse = await allCartOfUser(jwtDecode(response.token).idUser);
         saveCartOnRedux(cartResponse.carts, cartResponse.carts.length);
         navigate('./admin/product')

@@ -17,7 +17,9 @@ export default function InformationBasicProfile() {
     const [errors, setErrors] = useState({})
     const [dataUpdate, setDataUpdate] = useState(null);
     const saveTokenOnRedux = useSaveTokenOnRedux()
+    const [avatar, setAvatar] = useState(null);
 
+    // display default information user 
     const displayDefaultInformation = useCallback(() => {
         if (isAuthenticated && userData?.dataLogin) {
             const { name, address, date_of_birth, sex, avatar } = userData.dataLogin
@@ -26,7 +28,7 @@ export default function InformationBasicProfile() {
                 address,
                 date_of_birth,
                 sex,
-                avatar
+                avatar 
             })
         } else {
             setDataUser({
@@ -39,27 +41,28 @@ export default function InformationBasicProfile() {
         }
     }, [isAuthenticated, userData])
 
+
     useEffect(() => {
         displayDefaultInformation()
     }, [displayDefaultInformation]);
 
     useEffect(() => {
         if (isAuthenticated) {
-            const { email, password, phone } = userData.dataLogin
+            const { email, phone } = userData.dataLogin
             setDataUpdate({
                 ...dataUser,
                 email,
-                password,
                 phone
             })
         } else {
             setDataUpdate(null);
         }
     }, [isAuthenticated, userData, dataUser]);
-
+    
     const fetchApiUpdateUser = async (id, data) => {
         try {
             const resultUpdate = await updateUser(id, data)
+            console.log(resultUpdate)
             if (resultUpdate.errors) {
                 setErrors(resultUpdate.errors)
                 return
@@ -70,9 +73,9 @@ export default function InformationBasicProfile() {
                 setErrors({})
                 // window.location.reload()
             }
-            const refreshTokenWhenUpdate = {
+           const refreshTokenWhenUpdate = {
                 email: userData.dataLogin.email,
-                password: userData.dataLogin.password
+                password : userData.dataLogin.password
             }
             const resultTokenUpdate = await loginService(refreshTokenWhenUpdate)
             setCookieForToken(resultTokenUpdate.token)
@@ -82,9 +85,15 @@ export default function InformationBasicProfile() {
         }
     };
 
-    const handleSaveChanges = () => {
-        if (dataUpdate) {
-            fetchApiUpdateUser(userData.dataLogin.idUser, dataUpdate);
+    const handleSaveChanges = async() => {
+        if (dataUpdate && userData.dataLogin.idUser) {
+            var formData = new FormData()
+            formData.append('name', dataUpdate.name)
+            formData.append('address', dataUpdate.address)
+            formData.append('date_of_birth', dataUpdate.date_of_birth)
+            formData.append('sex', dataUpdate.sex)
+            formData.append('avatar', avatar)
+            fetchApiUpdateUser(userData.dataLogin.idUser, formData);
         }
     };
 
@@ -96,20 +105,32 @@ export default function InformationBasicProfile() {
         }));
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64Image = reader.result;
-                setDataUser(prevInfor => ({
-                    ...prevInfor,
-                    avatar: reader.result
-                }));
-                localStorage.setItem('avatar', base64Image); // Lưu ảnh mới vào localStorage
-            };
-            reader.readAsDataURL(file);
-        }
+    // const handleImageChange = (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => {
+    //             const base64Image = reader.result;
+    //             setDataUser(prevInfor => ({
+    //                 ...prevInfor,
+    //                 avatar: reader.result
+    //             }));
+    //             localStorage.setItem('avatar', base64Image); // Lưu ảnh mới vào localStorage
+    //         };
+    //         reader.readAsDataURL(file);
+    //     }
+    // };
+
+    const handleChangeFile = (e) => {
+        const selectedFileImage = e.target.files[0]
+        setAvatar(selectedFileImage);
+        setErrors(prevError => {
+            const newError = { ...prevError }
+            if (selectedFileImage) {
+                delete newError.image
+            }
+            return newError
+        })
     };
     return (
         <div style={{ borderRight: '1px solid #ccc' }} className='col-6 bg-white '>
@@ -119,7 +140,7 @@ export default function InformationBasicProfile() {
                     <div style={{ border: '4px solid rgb(194, 225, 255)', width: "100px", padding: '24px', borderRadius: '70px' }}>
                         <img
                             width="45px"
-                            src={localStorage.getItem('avatar') ? localStorage.getItem('avatar')  : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
+                            src={userData ? userData.dataLogin.avatar  : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
                         />
                     </div>
                     <div className='ms-3 flex-grow-1'>
@@ -132,7 +153,6 @@ export default function InformationBasicProfile() {
                                 style={{ height: '35px' }}
                                 type="text"
                                 className={`form-control flex-grow-1 ${errors.name ? 'is-invalid' : ''}`}
-                                aria-describedby="passwordHelpBlock"
                             />
                         </div>
                         {errors.name && <ErrorMessageInput errors={errors} field="name" />}
@@ -145,14 +165,14 @@ export default function InformationBasicProfile() {
                                 style={{ height: '35px' }}
                                 type="text"
                                 className="form-control flex-grow-1"
-                                aria-describedby="passwordHelpBlock"
                             />
                         </div>
                     </div>
                 </div>
 
                 <InputComponent 
-                    onChange={handleImageChange}
+                    name="avatar"
+                    onChange={handleChangeFile}
                     className = 'mt-3' 
                     type="file" 
                 />

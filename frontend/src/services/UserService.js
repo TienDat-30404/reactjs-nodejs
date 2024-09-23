@@ -1,6 +1,11 @@
 import Cookies from 'js-cookie'
-export const loginService = async (dataLogin) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up`, {
+export const loginService = async (dataLogin, isValidate) => {
+    const params = new URLSearchParams({});
+    if(isValidate)
+    {
+        params.append('validate_login', true)
+    }
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up?${params.toString}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -126,7 +126,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                         {isAuthenticated ? (
                                                             <>
                                                                 <ImageComponent
-                                                                    src={localStorage.getItem('avatar') ? localStorage.getItem('avatar') : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
+                                                                    src={ userData ? userData.dataLogin.avatar : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
                                                                     width="30px"
                                                                     height="30px"
                                                                     borderRadius="5px"

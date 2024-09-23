@@ -21,12 +21,12 @@ const refreshToken = async (token) => {
                 idUser : user.idUser,
                 name : user.name,
                 email : user.email,
-                password : user.password,
                 idRole : user.idRole,
                 sex : user.sex,
                 address : user.address,
                 phone : user.phone,
-                date_of_birth : user.date_of_birth
+                date_of_birth : user.date_of_birth,
+                avatar : user.avatar
             })
             resolve(accessToken)
         });

@@ -23,6 +23,7 @@ const addProduct = async (req, res, next) => {
 const updateProduct = async (req, res, next) => {
     const idProduct = req.params.idProduct
     console.log(idProduct)
+
     const { name, price, quantity, idCategory, description } = req.body
     const product = await Product.findOne({idProduct : idProduct})
     const newData = {

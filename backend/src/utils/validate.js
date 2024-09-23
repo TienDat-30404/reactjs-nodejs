@@ -48,20 +48,22 @@ const isCheckExistNameCategory = async (name) => {
     return !existNameCategory
 }
 
+const conditionLoginMiddleware = (condition, middleware) => {
+    return (req, res, next) => {
+      if (condition(req)) {
+        return middleware(req, res, next);
+      } else {
+        return next();
+      }
+    };
+  };
+  
+  const shouldUseValidation = (req) => {
+    return req.query.validate_login === 'true';
+  };
 
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         // Đặt thư mục lưu ảnh trong dự án của bạn
-//         cb(null, path.join(__dirname, 'uploads/images'));
-//     },
-//     filename: function (req, file, cb) {
-//         // Đổi tên file để tránh trùng lặp
-//         cb(null, Date.now() + path.extname(file.originalname));
-//     }
-// });
 
-// const upload = multer({ storage: storage });
 module.exports = {
     validateEmail, hashPassword, validateNameProduct, validatePriceProduct, validateTypeQuantityProduct,
- validateNameProductWhenUpdate, isCheckExistNameCategory
+ validateNameProductWhenUpdate, isCheckExistNameCategory, conditionLoginMiddleware, shouldUseValidation
 }
