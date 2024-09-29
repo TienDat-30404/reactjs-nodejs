@@ -15,7 +15,7 @@ const UserSchema = new Schema(
         date_of_birth : {type : String, default : ''},
         sex : {type : String, default : ''},
         avatar : {type : String, default : ''},
-        idRole : {type : Number, required : true, default : 0}
+        idRole : {type : Number, required : true, default : 1}
     },
     { timestamps: true });
 

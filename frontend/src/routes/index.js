@@ -11,6 +11,13 @@ import Admin from "../pages/Admin/Admin";
 import User from '../pages/Admin/Right/User/User'
 import DashBoard from "../pages/Admin/Right/DashBoard";
 import Product from "../pages/Admin/Right/Product/Product";
+import Order from "../pages/Admin/Right/Order/Order";
+
+
+// tesst 
+import { Cart_cnpm } from "../Test/Cart";
+import { Detail_cnpm } from "../Test/Detail";
+
 export const routes = [
     {
         path: '/',
@@ -85,6 +92,23 @@ export const routes = [
     {
         path : '/admin/product',
         page : Product,
+        isShowLeftAdmin : true
+    },
+    {
+        path : '/test/detail_product',
+        page : Detail_cnpm,
+        isShowHeader : true,
+        isPageUser : true
+    }, 
+    {
+        path : '/test/cart',
+        page : Cart_cnpm,
+        isShowHeader : true,
+        isPageUser : true
+    },
+    {
+        path : '/admin/order',
+        page : Order,
         isShowLeftAdmin : true
     }
 ]

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { InputComponent } from '../../components/InputComponent';
 import { ErrorMessageInput } from '../../components/InputComponent';
-import { addBill } from '../../services/BillService';
+import { addOrder } from '../../services/OrderService';
 import { useSaveCartOnRedux } from '../../until/tokenUser';
 export default function Payment() {
     const saveCartOnRedux = useSaveCartOnRedux()
@@ -113,7 +113,7 @@ export default function Payment() {
     // handle button buy Product
     const handleBuy = async () => {
 
-        const response = await addBill({
+        const response = await addOrder({
             idUser,
             totalPrice,
             phone: informations.phone,

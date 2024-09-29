@@ -1,6 +1,6 @@
 
 import Cookies from 'js-cookie';
-export const getAllProduct = async (page = null, sortBy = 'idProduct', type = 'asc', limit = null, idProduct = null, idCategory = null, search = null, priceFrom = null, priceTo = null, quantity) => {
+export const getAllProduct = async (page = null, sortBy = 'idProduct', type = 'asc', limit = null, idProduct = null, idCategory = null, search = null, priceFrom = null, priceTo = null, quantity=null) => {
     const params = new URLSearchParams({
         page: page || null,
         sortBy: sortBy || 'idProduct',
@@ -30,6 +30,7 @@ export const getAllProduct = async (page = null, sortBy = 'idProduct', type = 'a
         params.append('quantity', quantity)
     }
     const url = `${process.env.REACT_APP_API_URL}/get-all-product?${params.toString()}`;
+    console.log(url)
     const response = await fetch(url, {
         method: 'GET',
         headers: {

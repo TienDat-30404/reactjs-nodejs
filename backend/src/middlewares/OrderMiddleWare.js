@@ -1,4 +1,4 @@
-const validateAddBill = async (req, res, next) => {
+const validateAddOrder = async (req, res, next) => {
     try {
         const phoneRegex = /^09\d{8,9}$/;
         const { phone, address} = req.body
@@ -22,4 +22,4 @@ const validateAddBill = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = validateAddBill
+module.exports = validateAddOrder

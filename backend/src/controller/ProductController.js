@@ -7,6 +7,7 @@ const addProduct = async (req, res, next) => {
     try {
         const { name, price, quantity, idCategory, description } = req.body
         const result = await cloudinary.uploader.upload(req.file.path);
+        // console.log(result)
         if (!req.file) {
             return res.status(400).json({ error: "File image is required." });
         }

@@ -12,6 +12,7 @@ export default function ChangePassword({ show, close, idUser }) {
     useEffect(() => {
         const fetchDataUser = async () => {
             const response = await getDetailUser(idUser)
+            console.log(response.detailUser)
             setUser(response.detailUser)
         }
         fetchDataUser()

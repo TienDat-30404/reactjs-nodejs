@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 export default function CartProduct({id, image, name, price, width, height, widthImage, heightImage }) {
     const navigate = useNavigate()

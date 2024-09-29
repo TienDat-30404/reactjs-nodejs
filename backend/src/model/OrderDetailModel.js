@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const AutoIncrement = require('mongoose-sequence')(mongoose);
-const BillDetaiSchema = new Schema(
+const OrderDetailSchema = new Schema(
     {
-        idBill : {type : Number, ref : 'Bill', required : true},
+        idOrder : {type : Number, ref : 'Order', required : true},
         idProduct : {type : Number, ref : 'Product', required : true},
         quantity : {type : Number}
     },
@@ -11,7 +11,7 @@ const BillDetaiSchema = new Schema(
 
 
 // Thêm plugin AutoIncrement để tự động tăng giá trị của 'id'
-BillDetaiSchema.plugin(AutoIncrement, { inc_field: 'idBillDetail' });
+OrderDetailSchema.plugin(AutoIncrement, { inc_field: 'idOrderDetail' });
 
-const BillDetail = mongoose.model('BillDetail', BillDetaiSchema);
-module.exports = BillDetail;
+const OrderDetail = mongoose.model('OrderDetail', OrderDetailSchema);
+module.exports = OrderDetail;

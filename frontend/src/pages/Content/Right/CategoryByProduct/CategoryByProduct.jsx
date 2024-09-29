@@ -11,7 +11,7 @@ export default function Category() {
   const [totalPage, setTotalPage] = useState(1)
   const [categories, setCategories] = useState([])
   const getDataCategory = async (page) => {
-    const response = await getAllProduct(page, 'idProduct', 'asc', limit, idCategory)
+    const response = await getAllProduct(page, 'idProduct', 'asc', limit, null, idCategory)
     setTotalPage(response.totalPages)
     return response.products
   }
@@ -19,6 +19,7 @@ export default function Category() {
   useEffect(() => {
     const fetchDatasProduct = async () => {
       const listCategory = await getDataCategory(page)
+      console.log(listCategory)
       setCategories(listCategory)
     }
     fetchDatasProduct()
