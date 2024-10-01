@@ -5,5 +5,5 @@ const validateAddOrder = require('../middlewares/OrderMiddleWare')
 router.post('/add-order', validateAddOrder, OrderController.addOrder)
 router.get('/orders', OrderController.getAllOrder)
 router.get('/detail-order/:idOrder', OrderController.detailOrder)
-router.post('/update-order/:idOrder', OrderController.updateOrder)
+router.put('/confirm-order/:idOrder', OrderController.confirmOrder)
 module.exports = router

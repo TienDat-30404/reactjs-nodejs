@@ -13,7 +13,6 @@ import DashBoard from "../pages/Admin/Right/DashBoard";
 import Product from "../pages/Admin/Right/Product/Product";
 import Order from "../pages/Admin/Right/Order/Order";
 
-
 // tesst 
 import { Cart_cnpm } from "../Test/Cart";
 import { Detail_cnpm } from "../Test/Detail";
@@ -110,5 +109,5 @@ export const routes = [
         path : '/admin/order',
         page : Order,
         isShowLeftAdmin : true
-    }
+    },
 ]

@@ -1,36 +1,48 @@
-import React, { useEffect, useReducer, useRef, useState } from 'react'
-import { detailOrder } from '../../../../services/OrderService'
-import { handleChangeInput } from '../../../../until/function';
+import React, { useEffect, useState } from 'react';
+import { detailOrder } from '../../../../services/OrderService';
+import { confirmOrder } from '../../../../services/OrderService';
+import { useSelector, useDispatch } from 'react-redux';
 export default function DetailOrder({ show, close, idOrder, onSuccess, nameCustomer, isStatus, createdAt }) {
     const date = new Date(createdAt);
+    const day = date.getUTCDate();
+    const month = date.getUTCMonth() + 1;
+    const year = date.getUTCFullYear();
 
-    const day = date.getUTCDate(); // Lấy ngày
-    const month = date.getUTCMonth() + 1; // Lấy tháng (tháng bắt đầu từ 0, nên cộng thêm 1)
-    const year = date.getUTCFullYear(); // Lấy năm
-    const [orderDetail, setOrderDetail] = useState([])
-    const [updateOrder, setUpdateOrder] = useState({
-        statusOrder : isStatus,
-        quantity : 2,
-        totalPrice : 123000
-    })
+    const [orderDetail, setOrderDetail] = useState([]);
+    const [updateOrder, setUpdateOrder] = useState(isStatus);
+    console.log(updateOrder)
+
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
     useEffect(() => {
         const fetchDataOrderDetail = async () => {
-            if (idOrder) {
-                const responseOrderDetail = await detailOrder(idOrder)
-                setOrderDetail(responseOrderDetail.detailOrder)
-                console.log(responseOrderDetail)
+            if (idOrder && isStatus) {
+                const responseOrderDetail = await detailOrder(idOrder);
+                setOrderDetail(responseOrderDetail.detailOrder);
+                setUpdateOrder(isStatus)
+            }
+        };
+        fetchDataOrderDetail();
+    }, [idOrder]);
+
+    const handleConfirmOrder = async() => {
+        if(idOrder && userData) 
+        {
+            if(window.confirm("Xác nhận đơn hàng?"))
+            {
+                await confirmOrder(idOrder, {
+                    isStatus : updateOrder,
+                    idStaff : userData.dataLogin.idUser
+                })
+                onSuccess()
             }
         }
-        fetchDataOrderDetail()
-    }, [idOrder])
+    }
 
-    console.log(updateOrder)
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             {orderDetail.length > 0 && nameCustomer ? (
                 <div className="detail_order px-2 py-3">
                     <div className='d-flex align-items-center justify-content-around'>
-
                         <div className='d-flex align-items-center'>
                             <p style={{ fontFamily: "Verdana, sans-serif", fontSize: '14px' }} className='px-2'>Customer :</p>
                             <p style={{ fontFamily: "Times New Roman, Times, serif" }}>{nameCustomer}</p>
@@ -40,7 +52,7 @@ export default function DetailOrder({ show, close, idOrder, onSuccess, nameCusto
                             <p style={{ fontFamily: "Times New Roman, Times, serif" }}>{day}-{month}-{year}</p>
                         </div>
 
-                        <select onChange={(e) => handleChangeInput(e, setUpdateOrder)} className='form-control' style={{ width: '100px' }} name="statusOrder" id="">
+                        <select onChange={(e) => setUpdateOrder(e.target.value)} value = {updateOrder}  className='form-control' style={{ width: '100px' }} name="statusOrder" id="">
                             <option value="Success">Success</option>
                             <option value="Pending">Pending</option>
                             <option value="Cancel">Cancel</option>
@@ -65,20 +77,21 @@ export default function DetailOrder({ show, close, idOrder, onSuccess, nameCusto
                                         {order.product.name}
                                     </td>
                                     <td style={{ verticalAlign: 'middle' }}>
-                                        <button className='hover_quantity-cart'
+                                        <button
+                                            className='hover_quantity-cart'
                                             style={{ border: '1px solid #ccc', padding: '1px 8px' }}
                                         >
                                             -
                                         </button>
                                         <span 
-                                            name = "quantity"
-                                            onChange={(e) => handleChangeInput(e, setUpdateOrder)}
+                                            name="quantity"
                                             style={{ border: '1px solid #ccc', padding: '4px' }}>
                                             {order.quantity}
                                         </span>
                                         <button
                                             className='hover_quantity-cart'
-                                            style={{ border: '1px solid #ccc', padding: '1px 8px' }}>
+                                            style={{ border: '1px solid #ccc', padding: '1px 8px' }}
+                                        >
                                             +
                                         </button>
                                     </td>
@@ -87,9 +100,8 @@ export default function DetailOrder({ show, close, idOrder, onSuccess, nameCusto
                                 </tr>
                             ))}
 
-
                             <tr>
-                                <th colSpan="4" style={{ textAlign: 'right', verticalAlign: 'middle' }}></th>
+                                <th colSpan="4" style={{ textAlign: 'right', verticalAlign: 'middle' }}>Total:</th>
                                 <td style={{ verticalAlign: 'middle', color: 'red', fontWeight: '600' }}>
                                     {orderDetail.reduce((sum, order) => sum + order.quantity * order.product.price, 0)}
                                 </td>
@@ -98,10 +110,10 @@ export default function DetailOrder({ show, close, idOrder, onSuccess, nameCusto
                     </table>
                     <div className='d-flex justify-content-between'>
                         <button onClick={() => close()} className='btn btn-secondary'>Close</button>
-                        <button className='btn btn-primary'>Xác nhận</button>
+                        <button onClick={() => handleConfirmOrder()} className='btn btn-primary'>Xác nhận</button>
                     </div>
                 </div>
-            ) : "123"}
+            ) : "Loading..."}
         </div>
-    )
+    );
 }

@@ -3,40 +3,39 @@ const Cart = require('../model/CartModel')
 const Product = require('../model/ProductModel')
 const OrderDetail = require('../model/OrderDetailModel')
 const { default: mongoose } = require('mongoose')
-const addOrder = async(req, res, next) => {
+const addOrder = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction()
     try {
-        const {idUser, totalPrice, address, phone, paymentMethod, bankAccount, products} = req.body
-        const newOrder = new Order({idUser, totalPrice, address, phone, paymentMethod, bankAccount, products})
+        const { idUser, totalPrice, address, phone, paymentMethod, bankAccount, products } = req.body
+        const newOrder = new Order({ idUser, totalPrice, address, phone, paymentMethod, bankAccount, products })
         await newOrder.save()
         const orderDetails = products.map(product => {
             return {
-                idOrder : newOrder.idOrder,
-                idProduct : product.idProduct,
-                quantity : product.quantityCart
+                idOrder: newOrder.idOrder,
+                idProduct: product.idProduct,
+                quantity: product.quantityCart
             }
         })
         await OrderDetail.insertMany(orderDetails)
 
         const cartIds = products.map(product => product.idCart)
-        await Cart.deleteMany({ idCart : { $in: cartIds } })
+        await Cart.deleteMany({ idCart: { $in: cartIds } })
 
         await session.commitTransaction()
         session.endSession()
-        return res.status(200).json({newOrder, orderDetails})
+        return res.status(200).json({ newOrder, orderDetails })
     }
-    catch(error)
-    {
+    catch (error) {
         await session.abortTransaction();
         session.endSession();
         next(error);
     }
 }
 
-const getAllOrder = async(req, res, next) => {
+const getAllOrder = async (req, res, next) => {
     const orders = await Order.find({})
-    return res.status(200).json({orders})
+    return res.status(200).json({ orders })
 }
 
 const detailOrder = async (req, res, next) => {
@@ -49,8 +48,8 @@ const detailOrder = async (req, res, next) => {
             orderDetails.map(async (item) => {
                 const product = await Product.findOne({ idProduct: item.idProduct });
                 return {
-                    ...item._doc, 
-                    product: product 
+                    ...item._doc,
+                    product: product
                 };
             })
         );
@@ -64,19 +63,31 @@ const detailOrder = async (req, res, next) => {
 };
 
 
-const updateOrder = async(req, res, next) => {
+const confirmOrder = async (req, res, next) => {
     const idOrder = req.params.idOrder;
-    const data = req.body;
-    try 
-    {
-        const response = await Order.updateOne({idOrder : idOrder}, data);
-        return res.status(200).json({response})
+    const { isStatus, idStaff } = req.body;
+    var data
+    if (isStatus === "Success" || isStatus === "Cancel") {
+        data = {
+            isStatus: isStatus,
+            idStaff: idStaff,
+        }
     }
-    catch(error)
+    else 
     {
-        next(error);
+        data = {
+            isStatus : isStatus,
+            idStaff : null
+        }
+    }
+    try {
+        const response = await Order.updateOne({ idOrder: idOrder }, data)
+        return res.status(200).json({ response })
+    }
+    catch (error) {
+        next(error)
     }
 }
 
 
-module.exports = {addOrder, getAllOrder, detailOrder, updateOrder}
+module.exports = { addOrder, getAllOrder, detailOrder, confirmOrder }

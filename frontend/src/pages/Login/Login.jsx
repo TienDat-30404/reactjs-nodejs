@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { InputComponent, ErrorMessageInput } from '../../components/InputComponent';
 import { setCookieForToken, useSaveTokenOnRedux, useSaveCartOnRedux } from '../../until/tokenUser';
 import { jwtDecode } from 'jwt-decode';
-import { useSelector, useDispatch } from 'react-redux';
 import { allCartOfUser } from '../../services/CartService';
 import { loginService } from '../../services/UserService';
 import { useNavigate } from 'react-router-dom';
