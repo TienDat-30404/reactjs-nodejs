@@ -58,7 +58,7 @@
 }
 .product_name {
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -99,4 +99,18 @@ p
     {
         opacity : 0
     }
+}
+
+.icon_chat 
+{
+    position : fixed;
+    right : 5%;
+    bottom : 20%;
+}
+.customer_helper 
+{
+    position: fixed;
+    bottom : 10%;
+    right : 1%;
+    background-color: rgb(10, 104, 255);
 }

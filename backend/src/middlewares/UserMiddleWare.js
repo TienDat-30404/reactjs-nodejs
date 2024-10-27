@@ -54,6 +54,7 @@ const validateSignIn = async (req, res, next) => {
 const validateLogin = async (req, res, next) => {
     const { email, password } = req.body
     const isCheckUser = await User.findOne({ email })
+    
     const errors = {}
 
     if (password == "") {
@@ -78,6 +79,7 @@ const validateLogin = async (req, res, next) => {
     if (Object.keys(errors).length > 0) {
         return res.status(400).json({ errors })
     }
+    console.log(errors)
     next()
 }
 

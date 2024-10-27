@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
 import { searchUser } from '../../../../services/UserService'
+import { useSelector } from 'react-redux'
 import AddUser from './AddUser'
 import ChangePassword from './ChangePassword'
 import { deleteUser } from '../../../../services/UserService'
@@ -10,7 +11,10 @@ import { handleChangeInput } from '../../../../until/function'
 import { getDetailUser } from '../../../../services/UserService'
 import { getAllOrder } from '../../../../services/OrderService'
 import DetailOrder from './DetailOrder'
+import GeneralMessage from '../../Message/GeneralMessage'
+import DetailMessage from '../../Message/DetailMessage'
 export default function Order() {
+  const { isAuthenticated, userData } = useSelector(state => state.auth)
   const [orders, setOrders] = useState([])
   const [showAdd, setShowAdd] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
@@ -22,7 +26,11 @@ export default function Order() {
   const [createdAt, setCreatedAt] = useState('')
   const [nameCustomer, setNameCustomer] = useState(null)
   const [roles, setRoles] = useState([])
+  const [showGeneralMessage, setShowGeneralMessage] = useState(false)
+  const [showDetailMessage, setShowDetailMessage] = useState(false)
   const [selectedId, setSelectedId] = useState(null); // State để lưu idUser được chọn
+  const [keyMessage, setKeyMessage] = useState(null);
+
   const [wordSearch, setWordSearch] = useState({
     idUser: '',
     name: '',
@@ -106,24 +114,37 @@ export default function Order() {
       alert("Vui lòng chọn tài khoản muốn đổi tài khoản")
     }
   }
-  console.log(orders)
   useEffect(() => {
     fetchDatasOrder();
   }, []);
 
+  // display/hidden layout message 
+  const displayGeneralMessage = () => {
+    if (showGeneralMessage === false) {
+      setShowGeneralMessage(true)
+    }
+    else {
+      setShowGeneralMessage(false)
+    }
+  }
 
-  return (
+  const handleMessageClick = (key) => {
+    setKeyMessage(key); 
+    setShowDetailMessage(true)
+  };
+  return (  
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
-        <div className='d-flex align-items-center'>
+        <div className='d-flex align-items-center col-5'>
           <h3>Order</h3>
           <h6 className='ms-3'>({orders.length} order found)</h6>
           <button onClick={() => setShowAdd(true)} type="button" className="btn btn-outline-success ms-3">Tạo người dùng</button>
           <button onClick={() => switchModalChangePassword()} type="button" className="btn btn-outline-success ms-3">Đổi mật khẩu</button>
         </div>
-        <div className='d-flex align-items-center'>
-          <i className="bi bi-bell me-3"></i>
-          <i className="bi bi-search me-3"></i>
+        <div className='d-flex align-items-center justify-content-between col-2'>
+          <i onClick={() => displayGeneralMessage()} style={{ cursor: 'pointer' }} className="bi bi-chat-dots cursor-pointer"></i>
+          <i style={{ cursor: 'pointer' }} className="bi bi-bell"></i>
+          <i style={{ cursor: 'pointer' }} className="bi bi-search"></i>
           <ImageComponent
             src="https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png" alt=""
             width="30px"
@@ -132,6 +153,9 @@ export default function Order() {
           />
         </div>
       </div>
+
+      <GeneralMessage show={showGeneralMessage} close={() => setShowGeneralMessage(false)} switchDetailMessage={handleMessageClick} />
+      {keyMessage  && <DetailMessage show={showDetailMessage} close={() => setShowDetailMessage(false)} idUser={isAuthenticated ? userData.dataLogin.idUser : null} keyMessage={keyMessage} />}
 
       <form onSubmit={handleSearchUser} className='mt-3 w-100 align-items-center justify-content-between shadow p-3 mb-5 bg-white rounded '>
         {/* Các trường input */}
@@ -287,7 +311,7 @@ export default function Order() {
         </div>}
       <AddUser show={showAdd} close={() => setShowAdd(false)} onSuccess={handleAddUser} />
       <EditUser show={showEdit} close={() => setShowEdit(false)} idUser={idUser} onSuccess={fetchDatasOrder} />
-      <DetailOrder show={showDetail} close={() => setShowDetail(false)} idOrder={idOrder} onSuccess={fetchDatasOrder} nameCustomer={nameCustomer} isStatus={isStatus} createdAt = {createdAt} />
+      <DetailOrder show={showDetail} close={() => setShowDetail(false)} idOrder={idOrder} onSuccess={fetchDatasOrder} nameCustomer={nameCustomer} isStatus={isStatus} createdAt={createdAt} />
       <ChangePassword show={showChangePassword} close={() => setShowChangePassword(false)} idUser={selectedId} />
     </div>
   )

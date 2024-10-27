@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .admin {
   width: 100%;
 }
@@ -38,6 +39,7 @@
 }
 
 .product {
+  position: relative;
   font-family: "Times New Roman", Times, serif;
 }
 
@@ -57,7 +59,7 @@
 .add_product {
   display: flex;
   background-color: white;
-  width: 30%;
+  width: 1000px;
   padding: 0px 0px;
   border-radius: 10px;
   overflow: hidden;
@@ -74,7 +76,7 @@
 
 .detail_order {
   background-color: white;
-  width: 50%;
+  width: 1000px;
   padding: 0px 0px;
   border-radius: 10px;
   overflow: hidden;
@@ -83,6 +85,71 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.general_message {
+  position: absolute;
+  right: 1%;
+  width: 360px;
+  box-shadow: 0px 0px 5px 0px;
+  border-radius: 5px;
+  z-index: 5;
+  background-color: #ffffff;
+}
+
+.general_message-content:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
+
+.general_message-content-text {
+  display: inline-block;
+  white-space: nowrap; /* Ngăn không cho nội dung xuống dòng */
+  overflow: hidden; /* Ẩn phần nội dung vượt quá giới hạn */
+  text-overflow: ellipsis; /* Thêm dấu ba chấm khi nội dung dài */
+  max-width: 250px; /* Giới hạn chiều rộng của đoạn tin nhắn */
+}
+
+.general_message-time-text {
+  flex-shrink: 0; /* Đảm bảo phần thời gian không bị co lại */
+  padding-left: 10px; /* Khoảng cách giữa nội dung và thời gian */
+}
+
+.detail_message {
+  position: fixed;
+  right: 7%;
+  bottom: 0;
+  background-color: #ffffff;
+  box-shadow: 0px 0px 5px 0px;
+  width: 360px;
+  height: 450px;
+  z-index: 5;
+}
+
+.detail_message-header {
+  height: 15%;
+}
+
+.detail_message-content {
+  max-height: 70%;
+  overflow-y: scroll;
+}
+
+.detail_message-chat {
+  height: 15%;
+}
+
+.detail_message-text {
+  display: inline-block;
+  white-space: nowrap; /* Ngăn không cho nội dung xuống dòng */
+  overflow: hidden; /* Ẩn phần nội dung vượt quá giới hạn */
+  text-overflow: ellipsis; /* Thêm dấu ba chấm khi nội dung dài */
+  max-width: 130px; /* Giới hạn chiều rộng của đoạn tin nhắn */
+}
+
+.send_message:hover {
+  cursor: pointer;
+  opacity: 0.5;
 }
 
 /*# sourceMappingURL=admin.css.map */

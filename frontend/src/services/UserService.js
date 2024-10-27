@@ -1,11 +1,10 @@
 import Cookies from 'js-cookie'
 export const loginService = async (dataLogin, isValidate) => {
     const params = new URLSearchParams({});
-    if(isValidate)
-    {
+    if (isValidate) {
         params.append('validate_login', true)
     }
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up?${params.toString}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up?${params.toString()}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -17,18 +16,18 @@ export const loginService = async (dataLogin, isValidate) => {
     return response.json()
 }
 
-export const signInService = async(dataSignIn) => {
+export const signInService = async (dataSignIn) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-in`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(dataSignIn),
-      });
-      return response.json()
+    });
+    return response.json()
 }
 
-export const refreshTokenService = async() => {
+export const refreshTokenService = async () => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/refresh-token`, {
         method: 'POST',
         headers: {
@@ -39,15 +38,15 @@ export const refreshTokenService = async() => {
     return response.json()
 }
 
-export const updateUser = async(id, data) => {
+export const updateUser = async (id, data) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/update-user/${id}`, {
         method: 'PUT',
-        body : data
+        body: data
     });
     return response.json()
 }
 
-export const getAllUser = async() => {
+export const getAllUser = async () => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-user`, {
         method: 'GET',
         headers: {
@@ -62,7 +61,7 @@ export const deleteUser = async (id) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-user/${id}`, {
         method: 'DELETE',
         headers: {
-            'Authorization': `Bearer ${token}`, 
+            'Authorization': `Bearer ${token}`,
         }
     })
     return response.json()
@@ -78,37 +77,32 @@ export const getDetailUser = async (id) => {
     return response.json()
 }
 
-export const changePassword = async(id, data) => {
+export const changePassword = async (id, data) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/change-password/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body : JSON.stringify(data)
+        body: JSON.stringify(data)
     })
     return response.json()
 }
 
-export const searchUser = async(idUser, name, email, phone, idRole) => {
+export const searchUser = async (idUser, name, email, phone, idRole) => {
     const params = new URLSearchParams({});
-    if(idUser)
-    {
+    if (idUser) {
         params.append('idUser', idUser)
     }
-    if(name)
-    {
+    if (name) {
         params.append('name', name)
     }
-    if(email)
-    {
+    if (email) {
         params.append('email', email)
     }
-    if(phone)
-    {
+    if (phone) {
         params.append('phone', phone)
     }
-    if(idRole)
-    {
+    if (idRole) {
         params.append('idRole', idRole)
     }
     const url = `${process.env.REACT_APP_API_URL}/search-user?${params.toString()}`;

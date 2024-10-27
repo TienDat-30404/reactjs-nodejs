@@ -10,7 +10,6 @@ export default function DetailOrder({ show, close, idOrder, onSuccess, nameCusto
 
     const [orderDetail, setOrderDetail] = useState([]);
     const [updateOrder, setUpdateOrder] = useState(isStatus);
-    console.log(updateOrder)
 
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     useEffect(() => {

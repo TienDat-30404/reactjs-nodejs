@@ -1,47 +1,59 @@
-const express = require('express')
+const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io'); // Thêm socket.io
 
+const dotenv = require('dotenv');
+dotenv.config();
 
+const db = require('./config/connect.js');
+db.connectDB();
 
-// dotenv
-const dotenv = require('dotenv')
-dotenv.config()
+const app = express();
+const port = process.env.PORT;
 
-//connectDB
-const db = require('./config/connect.js')
-db.connectDB()
-
-const app = express()
-const port = process.env.PORT
-
-// cookier parser
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-/*  được sử dụng để thêm middleware nhằm phân tích body của các yêu cầu HTTP có định dạng JSON. Middleware này sẽ đọc nội dung của các yêu cầu HTTP và tự động chuyển đổi body từ chuỗi JSON sang đối tượng JavaScript, giúp bạn dễ dàng truy cập dữ liệu trong các request handlers. Chẳng hạn khi console.log(req.body), nếu ko cấu hình nó thì sẽ là undefined
-*/
 app.use(express.json());
 
-// cors 
-const cors = require('cors')
-// cấu hình 
+const cors = require('cors');
 const corsOptions = {
-  origin: 'http://localhost:3000', // chỉ cho phép các yêu cầu từ nguồn http://localhost:3000 được truy cập máy chủ.
-  credentials: true, /* Để cho phép gửi cookie (Khi credentials: true, máy chủ sẽ chấp nhận và xử lý các yêu cầu có gửi cookies hoặc các thông tin xác thực khác. Đồng thời, phía client cũng phải gửi yêu cầu với tùy chọn credentials: 'include' để gửi cookie hoặc thông tin xác thực.)
-  cấu hình ở đâu giúp khi ta login thành công có thể gửi cookier lên server */
+  origin: 'http://localhost:3000',
+  credentials: true,
 };
-app.use(cors(corsOptions))
+app.use(cors(corsOptions));
 
+// Tạo server HTTP
+const server = http.createServer(app);
 
+// Tích hợp socket.io với server
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000", // Client domain
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
 
-// routes
-const routes = require('./routes/index.js')
-routes(app)
+// Lưu io trong app để dùng trong các controller
+app.set('io', io);
 
-// Middleware xử lý lỗi - phải được đặt sau tất cả các route và middleware khác
+// Sự kiện kết nối từ client
+io.on('connection', (socket) => {
+  console.log('New client connected', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
+// Routes
+const routes = require('./routes/index.js');
+routes(app);
+
 const errorMiddleware = require('./middlewares/errorMiddleWare');
 app.use(errorMiddleware);
 
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
