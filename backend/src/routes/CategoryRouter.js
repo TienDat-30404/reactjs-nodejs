@@ -6,5 +6,5 @@ router.post('/add-category', validateAddCategory, CategoryController.addCategory
 // router.put('/update-product/:idProduct', validateUpdateProduct, ProductController.updateProduct)
 // router.delete('/delete-product/:idProduct', authencationMiddleWare, ProductController.deleteProduct)
 router.get('/get-all-category', CategoryController.getAllCategory)
-router.get('/detail-category/:idCategory', CategoryController.detailCategory)
+router.get('/detail-category/:_id', CategoryController.detailCategory)
 module.exports = router

@@ -14,6 +14,9 @@ const port = process.env.PORT;
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+// errorHandler 
+const errorHandler = require('./utils/errorHandler.jsx')
+
 app.use(express.json());
 
 const cors = require('cors');
@@ -53,6 +56,9 @@ routes(app);
 
 const errorMiddleware = require('./middlewares/errorMiddleWare');
 app.use(errorMiddleware);
+
+app.use(errorHandler);
+
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

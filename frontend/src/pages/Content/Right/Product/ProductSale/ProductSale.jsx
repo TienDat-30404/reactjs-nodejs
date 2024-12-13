@@ -2,17 +2,24 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import CartProduct from '../../../../../components/CartProduct'
 import { getAllProduct } from '../../../../../services/ProductService'
+import { useDispatch, useSelector } from 'react-redux'
+import { initDataProduct, switchPage } from '../../../../../redux/Products/productsSlice'
 export default function ProductSale() {
-    const [products, setProducts] = useState([])
-    const [page, setPage] = useState(1)
-    const [totalPage, setTotalPage] = useState(1)
+    const dispatch = useDispatch()
+    const products = useSelector(state => state.products.products)
+    const page = useSelector(state => state.products.page)
+    const totalPage = useSelector(state => state.products.totalPage)
+    const totalProduct = useSelector(state => state.products.totalProduct)
     const limit = 5;
     // get all product
     useEffect(() => {
         const fetchDatasProduct = async () => {
-            const listProducts = await getAllProduct(page, 'idProduct', 'asc', limit)
-            setProducts(listProducts.products)
-            setTotalPage(listProducts.totalPages)
+            const query = `page=${page}&sortBy=idProduct&type=asc&limit=${limit}`
+            const response = await getAllProduct(query)
+            if(response)
+            {
+                dispatch(initDataProduct(response))
+            }
         }
         fetchDatasProduct()
     }, [page])
@@ -20,14 +27,14 @@ export default function ProductSale() {
     // handle pagination next page
     const handleNextPage = () => {
         if (page < totalPage) {
-            setPage(page + 1)
+            dispatch(switchPage(page + 1))
         }
     }
 
     // handle pagination prev page
     const handlePrevPage = () => {
         if (page > 1) {
-            setPage(page - 1)
+            dispatch(switchPage(page - 1))
         }
     }
 
@@ -52,7 +59,7 @@ export default function ProductSale() {
                     products.map((product, index) => (
                         <CartProduct
                             key={index}
-                            id={product.idProduct}
+                            id={product._id}
                             image={product.image}
                             name={product.name}
                             price={(product.price).toLocaleString('vi-VN')}
@@ -65,8 +72,8 @@ export default function ProductSale() {
                     </div>
                 }
                 <div className='d-flex justify-content-center align-items-center mt-3'>
-                    <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
-                    <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
+                    <button disabled={page == 1} onClick={() => handlePrevPage()} type="button" className="btn btn-light me-3">Primary</button>
+                    <button disabled={page >= totalPage} onClick={() => handleNextPage()} type="button" className="btn btn-light">Next</button>
                 </div>
                 <span className='text-center mt-2'>Page {page} of {totalPage}</span>
             </div>

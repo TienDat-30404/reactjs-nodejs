@@ -1,20 +1,40 @@
 const User = require('../model/UserModel')
+
 const cloudinary = require('../config/cloudinary');
 const { generateToken, generateRefreshToken } = require('../utils/jwt')
 const { hashPassword } = require('../utils/validate')
 const refreshTokenJWT = require('../utils/jwt')
+const { OAuth2Client } = require("google-auth-library");
+const errorHandler = require('http-errors')
 // [POST] : /sign-in
 const createUser = async (req, res, next) => {
     try {
         const { name, email, password, confirm_password, idRole } = req.body;
-        const newUser = new User({ name, email, password: hashPassword(password), confirm_password, idRole });
-        await newUser.save();
-        res.status(200).json(newUser);
+        let idRolePermission;
+        if (idRole == null) {
+            idRolePermission = "672758398f3b3be36da846bd"
+        }
+        const user = new User({
+            name,
+            email,
+            password: hashPassword(password),
+            confirm_password,
+            idRole: idRole ? idRole : idRolePermission
+        });
+        await user.save();
+
+        const users = await User.findById(user._id).populate('idRole');
+        let userObject = users.toObject();
+        if (userObject.idRole) {
+            userObject.role = userObject.idRole;
+            delete userObject.idRole;
+        }
+        res.status(200).json({ user: userObject });
     } catch (error) {
         next(error);
-
     }
-}
+};
+
 
 // [POST] : /sign-up
 const loginUser = async (req, res, next) => {
@@ -22,7 +42,7 @@ const loginUser = async (req, res, next) => {
     const isCheckUser = await User.findOne({ email })
     const avatar = isCheckUser.avatar
     const payloadToken = {
-        idUser: isCheckUser.idUser,
+        idUser: isCheckUser._id,
         name: isCheckUser.name,
         email: isCheckUser.email,
         address: isCheckUser.address,
@@ -32,6 +52,7 @@ const loginUser = async (req, res, next) => {
         idRole: isCheckUser.idRole,
         avatar
     };
+    console.log(payloadToken)
 
     const accessToken = generateToken(payloadToken)
     const refreshToken = generateRefreshToken(payloadToken)
@@ -53,10 +74,9 @@ const loginUser = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
     try {
         const idUser = req.params.idUser
-        console.log(idUser)
         const { name, email, address, phone, date_of_birth, sex, idRole } = req.body
         console.log(name, email, address, phone, date_of_birth, sex, idRole)
-        const user = await User.findOne({ idUser: idUser })
+        const user = await User.findOne({ _id: idUser })
         const newData = {
             name: name,
             email: email,
@@ -71,7 +91,7 @@ const updateUser = async (req, res, next) => {
             const fielAvatar = await cloudinary.uploader.upload(req.file.path);
             newData.avatar = fielAvatar.secure_url
         }
-        await User.updateOne({ idUser: idUser }, newData)
+        await User.updateOne({ _id: idUser }, newData)
         return res.status(200).json({
             newData,
             message: "Update Successfully"
@@ -85,7 +105,7 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     try {
         const idUser = req.params.idUser
-        const delUser = await User.deleteOne({ idUser: idUser })
+        const delUser = await User.deleteOne({ _id: idUser })
         if (delUser.deletedCount > 0) {
             return res.status(200).json({
                 message: "Delete Successfully",
@@ -130,14 +150,58 @@ const deleteUser = async (req, res, next) => {
 }
 
 const getAllUser = async (req, res, next) => {
-    const getAllUser = await User.find({})
-    return res.status(200).json(getAllUser)
+    try {
+
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 10
+        const startPage = (page - 1) * limit
+        const objectFilter = {}
+        if (req.query.idUser) {
+            objectFilter._id = req.query.idUser
+        }
+        if (req.query.name) {
+            objectFilter.name = req.query.name
+        }
+        if (req.query.email) {
+            objectFilter.email = req.query.email
+        }
+        if (req.query.phone) {
+            objectFilter.phone = req.query.phone
+        }
+        const totalUser = Object.keys(objectFilter).length === 0
+            ? await User.countDocuments({})
+            : await User.countDocuments(objectFilter);
+        const totalPage = Math.ceil(totalUser / limit);
+
+        let users = await User.find(objectFilter)
+            .skip(startPage)
+            .limit(limit)
+            .populate('idRole')
+            .lean()
+        users = users.map(user => {
+            if (user.idRole) {
+                user.role = user.idRole;
+                delete user.idRole;
+            }
+            return user;
+        });
+        return res.status(200).json({
+            page,
+            totalPage,
+            limit,
+            totalUser,
+            users
+        })
+    }
+    catch (err) {
+        next(err)
+    }
 }
 
 
 const detailUser = async (req, res, next) => {
     try {
-        const detailUser = await User.findOne({ idUser: req.params.idUser })
+        const detailUser = await User.findOne({ _id: req.params.idUser })
         if (detailUser == null) {
             return res.status(400).json({
                 mesage: "Fail Detail User"
@@ -194,7 +258,7 @@ const changePassword = async (req, res, next) => {
         const idUser = req.params.idUser
         const { password } = req.body
         const newPassword = hashPassword(password)
-        await User.updateOne({ idUser: idUser }, { $set: { password: newPassword } })
+        await User.updateOne({ _id: idUser }, { $set: { password: newPassword } })
         return res.status(200).json({
             message: "Change Password Successful"
         })
@@ -214,23 +278,51 @@ const searchUser = async (req, res, next) => {
         searchParams.name = { $regex: name, $options: 'i' }; // 'i' để tìm không phân biệt chữ hoa chữ thường
     }
     if (email) {
-        searchParams.email = { $regex: email};
+        searchParams.email = { $regex: email };
     }
     if (phone) {
-        searchParams.phone = { $regex: phone}
+        searchParams.phone = { $regex: phone }
     }
     if (idRole) {
         searchParams.idRole = idRole
     }
-    
-    try 
-    {
+
+    try {
         const users = await User.find(searchParams)
-        return res.status(200).json({users})
+        return res.status(200).json({ users })
     }
-    catch (error)
-    {
-        return res.status(400).json({message : error.message})
+    catch (error) {
+        return res.status(400).json({ message: error.message })
     }
 }
-module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken, changePassword, searchUser }
+
+
+
+const authLoginGoogle = async (req, res, next) => {
+    try {
+        const { name, email, idRole } = req.body
+        let idRolePermission;
+        if (idRole == null) {
+            idRolePermission = "672758398f3b3be36da846bd"
+        }
+        const user = new User({
+            name,
+            email,
+            idRole : idRolePermission
+        })
+
+        await user.save();
+        const users = await User.findById(user._id).populate('idRole');
+        let userObject = users.toObject();
+        if (userObject.idRole) {
+            userObject.role = userObject.idRole;
+            delete userObject.idRole;
+        }
+        res.status(200).json({ user: userObject });
+    }
+    catch (error) {
+        console.error("Google token verification failed:", error);
+        res.status(400).json({ success: false, error: 'Dữ liệu không hợp lệ' });
+    }
+}
+module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken, changePassword, searchUser, authLoginGoogle }

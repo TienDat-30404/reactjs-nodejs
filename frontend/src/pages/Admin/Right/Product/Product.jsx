@@ -62,7 +62,7 @@ export default function Product() {
   const handleDeleteProduct = async (id) => {
     const response = await deleteProduct(id)
     if (response) {
-      setProducts(products.filter(user => user.idProduct != id))
+      setProducts(products.filter(product => product._id != id))
     }
   }
 
@@ -187,7 +187,7 @@ export default function Product() {
                 <option value="-1">Chọn thể loại</option>
                 {categories.length > 0 ? (
                   categories.map((category, index) => (
-                    <option key={index} value={category.idCategory}>{category.name}</option>
+                    <option key={index} value={category._id}>{category.name}</option>
                   ))
                 ) : <option>Hiện tại chưa có quyền</option>}
               </select>
@@ -220,7 +220,7 @@ export default function Product() {
           {products.length > 0 ? (
             products.map((product, index) => (
               <tr key={index}>
-                <td style={{ width: '4%' }}>{product.idProduct}</td>
+                <td style={{ width: '4%' }}>{product._id}</td>
                 <td style={{ width: '20%' }}>{product.name}</td>
                 <td style={{ width: '10%' }} className='text-center'>
                   <ImageComponent
@@ -238,14 +238,14 @@ export default function Product() {
                 <td style={{ maxWidth: '15%', overflowWrap: 'break-word', wordBreak: 'break-word', whiteSpace: 'normal' }}>{product.description}</td>
                 <td style={{ width: '6%' }} className='text-center'>
                   <button
-                    onClick={() => handleSwitchPageEdit(product.idProduct)}
+                    onClick={() => handleSwitchPageEdit(product._id)}
                     type="button"
                     className="btn btn-outline-primary">
                     Edit
                   </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button onClick={() => handleDeleteProduct(product.idProduct)} type="button" className="btn btn-outline-danger">Delete</button>
+                  <button onClick={() => handleDeleteProduct(product._id)} type="button" className="btn btn-outline-danger">Delete</button>
                 </td>
               </tr>
             ))

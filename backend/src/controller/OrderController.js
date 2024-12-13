@@ -12,15 +12,14 @@ const addOrder = async (req, res, next) => {
         await newOrder.save()
         const orderDetails = products.map(product => {
             return {
-                idOrder: newOrder.idOrder,
-                idProduct: product.idProduct,
-                quantity: product.quantityCart
+                idOrder: newOrder._id,
+                idProduct: product._id,
+                quantity: product.quantity
             }
         })
         await OrderDetail.insertMany(orderDetails)
-
-        const cartIds = products.map(product => product.idCart)
-        await Cart.deleteMany({ idCart: { $in: cartIds } })
+        const cartIds = products.map(product => product._id)
+        await Cart.deleteMany({ _id: { $in: cartIds } })
 
         await session.commitTransaction()
         session.endSession()

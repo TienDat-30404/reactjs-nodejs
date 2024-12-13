@@ -22,14 +22,14 @@ const addProduct = async (req, res, next) => {
 
 // [PUT] /update-product/:idProduct
 const updateProduct = async (req, res, next) => {
-    const idProduct = req.params.idProduct
+    const idProduct = req.params._id
     console.log(idProduct)
 
     const { name, price, quantity, idCategory, description } = req.body
-    const product = await Product.findOne({idProduct : idProduct})
+    const product = await Product.findOne({ _id: idProduct })
     const newData = {
         name: name,
-        image : product.image,  
+        image: product.image,
         price: price,
         quantity: quantity,
         idCategory: idCategory,
@@ -39,7 +39,7 @@ const updateProduct = async (req, res, next) => {
         const fileImage = await cloudinary.uploader.upload(req.file.path);
         newData.image = fileImage.secure_url
     }
-    await Product.updateOne({ idProduct: idProduct }, newData)
+    await Product.updateOne({ _id: idProduct }, newData)
     return res.status(200).json({
         newData,
         message: "Update Successfully"
@@ -51,7 +51,7 @@ const updateProduct = async (req, res, next) => {
 const deleteProduct = async (req, res, next) => {
     try {
         const idProduct = req.params.idProduct
-        const delProduct = await Product.deleteOne({ idProduct: idProduct })
+        const delProduct = await Product.deleteOne({ _id: idProduct })
         if (delProduct.deletedCount > 0) {
             return res.status(200).json({
                 message: "Delete Product Successfully"
@@ -68,22 +68,20 @@ const deleteProduct = async (req, res, next) => {
     }
 
 }
-
-// [GET] /get-all-product
 const getAllProduct = async (req, res, next) => {
     try {
-        const page = parseInt(req.query.page) || null;
-        const limit = parseInt(req.query.limit) || null;
-        const startPage = (page - 1) * limit
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const startPage = (page - 1) * limit;
 
-        const sortBy = req.query.sortBy || 'idProduct'
-        const type = req.query.type === "asc" ? 1 : -1  // nếu là 1 thì sắp xếp tăng dần và ngược lại
-        const objectSort = {}
-        objectSort[sortBy] = type
-        const objectFilter = {}
-        if(req.query.idProduct)
-        {
-            objectFilter.idProduct = req.query.idProduct
+        const sortBy = req.query.sortBy || 'idProduct';
+        const type = req.query.type === "asc" ? 1 : -1; // Tăng dần hoặc giảm dần
+        const objectSort = {};
+        objectSort[sortBy] = type;
+
+        const objectFilter = {};
+        if (req.query.idProduct) {
+            objectFilter._id = req.query.idProduct;
         }
         if (req.query.idCategory) {
             objectFilter.idCategory = req.query.idCategory;
@@ -99,63 +97,59 @@ const getAllProduct = async (req, res, next) => {
             objectFilter.price = { $gte: priceFrom, $lte: priceTo };
         }
 
-        if(req.query.quantity)
-        {
-            const quantity = parseInt(req.query.quantity)
-            objectFilter.quantity = {$lte : quantity }
+        if (req.query.quantity) {
+            const quantity = parseInt(req.query.quantity);
+            objectFilter.quantity = { $lte: quantity };
         }
-        console.log(objectFilter)
-        const totalProducts = Object.keys(objectFilter).length === 0
+
+        const totalProduct = Object.keys(objectFilter).length === 0
             ? await Product.countDocuments({})
             : await Product.countDocuments(objectFilter);
-        let products
+
+        let products;
         if (page) {
             products = await Product.find(objectFilter)
                 .skip(startPage)
                 .limit(limit)
                 .sort(objectSort)
-        }
-        else {
+                .populate('idCategory')
+                .lean();
+        } else {
             products = await Product.find(objectFilter)
                 .sort(objectSort)
+                .populate('idCategory')
+                .lean();
         }
-        const totalPages = page ? Math.ceil(totalProducts / limit) : 'all'
+
+        products = products.map(product => {
+            if (product.idCategory) {
+                product.category = product.idCategory;
+                delete product.idCategory;
+            }
+            return product;
+        });
+
+        const totalPage = page ? Math.ceil(totalProduct / limit) : 'all';
         return res.status(200).json({
             products,
             page,
-            totalProducts,
-            totalPages,
-            objectSort
-        })
+            totalProduct,
+            totalPage,
+            objectSort,
+            limit,
+        });
+    } catch (error) {
+        next(error);
     }
-    catch (error) {
-        next(error)
-    }
-}
+};
 
-/*
-    $eq : so sánh bằng - { field: { $eq: value } }
-    $ne : so sánh không bằng - { field: { $ne: value } }
-    $gt : so sánh lớn hơn - { field: { $gt: value } }
-    $gte : so sánh lớn hơn hoặc bằng - { field: { $gte: value } }
-    $lt : so sánh nhỏ hơn - { field: { $lt: value } }
-    $lte : so sánh nhỏ hơn - { field: { $lte: value } }
-    $in: So sánh nếu giá trị có trong một mảng - { field: { $in: [value1, value2, ...] } }
-    $nin: So sánh nếu giá trị không có trong một mảng - { field: { $nin: [value1, value2, ...] } }
-    $exists: Kiểm tra sự tồn tại của trường - { field: { $exists: true } }
-    $type: Kiểm tra kiểu dữ liệu của trường - { field: { $type: "string" } }
-    $regex: So sánh với biểu thức chính quy - { field: { $regex: /pattern/, $options: 'i' } }
-    $or: Toán tử logic OR - { $or: [ { field1: value1 }, { field2: value2 } ] }
-    $and: Toán tử logic AND - { $and: [ { field1: value1 }, { field2: value2 } ] }
-    $not: Toán tử logic NOT - { field: { $not: { $regex: /pattern/ } } }
-    $nor: Toán tử logic NOR - { $nor: [ { field1: value1 }, { field2: value2 } ] }
-*/
+
 
 // [GET] /detail-product/:idProduct
 const getDetailProduct = async (req, res, next) => {
     try {
-        const idProduct = req.params.idProduct
-        const detailProduct = await Product.findOne({ idProduct: idProduct })
+        const idProduct = req.params._id
+        const detailProduct = await Product.findOne({ _id: idProduct })
         if (detailProduct == null) {
             return res.status(400).json({
                 message: "Fail Detail Product"
@@ -180,33 +174,5 @@ const getPrice = async (req, res, next) => {
     })
 }
 
-const searchProduct = async (req, res, next) => {
-    const { idProduct, name, email, phone, idRole } = req.query
-    const searchParams = {}
-    if (idProduct) {
-        searchParams.idProduct = idProduct
-    }
-    if (name) {
-        searchParams.name = { $regex: name, $options: 'i' }; // 'i' để tìm không phân biệt chữ hoa chữ thường
-    }
-    if (email) {
-        searchParams.email = { $regex: email};
-    }
-    if (phone) {
-        searchParams.phone = { $regex: phone}
-    }
-    if (idRole) {
-        searchParams.idRole = idRole
-    }
-    try 
-    {
-        const users = await User.find(searchParams)
-        return res.status(200).json({users})
-    }
-    catch (error)
-    {
-        return res.status(400).json({message : error.message})
-    }
-}
 
-module.exports = { addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, getPrice, searchProduct }
+module.exports = { addProduct, updateProduct, deleteProduct, getAllProduct, getDetailProduct, getPrice }

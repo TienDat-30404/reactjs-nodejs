@@ -4,7 +4,7 @@ import { ErrorMessageInput } from '../../../../components/InputComponent'
 import { getAllRole } from '../../../../services/RoleService'
 import { getDetailUser } from '../../../../services/UserService'
 import { updateUser } from '../../../../services/UserService'
-export default function EditUser({ show, close, idUser, onSuccess }) {
+export default function EditUser({ show, close, idUser }) {
     const [informations, setInformations] = useState({
         name: '',
         email: '',
@@ -73,7 +73,6 @@ export default function EditUser({ show, close, idUser, onSuccess }) {
             }
             else {
                 alert("Chỉnh sửa người dùng thành công")
-                onSuccess()
             }
         }
     }
@@ -257,7 +256,7 @@ export default function EditUser({ show, close, idUser, onSuccess }) {
                                     <option value="-1" checked>Chọn loại tài khoản</option>
                                     {roles.length > 0 ? (
                                         roles.map((role, index) => (
-                                            <option key={index} value={role.idRole}>{role.name}</option>
+                                            <option key={index} value={role._id}>{role.name}</option>
                                         ))
                                     ) : <option>Hiện không có loại tài khoản nào. Vui lòng thêm vào loại tài khoản để sử dụng chức năng này.</option>}
                                 </select>

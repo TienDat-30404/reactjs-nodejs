@@ -27,7 +27,7 @@ export const routes = [
         isPageUser : true,
     },
     {
-        path: '/detail/:idProduct',
+        path: '/detail/:_id',
         page: Detail,
         isShowHeader: true,
         isPageUser : true,
@@ -49,7 +49,7 @@ export const routes = [
         isPageUser : true,
     },
     {
-        path: '/category/:idCategory',
+        path: '/category/:_id',
         page: CategoryByProduct,
         isShowHeader: true,
         isShowProduct: false,

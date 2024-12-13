@@ -2,14 +2,13 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { InputComponent, ErrorMessageInput } from '../../components/InputComponent';
 import { useSelector } from 'react-redux';
-import { updateUser, loginService } from '../../services/UserService';
-import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
-import { jwtDecode } from 'jwt-decode';
+import { useSaveTokenOnRedux } from '../../until/function';
+import { changePassword } from '../../services/UserService';
+import { toast } from 'react-toastify';
 // import bcrypt from 'bcrypt'
 export default function UpdatePassword({ show, closeModal }) {
     const saveTokenOnRedux = useSaveTokenOnRedux()
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
-    const [dataUpdate, setDataUpdate] = useState(null)
     const [errors, setErrors] = useState({})
     const [dataPassword, setDataPassword] = useState({
         oldPassword: '',
@@ -19,9 +18,9 @@ export default function UpdatePassword({ show, closeModal }) {
 
     const handleCloseModal = () => {
         setDataPassword({
-            oldPassword : '',
-            password : '',
-            confirmPassword : ''
+            oldPassword: '',
+            password: '',
+            confirmPassword: ''
         })
         closeModal()
         setErrors({})
@@ -35,53 +34,31 @@ export default function UpdatePassword({ show, closeModal }) {
         }));
     };
 
-    useEffect(() => {
-        if (isAuthenticated) {
-            const { name, email, address, phone, sex } = userData.dataLogin
-            setDataUpdate({
-                name,
-                email,
-                address,
-                phone,
-                sex,
+    const handleSaveChanges = async () => {
+
+        if (userData && isAuthenticated) {
+
+            const response = await changePassword(userData.dataLogin.idUser,
+            {
+                email: userData.dataLogin.email,
                 oldPassword: dataPassword.oldPassword,
                 password: dataPassword.password,
-                confirmPassword: dataPassword.confirmPassword,
-            })
-        } else {
-            setDataUpdate(null);
-        }
-    }, [isAuthenticated, userData, dataPassword.oldPassword, dataPassword.password, dataPassword.confirmPassword]);
+                confirmPassword: dataPassword.confirmPassword
+            }, true)
+            if(response.errors)
+            {
 
-    const fetchApiUpdateUser = async (id, data) => {
-        try {
-            const resultUpdate = await updateUser(id, data)
-            console.log(resultUpdate)
-            if (resultUpdate.errors) {
-                setErrors(resultUpdate.errors)
+                setErrors(response.errors)
                 return
             }
-            if (resultUpdate.message) {
-                alert("Chỉnh sửa thành công")
+            else 
+            {
                 setErrors({})
+                toast.success("Thay đổi mật khẩu thành công")
             }
-            const refreshTokenWhenUpdate = {
-                email: userData.dataLogin.email,
-                password: dataPassword.password
-            }
-            const resultTokenUpdate = await loginService(refreshTokenWhenUpdate)
-            setCookieForToken(resultTokenUpdate.token)
-            saveTokenOnRedux(jwtDecode(resultTokenUpdate.token))
-        } catch (error) {
-            console.log('Có lỗi xảy ra:', error);
         }
     };
-
-    const handleSaveChanges = () => {
-        if (dataUpdate) {
-            fetchApiUpdateUser(userData.dataLogin.idUser, dataUpdate);
-        }
-    };
+    
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="modal-dialog update-user">
@@ -93,7 +70,7 @@ export default function UpdatePassword({ show, closeModal }) {
                             name="oldPassword"
                             value={dataPassword.oldPassword}
                             onChange={handleChangeInput}
-                            type="password"
+                            type="oldPassword"
                             id="inputPassword5"
                             className={`form-control ${errors.oldPassword ? 'is-invalid' : ''}`}
                             aria-describedby="passwordHelpBlock"

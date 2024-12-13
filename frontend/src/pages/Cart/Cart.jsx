@@ -6,141 +6,93 @@ import { getAllCart, deleteCart, updateQuantityCart } from '../../services/CartS
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useSaveCartOnRedux } from '../../until/tokenUser'
+import { useSelector, useDispatch } from 'react-redux'
+import { initDataCart, switchPage, updateQuantity, deleteCartRedux } from '../../redux/Cart/cartsSlice'
 export default function Cart() {
-    const saveCartOnRedux = useSaveCartOnRedux()
-    const limit = 6
-    const [totalPage, setTotalPage] = useState(1)
-    const [products, setProducts] = useState([])
-    const [page, setPage] = useState(1)
-    const [pageCart, setPageCart] = useState(1)
-    const [totalPageCart, setTotalPageCart] = useState(1)
-    const [totalProductInCart, setTotalProductInCart] = useState(1)
-    const [sortBy, setSortBy] = useState('idCart')
-    const [type, setType] = useState('asc')
-    const [carts, setCart] = useState([])
+
+    const dispatch = useDispatch()
+
+
     const [cartsCheck, setCartsCheck] = useState([])
+
+    const carts = useSelector(state => state.carts.carts)
+    const page = useSelector(state => state.carts.page)
+    const totalPage = useSelector(state => state.carts.totalPage)
+    // const limit = useSelector(state => state.carts.limit)
+    const limit = 2;
+    const totalProductInCart = useSelector(state => state.carts.totalProductInCart)
     const { idUser } = useParams()
     const navigate = useNavigate()
 
+    const fetchDataCarts = async () => {
+        let query = `idUser=${idUser}&page=${page}&limit=${limit}`
+        const response = await getAllCart(query)
+        console.log(response)
+        if (response) {
+            dispatch(initDataCart(response))
+        }
+    }
+
     useEffect(() => {
-        const fetchDatas = async () => {
-            const [listProduct, cart] = await Promise.all([
-                getAllProduct(page, 'idProduct', 'asc', limit),
-                getAllCart(idUser, pageCart, sortBy, type)
-            ])
-            setProducts(listProduct.products)
-            setTotalPage(listProduct.totalPages)
+        fetchDataCarts()
+    }, [page, dispatch])
 
-            setCart(cart.listCart)
-            setTotalPageCart(cart.totalPages)
-            setTotalProductInCart(cart.totalProductInCart)
 
-        }
-        fetchDatas()
-    }, [page, pageCart, idUser, sortBy, type])
-
-    // handle pagination next page
-    const handleNextPage = useCallback(() => {
-        if (page < totalPage) {
-            setPage(page + 1)
-        }
-    }, [page, totalPage])
-
-    // handle pagination prev page 
-    const handlePrevPage = useCallback(() => {
-        if (page > 1) {
-            setPage(page - 1)
-        }
-    }, [page, totalPage])
 
     //  handle pagination next page Cart
-    const handleNextPageCart = useCallback(() => {
-        if (pageCart < totalPageCart) {
-            setPageCart(pageCart + 1)
+    const handleNextPageCart = () => {
+        if (page < totalPage) {
+            dispatch(switchPage(page + 1))
         }
-    }, [pageCart, totalPageCart])
+    }
 
     // handle pagination prev page Cart
     const handlePrevPageCart = useCallback(() => {
-        if (pageCart > 1) {
-            setPageCart(pageCart - 1)
+        if (page > 1) {
+            dispatch(switchPage(page - 1))
         }
-    }, [pageCart, totalPageCart])
+    }, [page])
 
     // delete cart
     const handleDeleteCart = async (idCart) => {
         const response = await deleteCart(idCart)
         if (response.success) {
-            alert("Xóa thành công")
-
-            const updateCart = carts.filter(cart => cart.idCart != idCart)
-            setCart(updateCart)
-            // dispatch(resetCartRedux())
-            saveCartOnRedux(updateCart, updateCart.length)
-            setTotalProductInCart(totalProductInCart - 1)
-
-            const updateTotalPrice = cartsCheck.filter(cart => cart.idCart != idCart)
-            setCartsCheck(updateTotalPrice)
-
-            if (updateCart.length === 0 && pageCart > 1) {
-                setPageCart(pageCart - 1)
+            if(carts.length - 1 < limit)
+            {
+                fetchDataCarts()
             }
-            else {
-                const response = await getAllCart(idUser, pageCart, sortBy, type)
-                setCart(response.listCart)
-                setTotalPageCart(response.totalPages)
-            }
+
         }
     }
 
     // increase quantity cart 
-    const handleIncreaseQuantityCart = async (idCart, quantity) => {
-        const newQuantity = quantity + 1
+    const handleIncreaseQuantityCart = async (idCart, newQuantity) => {
         const response = await updateQuantityCart(idCart, newQuantity)
+        console.log(response)
         if (response.success) {
-            const updateCart = carts.map(cart =>
-                cart.idCart === idCart ? { ...cart, quantityCart: newQuantity } : cart
-            )
-            setCart(updateCart)
-
-            const updateTotalPrice = cartsCheck.map(cart =>
-                cart.idCart === idCart ? { ...cart, quantityCart: newQuantity } : cart
-            )
-            setCartsCheck(updateTotalPrice)
+            dispatch(updateQuantity({
+                _id: idCart,
+                quantity: newQuantity
+            }))
         }
     }
 
-    // decrease quantity cart
-    const handleDecreaseQuantityCart = async (idCart, quantity) => {
-        const newQuantity = quantity - 1
-        const response = await updateQuantityCart(idCart, newQuantity)
-        if (response.success) {
-            const updateCart = carts.map(cart =>
-                cart.idCart === idCart ? { ...cart, quantityCart: newQuantity } : cart
-            )
-            setCart(updateCart)
-
-            const updateTotalPrice = cartsCheck.map(cart =>
-                cart.idCart === idCart ? { ...cart, quantityCart: newQuantity } : cart
-            )
-            setCartsCheck(updateTotalPrice)
-        }
-    }
 
     // change input checkbox
     const handleChangeCheckInput = async (cart) => {
         setCartsCheck(prev => {
-            const isCheck = prev.some(item => item.idCart === cart.idCart)
+            const isCheck = prev.some(item => item._id === cart._id)
             if (isCheck) {
-                return prev.filter(item => item.idCart !== cart.idCart)
+                return prev.filter(item => item._id !== cart._id)
             }
             else {
                 return [...prev, cart]
             }
         })
     }
+
     // total Price
-    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.price * cart.quantityCart), 0)
+    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.product.price * cart.quantity), 0)
 
     // switch payment
     const switchPayment = () => {
@@ -170,43 +122,44 @@ export default function Cart() {
                                 <div key={index} className='col-12 d-flex align-items-center bg-white px-2 py-2'>
                                     <div className='d-flex align-items-center col-5'>
                                         <input
-                                            checked={cartsCheck.some(item => item.idCart === cart.idCart)}
+                                            checked={cartsCheck.some(item => item._id === cart._id)}
                                             onChange={() => handleChangeCheckInput(cart)}
                                             style={{ width: '17px', height: '20px', marginRight: '8px' }}
                                             type="checkbox" name="" id=""
                                         />
-                                        <img width="75px" src={cart.image} alt="" />
-                                        <p>{cart.name}</p>
+                                        <img width="75px" src={cart.product.image} alt="" />
+                                        <p>{cart.product.name}</p>
                                     </div>
-                                    <span className='col-2 '>{(cart.price).toLocaleString('vi-VN')}đ</span>
+                                    <span className='col-2 '>{(cart.product.price).toLocaleString('vi-VN')}đ</span>
                                     <div className='col-2'>
                                         <button
-                                            disabled={cart.quantityCart === 1}
-                                            className={cart.quantityCart == 1 ? '' : 'hover_quantity-cart'}
-                                            onClick={() => handleDecreaseQuantityCart(cart.idCart, cart.quantityCart)}
+                                            disabled={cart.quantity === 1}
+                                            className={cart.quantity == 1 ? '' : 'hover_quantity-cart'}
+                                            onClick={() => handleIncreaseQuantityCart(cart._id, cart.quantity - 1)}
+
                                             style={{ border: '1px solid #ccc', padding: '1px 8px', cursor: 'pointer' }}>
                                             -
                                         </button>
-                                        <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>{cart.quantityCart}</span>
+                                        <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>{cart.quantity}</span>
                                         <button
                                             className='hover_quantity-cart'
-                                            onClick={() => handleIncreaseQuantityCart(cart.idCart, cart.quantityCart)}
+                                            onClick={() => handleIncreaseQuantityCart(cart._id, cart.quantity + 1)}
                                             style={{ border: '1px solid #ccc', padding: '1px 8px' }}>
                                             +
                                         </button>
                                     </div>
-                                    <span className='col-2 text-danger fw-bold'>{(cart.price * cart.quantityCart).toLocaleString('vi-VN')}</span>
-                                    <i onClick={() => handleDeleteCart(cart.idCart)} style={{ cursor: 'pointer' }} className="col-2 bi bi-trash3 "></i>
+                                    <span className='col-2 text-danger fw-bold'>{(cart.product.price * cart.quantity).toLocaleString('vi-VN')}</span>
+                                    <i onClick={() => handleDeleteCart(cart._id)} style={{ cursor: 'pointer' }} className="col-2 bi bi-trash3 "></i>
                                 </div>
                             ))}
-                            {totalPageCart > 1 ? (
+                            {totalPage > 1 ? (
                                 <>
                                     <div className='d-flex justify-content-center align-items-center mt-3'>
-                                        <button disabled={pageCart == 1} onClick={handlePrevPageCart} type="button" className="btn btn-light me-3">Primary</button>
-                                        <button disabled={pageCart >= totalPageCart} onClick={handleNextPageCart} type="button" className="btn btn-light">Next</button>
+                                        <button disabled={page == 1} onClick={() => handlePrevPageCart()} type="button" className="btn btn-light me-3">Primary</button>
+                                        <button disabled={page >= totalPage} onClick={() => handleNextPageCart()} type="button" className="btn btn-light">Next</button>
                                     </div>
                                     <div className='mt-2 d-flex justify-content-center'>
-                                        <span>Page {pageCart} of {totalPageCart}</span>
+                                        <span>Page {page} of {totalPage}</span>
                                     </div>
                                 </>
                             ) :
@@ -235,7 +188,7 @@ export default function Cart() {
                     <div className='mt-2 bg-white px-3 py-2'>
                         <div className='d-flex justify-content-between'>
                             <p style={{ fontSize: '14px', color: '#888' }}>Tạm tính</p>
-                            <p style={{ fontSize: '14px' }}>{totalPrice.toLocaleString('vi-VN')}đ</p>
+                            {/* <p style={{ fontSize: '14px' }}>{totalPrice.toLocaleString('vi-VN')}đ</p> */}
                         </div>
                         <div className='d-flex justify-content-between mt-1 mb-2'>
                             <p style={{ fontSize: '14px', color: '#888' }}>Giảm giá</p>
@@ -254,32 +207,6 @@ export default function Cart() {
                             <span style={{ color: 'white', paddingLeft: '3px' }}>({cartsCheck.length})</span>
                         </button>
                     </div>
-                </div>
-            </div>
-            <h3 style={{ fontSize: '21px', fontWeight: '500', fontFamily: 'Georgia, serif', width: '100%', marginTop: '20px' }}>Sản phẩm bạn quan tâm</h3>
-            <div className='d-flex mt-2 row see_more-cart'>
-                {products.length > 0 ? (
-                    products.map((product, index) => (
-                        <CartProduct
-                            key={index}
-                            width="210px"
-                            id={product.idProduct}
-                            image={product.image}
-                            name={product.name}
-                            price={(product.price).toLocaleString('vi-VN')}
-                        />
-                    ))) :
-                    <div class="loading">
-                        <div class="spinner"></div>
-                    </div>
-                }
-                <div className='pagination-controls'>
-                    {page != 1 && (
-                        <i style={{ fontSize: '30px', cursor: 'pointer' }} onClick={handlePrevPage} className="bi bi-arrow-left-circle"></i>
-                    )}
-                    {(totalPage > 1 && page != totalPage) && (
-                        <i style={{ fontSize: '30px', cursor: 'pointer' }} onClick={handleNextPage} className="bi bi-arrow-right-circle"></i>
-                    )}
                 </div>
             </div>
         </div>

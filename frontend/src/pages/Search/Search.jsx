@@ -4,76 +4,82 @@ import { useNavigate } from 'react-router-dom';
 import { getAllProduct } from '../../services/ProductService'
 import CartProduct from '../../components/CartProduct'
 import { detailCategory } from '../../services/CategoryService';
+import { useSelector, useDispatch } from 'react-redux';
+import { initDataProduct, switchPage } from '../../redux/Products/productsSlice';
 export default function Search() {
+    const dispatch = useDispatch()
     const navigate = useNavigate()
     const limit = 4
-    const [page, setPage] = useState(1)
     const [nameCategory, setNameCategory] = useState({})
-    const [totalPage, setTotalPage] = useState(1)
     const [sort, setSort] = useState('idProduct')
     const [type, setType] = useState('asc')
-    const [resultSearch, setResultSearch] = useState([])
     const params = new URLSearchParams(window.location.search)
     const wordSearch = params.get('find') ? params.get('find') : null
     const idCategory = params.get('idCategory') ? params.get('idCategory') : null
     const priceFrom = params.get('priceFrom') ? params.get('priceFrom') : null
     const priceTo = params.get('priceTo') ? params.get('priceTo') : null
- 
+
+
+    const products = useSelector(state => state.products.products)
+    const page = useSelector(state => state.products.page)
+    const totalPage = useSelector(state => state.products.totalPage)
+    const totalProduct = useSelector(state => state.products.totalProduct)
     useEffect(() => {
         const fetchDatasSearchProduct = async () => {
-            const listSearchProduct = await getAllProduct(page, sort, type, limit, null, idCategory, wordSearch, priceFrom, priceTo)
-            setResultSearch(listSearchProduct)
-            setTotalPage(listSearchProduct.totalPages)
+            var query = `page=${page}&sortBy=${sort}&type=${type}&limit=${limit}`
+            if (idCategory) {
+                query += `&idCategory=${idCategory}`
+            }
+            if (wordSearch) {
+                query += `&search=${wordSearch}`
+            }
+            if (priceFrom) {
+                query += `&priceFrom=${priceFrom}`
+            }
+            if (priceTo) {
+                query += `&priceTo=${priceTo}`
+            }
+            const response = await getAllProduct(query)
+            if (response) {
+                dispatch(initDataProduct(response))
+            }
         }
         fetchDatasSearchProduct()
-    }, [page, sort, type, limit, idCategory, wordSearch, priceFrom, priceTo])
+    }, [
+        page, sort, type, limit, idCategory, wordSearch, priceFrom, priceTo
+    ])
 
     const handleNextPage = () => {
         if (page < totalPage) {
-            setPage(page + 1)
+            dispatch(switchPage(page + 1))
         }
     }
 
     const handlePrevPage = () => {
         if (page > 1) {
-            setPage(page - 1)
+            dispatch(switchPage(page - 1))
         }
     }
     useEffect(() => {
-        setPage(1)
+        dispatch(switchPage(1))
     }, [wordSearch, idCategory, priceFrom, priceTo])
 
-    // get name category 
-    useEffect(() => {
-        const fetchCategoryName = async () => {
-            if (idCategory) {
-                const category = await detailCategory(idCategory);
-                setNameCategory(category.category);
-            } else {
-                setNameCategory('');
-            }
-        };
-        fetchCategoryName();
-    }, [idCategory]);
 
     // arrange price
     const handleSortChange = (e) => {
-        if(e.target.value === "priceAsc")
-        {
-            setSort('price'); 
+        if (e.target.value === "priceAsc") {
+            setSort('price');
             setType('asc')
         }
-        else if(e.target.value === 'priceDesc')
-        {
+        else if (e.target.value === 'priceDesc') {
             setSort('price')
             setType('desc')
         }
-        else 
-        {
+        else {
             setSort('idProduct')
             setType('asc')
         }
-        setPage(1)
+        dispatch(switchPage(1))
     }
     return (
         <div className="container d-flex">
@@ -90,13 +96,9 @@ export default function Search() {
                         <>
                             <span className='me-2'>, Thể loại : </span>
                             <p style={{ color: 'red', fontWeight: '500', fontSize: '15px', marginRight: '6px' }}>
-                                {nameCategory.length > 0 ? (
-                                    nameCategory.map((category, index) => (
-                                        <span key={index}>{category.name}</span>
-                                    ))
-                                ) : (
-                                    <p>123</p>
-                                )}
+                                {products.length > 0 &&
+                                    <span>{products[0].category.name}</span>
+                                }
                             </p>
                         </>
                         : ''
@@ -137,12 +139,12 @@ export default function Search() {
                     </div>
                 </div>
                 <div className='d-flex row col-12'>
-                    {resultSearch.products ? (
+                    {products ? (
                         <div>
                             <div className='d-flex'>
-                                {resultSearch.products.map((product, index) => (
+                                {products.map((product, index) => (
                                     <CartProduct
-                                        id={product.idProduct}
+                                        id={product._id}
                                         ket={index}
                                         width="300px"
                                         widthImage="300px"
@@ -153,12 +155,12 @@ export default function Search() {
                                     />
                                 ))}
                             </div>
-                            {resultSearch.products.length > 0 ? (
+                            {products.length > 0 ? (
                                 <div>
 
                                     <div className='d-flex justify-content-center align-items-center mt-3'>
-                                        <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
-                                        <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
+                                        <button disabled={page == 1} onClick={() => handlePrevPage()} type="button" className="btn btn-light me-3">Primary</button>
+                                        <button disabled={page >= totalPage} onClick={() => handleNextPage()} type="button" className="btn btn-light">Next</button>
                                     </div>
                                     <div className='d-flex justify-content-center align-items-center mt-2'>
                                         <span>Page {page} of {totalPage}</span>

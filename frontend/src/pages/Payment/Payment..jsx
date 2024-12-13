@@ -5,16 +5,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { InputComponent } from '../../components/InputComponent';
 import { ErrorMessageInput } from '../../components/InputComponent';
 import { addOrder } from '../../services/OrderService';
-import { useSaveCartOnRedux } from '../../until/tokenUser';
+import { toast, ToastContainer } from 'react-toastify';
 export default function Payment() {
-    const saveCartOnRedux = useSaveCartOnRedux()
     const nagigate = useNavigate()
     let { isAuthenticated, userData, dataCart } = useSelector(state => state.auth)
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const location = useLocation();
     let { cartsCheck } = location.state || {};
+    console.log(cartsCheck)
     // total Price
-    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.price * cart.quantityCart), 0)
+    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.product.price * cart.quantity), 0)
 
     const [errors, setErrors] = useState({})
     const [provinces, setProvinces] = useState([])
@@ -126,22 +126,44 @@ export default function Payment() {
                 banks.find(bank => bank.id === parseInt(informations.paymentMethod)).name : 'Thanh toán sau khi nhận hàng',
 
             bankAccount: informations.bankAccount,
-            products: cartsCheck
+            products: cartsCheck,
+            totalPrice: totalPrice
 
         })
+        console.log(response)
         if (response.errors) {
             setErrors(response.errors)
             return
         }
+        if (response.error) {
+            alert("Lỗi khi thanh toán")
+            return
+        }
         const idProductCartCheck = new Set(cartsCheck.map(item => item.idProduct));
         dataCart = dataCart.carts.filter(item => !idProductCartCheck.has(item.idProduct));
-        saveCartOnRedux(dataCart, dataCart.length)
-        alert("Đặt hàng thành công")
-        nagigate('/')
+        toast("Đặt hàng thành công")
+        setTimeout(() => {
+            nagigate('/')
+        }, 2500)
     }
     return (
         <div>
             <div className='w-100 bg-white'>
+                <ToastContainer
+                    className="text-base"
+                    fontSize="10px"
+                    position="top-right"
+                    autoClose={2000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light"
+                />
+
                 <div className='col-12 container d-flex justify-content-between '>
                     <div style={{ position: 'relative' }} className='d-flex align-items-center'>
                         <ImageComponent

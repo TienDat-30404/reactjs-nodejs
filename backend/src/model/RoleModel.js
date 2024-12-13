@@ -9,8 +9,6 @@ const RoleSchema = new Schema(
     { timestamps: true }
 );
 
-// Thêm plugin AutoIncrement để tự động tăng giá trị của 'idRole'
-RoleSchema.plugin(AutoIncrement, { inc_field: 'idRole' });
 
 const Role = mongoose.model('Role', RoleSchema);
 

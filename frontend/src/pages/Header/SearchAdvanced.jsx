@@ -101,7 +101,7 @@ const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
                                 <option value="0">Tất cả</option>
                                 {categories.categories.map((category, index) => (
                                     <>
-                                        <option key={index} value={category.idCategory}>{category.name}</option>
+                                        <option key={index} value={category._id}>{category.name}</option>
                                     </>
                                 ))}
                             </select>

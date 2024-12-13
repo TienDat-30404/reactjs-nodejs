@@ -47,9 +47,9 @@ const validateAddProduct = async (req, res, next) => {
 
 // validate update product
 const validateUpdateProduct = async (req, res, next) => {
-    const idProduct = req.params.idProduct
+    const idProduct = req.params._id
     const { name, price, quantity, idCategory, description } = req.body
-    const currentProduct = await Product.findOne({ idProduct: idProduct });
+    const currentProduct = await Product.findOne({ _id: idProduct });
     const errors = {}
     if (name.trim() == "") {
         errors.name = "Vui lòng nhập tên sản phẩm"

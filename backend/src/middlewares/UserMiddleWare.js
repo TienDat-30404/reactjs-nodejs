@@ -91,7 +91,7 @@ const validateUpdateUser = async (req, res, next) => {
         const phoneRegex = /^09\d{8,9}$/;
         const countNameUser = await User.countDocuments({ name })
         const countEmailUser = await User.countDocuments({ email })
-        const isCheckUser = await User.findOne({ idUser: idUser })
+        const isCheckUser = await User.findOne({ _id: idUser })
         const errors = {}
 
         if (name == "") {
@@ -126,4 +126,60 @@ const validateUpdateUser = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { validateSignIn, validateLogin, validateUpdateUser }
+
+const validateChangePassword = async (req, res, next) => {
+    const { email, oldPassword, password, confirmPassword } = req.body
+    const isCheckUser = await User.findOne({ email })
+    
+    const errors = {}
+
+    if (password == "") {
+        errors.password = "Mật khẩu không được để trống"
+    }
+
+    if (isCheckUser == null) {
+        errors.email = "Email không chính xác"
+    }
+    else {
+        const regexHashPassword = /^\$2[ayb]\$[0-9]{2}\$.{53}$/;
+        if (!regexHashPassword.test(password)) {
+            const comparePassword = bcrypt.compareSync(oldPassword, isCheckUser.password);
+            if (!comparePassword) {
+                errors.oldPassword = "Mật khẩu cũ không chính xác"
+            }
+        }
+    }
+    if (confirmPassword === "") {
+        errors.confirmPasswrd = "Mật khẩu xác nhận không được để trống"
+    }
+    if(password !== confirmPassword)
+    {
+        errors.confirmPassword = "Mật khẩu xác nhận không chính xác"
+    }
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ errors })
+    }
+    console.log(errors)
+    next()
+}
+
+
+const authLoginGoogle = async (req, res, next) => {
+    try {
+        const {email} = req.body
+        const errors = {};
+        const existEmail = await User.countDocuments({ email }) 
+        
+        if (existEmail > 0) {
+            errors.email = "Email đã tồn tại";
+        }
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({ errors });
+        }
+        next()
+    }
+    catch (error) {
+        next(error)
+    }
+}
+module.exports = { validateSignIn, validateLogin, validateUpdateUser, validateChangePassword, authLoginGoogle }

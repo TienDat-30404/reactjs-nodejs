@@ -6,9 +6,13 @@ import HeaderSupport from "./HeaderSupport";
 import { useNavigate } from "react-router-dom";
 import '../../public/css/header.css';
 import { useSelector, useDispatch } from 'react-redux';
-import { logoutSuccess } from "../../redux/userSlice";
-import { logoutUser } from "../../until/tokenUser";
+import { logoutSuccess } from "../../redux/Auth/authSlice";
+import { logoutUser } from "../../services/UserService";
 import SearchAdvanced from "./SearchAdvanced";
+import { switchPage } from "../../redux/Products/productsSlice";
+import { getAllCart } from "../../services/CartService";
+import { initDataCart } from "../../redux/Cart/cartsSlice";
+import { toast } from "react-toastify";
 const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
     const [showModal, setShowModal] = useState(false);
     const displaySearchAdvanced = () => {
@@ -18,18 +22,38 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [word, setWord] = useState('');
-    const { isAuthenticated, userData, dataCart } = useSelector((state) => state.auth);
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const handleClickLogout = () => {
-        logoutUser();
-        dispatch(logoutSuccess());
-        window.location.reload();
+        toast.success("Đang đăng xuất")
+        setTimeout(() => {
+            toast.success("Đăng xuất thành công. Chúc bạn một ngày tốt lành")
+            logoutUser();
+            dispatch(logoutSuccess());
+            navigate('/')
+        }, 2500)
     };
 
     const avatarRef = useRef(null);
     const modalRef = useRef(null);
     const headerRef = useRef(null);
 
+    const totalProductInCart = useSelector(state => state.carts.totalProductInCart)
+
+    useEffect(() => {
+        const fetchDatasCart = async () => {
+            if (isAuthenticated && userData) {
+                const query = `idUser=${idUser}`
+                const response = await getAllCart(query)
+                console.log(idUser)
+                console.log(response)
+                if (response) {
+                    dispatch(initDataCart(response))
+                }
+            }
+        }
+        fetchDatasCart()
+    }, [idUser])
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -68,8 +92,14 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
             navigate(`/cart/${idUser}`)
         }
         else {
-            alert("Vui lòng đăng nhập")
+            toast.error("Vui lòng đăng nhập")
         }
+    }
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        dispatch(switchPage(1))
+        navigate(`/search?find=${word}`)
     }
 
     return (
@@ -102,7 +132,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                     className='btn btn-outline-success'
                                     type='submit'
                                     content='Search'
-                                    onClick={(e) => { e.preventDefault(); navigate(`/search?find=${word}`) }}
+                                    onClick={(e) => handleSearch(e)}
                                 />
                             </form>
 
@@ -125,12 +155,21 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                     <div className="d-flex align-items-center">
                                                         {isAuthenticated ? (
                                                             <>
-                                                                <ImageComponent
-                                                                    src={ userData ? userData.dataLogin.avatar : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
-                                                                    width="30px"
-                                                                    height="30px"
-                                                                    borderRadius="5px"
-                                                                />
+                                                                {userData && userData.dataLogin.avatar ? (
+                                                                    <ImageComponent
+                                                                        src={userData && userData.dataLogin.avatar != "" ? localStorage.getItem("avatar") : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
+                                                                        width="30px"
+                                                                        height="30px"
+                                                                        borderRadius="5px"
+                                                                    />
+                                                                ) :
+                                                                    <ImageComponent
+                                                                        src={userData && userData.dataLogin.picture != "" ? localStorage.getItem("avatar") : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
+                                                                        width="30px"
+                                                                        height="30px"
+                                                                        borderRadius="5px"
+                                                                    />
+                                                                }
                                                                 <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">{userData.dataLogin.name}</p>
                                                             </>
                                                         ) :
@@ -148,7 +187,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                         </div>
                                                         <div className="d-flex align-items-center p-2">
                                                             <i className="bi bi-box-arrow-right me-2"></i>
-                                                            <p onClick={handleClickLogout}>Đăng xuất</p>
+                                                            <p onClick={() => handleClickLogout()}>Đăng xuất</p>
                                                         </div>
                                                     </div>
                                                 </li>
@@ -156,13 +195,15 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                     <i className="bi bi-cart-check-fill"></i>
                                                     <button className="btn position-relative">
                                                         Giỏ hàng
-                                                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                            { dataCart ? (
-                                                                dataCart.length
-                                                            ) : 
-                                                            0
-                                                            }
-                                                        </span>
+                                                        {idUser && (
+                                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                                {totalProductInCart ? (
+                                                                    totalProductInCart
+                                                                ) :
+                                                                    0
+                                                                }
+                                                            </span>
+                                                        )}
                                                     </button>
                                                 </li>
                                             </ul>

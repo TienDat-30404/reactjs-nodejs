@@ -14,6 +14,8 @@ import Right from './pages/Content/Right/Right';
 import Body from './pages/Content/Body';
 import CategoryByProduct from './pages/Content/Right/CategoryByProduct/CategoryByProduct';
 import Admin from './pages/Admin/Admin';
+import "react-toastify/dist/ReactToastify.css";
+
 // import Component from './pages/Component';
 function App() {
   const { checkAndUpdateToken } = useAuthHandler();

@@ -3,7 +3,10 @@ import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
 import { getAllRole, addRole } from '../../../../services/RoleService'
 import { signInService } from '../../../../services/UserService'
-export default function AddUser({ show, close, onSuccess }) {
+import { useSelector, useDispatch } from 'react-redux'
+import { initDataRole } from '../../../../redux/Role/rolesSlice'
+import { addUser } from '../../../../redux/User/usersSlice'
+export default function AddUser({ show, close }) {
     const [informations, setInformations] = useState({
         name: '',
         email: '',
@@ -11,20 +14,22 @@ export default function AddUser({ show, close, onSuccess }) {
         idRole: '',
     })
     
+    const dispatch = useDispatch()
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
-    const [roles, setRoles] = useState([])
+    const roles = useSelector(state => state.roles.roles)
     useEffect(() => {
         const fetchDatasRole = async () => {
             const response = await getAllRole();
-            setRoles(response.roles)
+            if(response)
+            {
+                dispatch(initDataRole(response))
+            }
         }
         fetchDatasRole()
     }, [])
 
-    useEffect(() => {
-        console.log(informations)
-    }, [informations.name, informations.email, informations.password, informations.idRole])
+ 
 
     // handle click add account
     const handleClickAddAccount = async () => {
@@ -44,7 +49,7 @@ export default function AddUser({ show, close, onSuccess }) {
         }
         else {
             alert("Thêm tài khoản thành công")
-            onSuccess()
+            dispatch(addUser(response.user))
         }
     }
 
@@ -147,7 +152,7 @@ export default function AddUser({ show, close, onSuccess }) {
                                 <option value="0" checked>Chọn loại tài khoản</option>
                                 {roles.length > 0 ? (
                                     roles.map((role, index) => (
-                                        <option key = {index} value={role.idRole}>{role.name}</option>
+                                        <option key = {index} value={role._id}>{role.name}</option>
                                     ))
                                 ) : <option>Hiện không có loại tài khoản nào. Vui lòng thêm vào loại tài khoản để sử dụng chức năng này.</option>}
                             </select>

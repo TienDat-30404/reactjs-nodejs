@@ -7,7 +7,7 @@ const initialState = {
       length: 0
   }
 }
-export const userSlice = createSlice({
+export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
@@ -15,13 +15,7 @@ export const userSlice = createSlice({
         state.isAuthenticated = true
         state.userData = action.payload
     },
-    setCartRedux : (state, action) => {
-      state.isAuthenticated = true;
-      state.dataCart = {
-        carts: action.payload.carts,
-        length: action.payload.length
-    };
-    },
+  
 
     resetCartRedux : (state, action) => {
       state.isAuthenticated = true;
@@ -36,6 +30,6 @@ export const userSlice = createSlice({
   }
 })
 
-export const { loginSuccess, logoutSuccess, setCartRedux, resetCartRedux} = userSlice.actions
+export const { loginSuccess, logoutSuccess, resetCartRedux} = authSlice.actions
 
-export default userSlice.reducer
+export default authSlice.reducer

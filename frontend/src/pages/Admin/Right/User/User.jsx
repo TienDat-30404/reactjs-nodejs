@@ -5,17 +5,18 @@ import AddUser from './AddUser'
 import ChangePassword from './ChangePassword'
 import { deleteUser } from '../../../../services/UserService'
 import EditUser from './EditUser'
-import { getDetailRole } from '../../../../services/RoleService'
 import { InputComponent } from '../../../../components/InputComponent'
 import { getAllRole } from '../../../../services/RoleService'
 import { handleChangeInput } from '../../../../until/function'
+import { useSelector, useDispatch } from 'react-redux'
+import { deleteUserRedux, initDataUser, switchPage } from '../../../../redux/User/usersSlice'
+import { initDataRole } from '../../../../redux/Role/rolesSlice'
 export default function User() {
-  const [users, setUsers] = useState([])
+  const dispatch = useDispatch()
   const [showAdd, setShowAdd] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
   const [idUser, setIdUser] = useState(null)
-  const [roles, setRoles] = useState([])
   const [selectedId, setSelectedId] = useState(null); // State để lưu idUser được chọn
   const [wordSearch, setWordSearch] = useState({
     idUser: '',
@@ -25,36 +26,47 @@ export default function User() {
     idRole: ''
   })
 
-  // Fetch all users
-  const fetchDatasUser = async () => {
-    const allUser = await getAllUser()
-    await fetchUsersWithRoles(allUser)
-  }
+  const users = useSelector(state => state.users.users)
+  const page = useSelector(state => state.users.page)
+  const totalPage = useSelector(state => state.users.totalPage)
+  const limit = useSelector(state => state.users.limit)
+  const totalUser = useSelector(state => state.users.totalUser)
 
-  // Fetch users with roles
-  const fetchUsersWithRoles = async (usersList) => {
-    const nameRoleUser = await Promise.all(
-      usersList.map(async (item) => {
-        const user = await getDetailRole(item.idRole)
-        return { ...item, user }
-      })
-    )
-    setUsers(nameRoleUser)
-  }
+  const roles = useSelector(state => state.roles.roles)
 
-  // get all role
-  useEffect(() => {
-    const fetchDatasRole = async () => {
-      const response = await getAllRole();
-      setRoles(response.roles)
+  const fetchDataUser = async () => {
+    let query = `page=${page}&limit=1000`
+    const responseUser = await getAllUser(query)
+    const responseRole = await getAllRole()
+    if (responseUser && responseRole) {
+      dispatch(initDataUser(responseUser))
+      dispatch(initDataRole(responseRole))
     }
-    fetchDatasRole()
-  }, [])
+  }
+
+  useEffect(() => {
+    fetchDataUser()
+  }, [page, dispatch])
+
+
+
+  //  handle pagination next page Cart
+  const handleNextPageCart = () => {
+    if (page < totalPage) {
+      dispatch(switchPage(page + 1))
+    }
+  }
+
+  // handle pagination prev page Cart
+  const handlePrevPageCart = useCallback(() => {
+    if (page > 1) {
+      dispatch(switchPage(page - 1))
+    }
+  }, [page])
 
   const handleSelectRow = (id) => {
     setSelectedId(id); // Lưu idUser của dòng được chọn
   };
-
 
 
   const handleSwitchPageEdit = (id) => {
@@ -62,25 +74,22 @@ export default function User() {
     setIdUser(id)
   }
 
-  // handle display account immediately after add account
-  const handleAddUser = () => {
-    fetchDatasUser();
-  };
+  
 
   // handle search user
   const handleSearchUser = async (e) => {
-    e.preventDefault()
-    const response = await searchUser(wordSearch.idUser, wordSearch.name, wordSearch.email, wordSearch.phone, wordSearch.idRole)
-    if (response && response.users) {
-      await fetchUsersWithRoles(response.users);  // Lấy chi tiết role của các user trong kết quả tìm kiếm
-    }
+    // e.preventDefault()
+    // const response = await searchUser(wordSearch.idUser, wordSearch.name, wordSearch.email, wordSearch.phone, wordSearch.idRole)
+    // if (response && response.users) {
+    //   await fetchUsersWithRoles(response.users);  // Lấy chi tiết role của các user trong kết quả tìm kiếm
+    // }
   }
 
   // handle delete account
   const handleDeleteUser = async (id) => {
     const response = await deleteUser(id)
-    if (response.message == "Delete Successfully") {
-      setUsers(prevUsers => prevUsers.filter(user => user.idUser !== id));
+    if (response) {
+      dispatch(deleteUserRedux({id}))
     }
   }
 
@@ -93,10 +102,6 @@ export default function User() {
       alert("Vui lòng chọn tài khoản muốn đổi tài khoản")
     }
   }
-
-  useEffect(() => {
-    fetchDatasUser();
-  }, []);
 
 
 
@@ -220,13 +225,13 @@ export default function User() {
             {users.map((user, index) => (
               <tr key={index}
                 style={{
-                  backgroundColor: selectedId === user.idUser ? 'lightblue' : 'white', // Đổi màu nền khi được chọn
+                  backgroundColor: selectedId === user._id ? 'lightblue' : 'white', // Đổi màu nền khi được chọn
                   cursor: 'pointer'
                 }}
-                onClick={() => handleSelectRow(user.idUser)} // Sự kiện click để chọn user
+                onClick={() => handleSelectRow(user._id)} // Sự kiện click để chọn user
               >
 
-                <td style={{ width: '4%' }}>{user.idUser}</td>
+                <td style={{ width: '4%' }}>{user._id}</td>
                 <td style={{ width: '8%' }}>{user.name}</td>
 
                 <td style={{ width: '15%' }} className='text-center'>{user.email}</td>
@@ -248,18 +253,18 @@ export default function User() {
                   }
                 </td>
 
-                <td key={index} className='text-center' >{user.user.detailRole.name}</td>
+                <td key={index} className='text-center' >{user.role.name}</td>
 
                 <td style={{ width: '6%' }} className='text-center'>
                   <button
-                    onClick={() => handleSwitchPageEdit(user.idUser)}
+                    onClick={() => handleSwitchPageEdit(user._id)}
                     type="button"
                     className="btn btn-outline-primary">
                     Edit
                   </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button onClick={() => handleDeleteUser(user.idUser)} type="button" className="btn btn-outline-danger">Delete</button>
+                  <button onClick={() => handleDeleteUser(user._id)} type="button" className="btn btn-outline-danger">Delete</button>
                 </td>
               </tr>
             ))}
@@ -272,8 +277,8 @@ export default function User() {
           <img src="https://tse3.mm.bing.net/th?id=OIP.-CiVIfCy46VrgitiIjfahwAAAA&pid=Api&P=0&h=180" alt="" />
           <h2>Không có nhân viên mà bạn muốn tìm kiếm</h2>
         </div>}
-      <AddUser show={showAdd} close={() => setShowAdd(false)} onSuccess={handleAddUser} />
-      <EditUser show={showEdit} close={() => setShowEdit(false)} idUser={idUser} onSuccess={fetchDatasUser} />
+      <AddUser show={showAdd} close={() => setShowAdd(false)} />
+      <EditUser show={showEdit} close={() => setShowEdit(false)} idUser={idUser}  />
       <ChangePassword show={showChangePassword} close={() => setShowChangePassword(false)} idUser={selectedId} />
     </div>
   )

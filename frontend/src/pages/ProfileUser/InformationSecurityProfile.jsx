@@ -2,9 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import { InputComponent, ErrorMessageInput } from '../../components/InputComponent'
 import { updateUser, loginService } from '../../services/UserService';
-import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
+import { setCookieForToken } from '../../until/tokenUser';
+import { useSaveTokenOnRedux } from '../../until/function';
 import { jwtDecode } from 'jwt-decode';
 import UpdatePassword from './UpdatePassword';
+import { toast } from 'react-toastify';
 export default function InformationSecurityProfile() {
     const saveTokenOnRedux = useSaveTokenOnRedux()
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
@@ -66,7 +68,7 @@ export default function InformationSecurityProfile() {
             }
 
             if (resultUpdate.message) {
-                alert("Chỉnh sửa thành công")
+                toast.success("Chỉnh sửa thành công")
                 setErrors({})
                 // window.location.reload()
             }

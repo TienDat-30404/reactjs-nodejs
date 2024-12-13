@@ -183,7 +183,7 @@ export default function AddProduct({ show, close, onSuccess }) {
                                 <option value="0" checked>Chọn thể loại</option>
                                 {category.length > 0 ? (
                                     category.map((category, index) => (
-                                        <option value={category.idCategory}>{category.name}</option>
+                                        <option key = {index} value={category._id}>{category.name}</option>
                                     ))
                                 ) : <option>Hiện không có thể loại sản phẩm nào</option>}
                             </select>

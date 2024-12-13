@@ -25,7 +25,7 @@ const getAllRole = async(req, res, next) => {
 const detailRole = async (req, res, next) => {
     try {
         const idRole = req.params.idRole
-        const detailRole = await Role.findOne({ idRole: idRole })
+        const detailRole = await Role.findOne({ _id: idRole })
         if (detailRole == null) {
             return res.status(400).json({
                 message: "Fail Detail Role"

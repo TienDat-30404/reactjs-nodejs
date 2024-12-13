@@ -3,101 +3,78 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom';
 import { getDetailProduct } from '../../services/ProductService'
 import { addCart } from '../../services/CartService';
-import { useSelector } from 'react-redux';
-import { useSaveCartOnRedux } from '../../until/tokenUser';
-export default function Detail() {
-    const saveCartOnRedux = useSaveCartOnRedux()
-    const { idProduct } = useParams();
+import { useSelector, useDispatch } from 'react-redux';
+import { addCartRedux } from '../../redux/Cart/cartsSlice';
+import { toast, ToastContainer } from 'react-toastify';
 
-    const { isAuthenticated, userData, dataCart} = useSelector((state) => state.auth);
+export default function Detail() {
+    const { _id } = useParams();
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const idUser = isAuthenticated && userData.dataLogin.idUser
 
     const [show, setShow] = useState({
-        display : false,
-        status : 'success',
+        display: false,
+        status: 'success',
     })
     const [details, setDetail] = useState([])
-    const [carts, setCarts] = useState([])
+
+    const dispatch = useDispatch()
+    const carts = useSelector(state => state.carts.carts)
+    const totalProductInCart = useSelector(state => state.carts.totalProductInCart)
+
     useEffect(() => {
         const fetchDataDetailProduct = async () => {
-            const detailProduct = await getDetailProduct(idProduct)
+            const detailProduct = await getDetailProduct(_id)
             setDetail(detailProduct)
         }
         fetchDataDetailProduct()
-    }, [idProduct])
+    }, [_id])
 
-    // get All Cart of User to handle add product on cart 
-    useEffect(() => {
-        const fetchDatasCart = async () => {
-            if (dataCart) {
-                setCarts(dataCart.carts);
-            }
-        }
-        fetchDatasCart()
-    }, [dataCart])
 
-    const toastAddProduct = (status) =>
-    {
-        setShow({
-            display : true,
-            status : status
-        })
-        setTimeout(() => {
-        setShow({
-            display : false,
-            status : 'success',
-        }); 
-    }, 2000);
-    }
 
     // add product on cart
     const handleAddCart = async () => {
-        const isCheckExistCart = carts.find(cart => cart.idProduct == idProduct)
+
+        const isCheckExistCart = carts.find(cart => cart.product._id == _id)
+        console.log(isCheckExistCart)
         if (isCheckExistCart) {
-            toastAddProduct('fail')
+            toast.error("Sản phẩm đã được thêm vào giỏ hàng")
             return
         }
-        await addCart({
+
+        const response = await addCart({
             idUser: idUser,
-            idProduct: idProduct,
+            idProduct: _id,
             quantity: 1
         })
-       
-        const newCart = {
-            idUser: idUser,
-            idProduct: parseInt(idProduct),
-            quantity: 1
-        }
-        const allCartWhenAdd = [...carts, newCart]
-        saveCartOnRedux(allCartWhenAdd, allCartWhenAdd.length)
 
-        toastAddProduct('success')
+        if (response) {
+            dispatch(addCartRedux({
+                cart: response,
+                totalProductInCart: totalProductInCart + 1
+            }))
+        }
+
+        toast.success("Thêm vào giỏ hàng thành công")
     }
 
     return (
         <div className="container mt-3 detail">
 
-            <div className={`toast toast_add-cart ${show.display ? 'd-block' : 'd-none'} ${show.status == 'success' ? 'bg-success' : 'bg-danger'}`} role="alert" aria-live="assertive" aria-atomic="true">
-                <div className="toast-header">
-                    {show.status == 'success' ? (
-
-                        <i style = {{ fontSize : '15px' }} className="bi bi-check-circle me-2"></i>
-                    ) : 
-                        <i class="bi bi-x-circle me-2"></i>
-                    }
-
-                    {show.status == 'success' ? (
-                        <strong className="me-auto">Congratulation</strong>
-                    ): 
-                        <strong className="me-auto">Error</strong>
-                    }
-                    <small>View to Cart</small>
-                    <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div className="toast-body bg-white">
-                    {show.status == 'success' ? 'Thêm sản phẩm vào giỏ hàng thành công' : 'Sản phẩm đã được thêm vào giỏ hàng'}
-                </div>
-            </div>
+            <ToastContainer
+                className="text-base"
+                fontSize="10px"
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
 
             {details && details.detailProduct ? (
 
@@ -106,7 +83,7 @@ export default function Detail() {
                     <div className="col-3 row d-flex align-items-center bg-white rounded-3 me-3">
                         <div style={{ padding: '10px' }}>
                             <img
-                                style = {{ objectFit : 'contain' }}
+                                style={{ objectFit: 'contain' }}
                                 height="300px"
                                 width="100%"
                                 src={details.detailProduct.image}

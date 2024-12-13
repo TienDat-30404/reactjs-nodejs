@@ -10,9 +10,21 @@ export const loginService = async (dataLogin, isValidate) => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(dataLogin),
-        credentials: 'include' // Để gửi cookie từ client đến server
+        credentials: 'include' 
     })
 
+    return response.json()
+}
+
+export const loginGoogle = async (dataGoogle) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/google`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataGoogle),
+        credentials: 'include' 
+    });
     return response.json()
 }
 
@@ -46,8 +58,8 @@ export const updateUser = async (id, data) => {
     return response.json()
 }
 
-export const getAllUser = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-user`, {
+export const getAllUser = async (query) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-user?${query}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -77,14 +89,19 @@ export const getDetailUser = async (id) => {
     return response.json()
 }
 
-export const changePassword = async (id, data) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/change-password/${id}`, {
+export const changePassword = async (id, data, isChange) => {
+    const params = new URLSearchParams({});
+    if (isChange) {
+        params.append('change', true)
+    }
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/change-password/${id}?${params.toString()}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
     })
+    console.log(params.toString())
     return response.json()
 }
 
@@ -113,4 +130,18 @@ export const searchUser = async (idUser, name, email, phone, idRole) => {
         },
     });
     return response.json();
+}
+
+
+
+export const logoutUser = async () => {
+    await fetch(`${process.env.REACT_APP_API_URL}/logout-refresh-token`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include' // Để gửi cookie từ client đến server
+    })
+    Cookies.remove('accessToken', { path: '' });
+    localStorage.removeItem('avatar')
 }

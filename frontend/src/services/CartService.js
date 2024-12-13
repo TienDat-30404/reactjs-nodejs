@@ -10,14 +10,9 @@ export const addCart = async (data) => {
 }
 
 // lấy sp có phân trang
-export const getAllCart = async(idUser, page, sortBy='idCart', type='asc') => {
-    const params = new URLSearchParams({
-        idUser,
-        page,
-        sortBy : sortBy || 'idCart',
-        type : type || 'asc'
-    })
-    const url = `${process.env.REACT_APP_API_URL}/get-all-cart?${params.toString()}`
+export const getAllCart = async(query) => {
+   
+    const url = `${process.env.REACT_APP_API_URL}/get-all-cart?${query}`
     const response = await fetch(url, {
         method: 'GET',
         headers: {

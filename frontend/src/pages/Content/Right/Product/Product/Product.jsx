@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import CartProduct from '../../../../../components/CartProduct'
 import { getAllProduct } from '../../../../../services/ProductService'
+import { useDispatch, useSelector } from "react-redux";
+import { initDataProduct } from '../../../../../redux/Products/productsSlice';
 export default function Product() {
     const [page, setPage] = useState(1)
-    const limit = 8
+    const limit = 5
     const [totalPage, setTotalPage] = useState(1)
-    const [products, setProducts] = useState([])
+    // const [products, setProducts] = useState([])
 
+
+    const dispatch = useDispatch()
+    const products = useSelector(state => state.products.products)
+    console.log(products)
     useEffect(() => {
         const fetchDatasProduct = async () => {
             const listProduct = await getAllProduct(page, 'idProduct', 'asc',limit)
-            setProducts(listProduct.products)
-            setTotalPage(listProduct.totalPages)
+            console.log(listProduct)
+            // setProducts(listProduct)
+            // setTotalPage(initDataProduct(listProduct))
+            if(listProduct)
+            {
+                dispatch(initDataProduct(listProduct))
+            }
         }
         fetchDatasProduct()
     }, [page])
@@ -79,7 +90,7 @@ export default function Product() {
                         products.map((product, index) => (
                             <CartProduct
                                 key={index}
-                                id={product.idProduct}
+                                id={product._id}
                                 image={product.image}
                                 name={product.name}
                                 price={(product.price).toLocaleString('vi-VN')}
@@ -88,12 +99,12 @@ export default function Product() {
                         <div className="loading">
                             <div className="spinner"></div>
                         </div>
-                    }
+                    } 
                     <div className='d-flex justify-content-center align-items-center mt-3'>
                         <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
                         <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
                     </div>
-                    <span className='text-center mt-2'>Page {page} of {totalPage}</span>
+                    <span className='text-center mt-2'>Page {page} of {totalPage}</span> 
 
 
                 </div>

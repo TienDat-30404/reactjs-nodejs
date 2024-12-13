@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { InputComponent } from '../../components/InputComponent';
-import { setCookieForToken, useSaveTokenOnRedux } from '../../until/tokenUser';
+import { setCookieForToken } from '../../until/tokenUser';
+import { useSaveTokenOnRedux } from '../../until/function';
 import { jwtDecode } from 'jwt-decode';
 import { loginService, updateUser } from '../../services/UserService';
 import { ErrorMessageInput } from '../../components/InputComponent';
+import { ToastContainer, toast } from 'react-toastify';
 export default function InformationBasicProfile() {
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const [dataUser, setDataUser] = useState({
@@ -69,13 +71,12 @@ export default function InformationBasicProfile() {
             }
 
             if (resultUpdate.message) {
-                alert("Chỉnh sửa thành công")
+                toast.success("Chỉnh sửa thành công")
                 setErrors({})
                 // window.location.reload()
             }
            const refreshTokenWhenUpdate = {
                 email: userData.dataLogin.email,
-                password : userData.dataLogin.password
             }
             const resultTokenUpdate = await loginService(refreshTokenWhenUpdate)
             setCookieForToken(resultTokenUpdate.token)
