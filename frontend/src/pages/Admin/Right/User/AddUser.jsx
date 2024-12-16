@@ -2,7 +2,7 @@ import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
 import { getAllRole, addRole } from '../../../../services/RoleService'
-import { signInService } from '../../../../services/UserService'
+import { sendOtpForCreateAccount } from '../../../../services/UserService'
 import { useSelector, useDispatch } from 'react-redux'
 import { initDataRole } from '../../../../redux/Role/rolesSlice'
 import { addUser } from '../../../../redux/User/usersSlice'
@@ -34,7 +34,7 @@ export default function AddUser({ show, close }) {
     // handle click add account
     const handleClickAddAccount = async () => {
         inputFocusRef.current.focus()
-        const response = await signInService(
+        const response = await sendOtpForCreateAccount(
             {
                 name : informations.name,
                 email : informations.email,

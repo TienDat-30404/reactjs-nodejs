@@ -1,20 +1,27 @@
 const { validateEmail } = require('../utils/validate')
 const User = require('../model/UserModel')
+const Account = require('../model/AccountModel')
 const bcrypt = require('bcrypt')
 const { generateToken, generateRefreshToken } = require('../utils/jwt')
 // validate for sign in
 const validateSignIn = async (req, res, next) => {
     try {
-        const { name, email, password, confirm_password, idRole } = req.body
-        const existUser = await User.findOne({ name })
+        const { userName, name, email, password, confirm_password, idRole } = req.body
         const errors = {};
-        const existEmail = await User.countDocuments({ email }) // i chang User.findOne, chỉ khác kiểu trả về
+        const existEmail = await Account.countDocuments({ email, deletedAt : null, typeLogin : "normal" })
+        console.log(existEmail)
+        const existUserName = await Account.countDocuments({ userName, deletedAt : null })
+        if (userName == "") {
+            errors.userName = "Tên tài khoản không được để trống";
+        }
+        if (existUserName > 0) {
+            errors.userName = "Tên tài khoản đã tồn tại";
+        }
         if (name == "") {
-            errors.name = "Tên người dùng không được để trống";
+            errors.name = "Tên người dùng không được để trống"
         }
-        else if (existUser && name != "") {
-            errors.name = "Tên người dùng đã tồn tại";
-        }
+
+
         if (email == "") {
             errors.email = "Email không được để trống"
         }
@@ -33,11 +40,10 @@ const validateSignIn = async (req, res, next) => {
         if (confirm_password == "") {
             errors.confirm_password = "Xác nhận mật khẩu không được để trống"
         }
-        if (password !== confirm_password) {
+        else if (password !== confirm_password) {
             errors.confirm_password = "Mật khẩu không trùng khớp";
         }
-        if(idRole == -1)
-        {
+        if (idRole == -1) {
             errors.idRole = "Vui lòng chọn loại tài khoản"
         }
         if (Object.keys(errors).length > 0) {
@@ -53,21 +59,21 @@ const validateSignIn = async (req, res, next) => {
 // validate for login
 const validateLogin = async (req, res, next) => {
     const { email, password } = req.body
-    const isCheckUser = await User.findOne({ email })
-    
+    const isCheckAccount = await Account.findOne({ email })
+
     const errors = {}
 
     if (password == "") {
         errors.password = "Mật khẩu không được để trống"
     }
 
-    if (isCheckUser == null) {
+    if (isCheckAccount == null) {
         errors.email = "Email không chính xác"
     }
     else {
         const regexHashPassword = /^\$2[ayb]\$[0-9]{2}\$.{53}$/;
         if (!regexHashPassword.test(password)) {
-            const comparePassword = bcrypt.compareSync(password, isCheckUser.password);
+            const comparePassword = bcrypt.compareSync(password, isCheckAccount.password);
             if (!comparePassword) {
                 errors.password = "Mật khẩu không chính xác"
             }
@@ -116,7 +122,7 @@ const validateUpdateUser = async (req, res, next) => {
         if (!phoneRegex.test(phone) && phone != "") {
             errors.phone = "Số điện thoại không hợp lệ"
         }
-        
+
         if (Object.keys(errors).length > 0) {
             return res.status(400).json({ errors })
         }
@@ -130,7 +136,7 @@ const validateUpdateUser = async (req, res, next) => {
 const validateChangePassword = async (req, res, next) => {
     const { email, oldPassword, password, confirmPassword } = req.body
     const isCheckUser = await User.findOne({ email })
-    
+
     const errors = {}
 
     if (password == "") {
@@ -152,8 +158,7 @@ const validateChangePassword = async (req, res, next) => {
     if (confirmPassword === "") {
         errors.confirmPasswrd = "Mật khẩu xác nhận không được để trống"
     }
-    if(password !== confirmPassword)
-    {
+    if (password !== confirmPassword) {
         errors.confirmPassword = "Mật khẩu xác nhận không chính xác"
     }
     if (Object.keys(errors).length > 0) {
@@ -166,10 +171,10 @@ const validateChangePassword = async (req, res, next) => {
 
 const authLoginGoogle = async (req, res, next) => {
     try {
-        const {email} = req.body
+        const { email } = req.body
         const errors = {};
-        const existEmail = await User.countDocuments({ email }) 
-        
+        const existEmail = await User.countDocuments({ email })
+
         if (existEmail > 0) {
             errors.email = "Email đã tồn tại";
         }

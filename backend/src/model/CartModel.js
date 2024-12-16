@@ -4,7 +4,9 @@ const CartSchema = new Schema(
     {
         idUser : {type: Schema.Types.ObjectId, ref : 'User', required : true},
         idProduct : {type: Schema.Types.ObjectId, ref : 'Product', required : true},
-        quantity : {type : Number, required : true}
+        quantity : {type : Number, required : true},
+        deletedAt : {type : Date, default : null}
+
     },
     { timestamps: true });
 

@@ -6,7 +6,7 @@ const {validateSignIn, validateLogin, validateUpdateUser, validateChangePassword
 const authencationMiddleWare = require('../middlewares/authencationMiddleWare')
 const {conditionLoginMiddleware, shouldUseValidation, conditionChagePasswordMiddleware, shouldUseChangePassword} = require('../utils/validate')
 
-router.post('/sign-in', validateSignIn, UserController.createUser)
+router.post('/sign-in',  UserController.createUser)
 router.post('/sign-up', conditionLoginMiddleware(shouldUseValidation, validateLogin), UserController.loginUser)
 router.put('/update-user/:idUser', uploadAvatar.single('avatar'), UserController.updateUser)
 router.delete('/delete-user/:idUser', UserController.deleteUser)

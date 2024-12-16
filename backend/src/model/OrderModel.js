@@ -9,7 +9,9 @@ const OrderSchema = new Schema(
         address : {type : String, required : true},
         paymentMethod : {type : String, required : true},
         bankAccount : {type : String},
-        isStatus : {type : String, default : 'Pending' }
+        isStatus : {type : String, default : 'Pending' },
+        deletedAt : {type : Date, default : null}
+
     },
     { timestamps: true });
 

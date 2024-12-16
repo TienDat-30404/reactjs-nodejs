@@ -4,6 +4,8 @@ const CategorySchema = new Schema(
     {
         name: { type: String, required: true,},
         image : {type : String, require : true},
+        deletedAt : {type : Date, default : null}
+
     },
     { timestamps: true });
 

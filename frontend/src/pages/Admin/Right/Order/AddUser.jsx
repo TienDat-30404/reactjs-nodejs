@@ -2,7 +2,7 @@ import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
 import { getAllRole, addRole } from '../../../../services/RoleService'
-import { signInService } from '../../../../services/UserService'
+import { sendOtpForCreateAccount } from '../../../../services/UserService'
 export default function AddUser({ show, close, onSuccess }) {
     const [informations, setInformations] = useState({
         name: '',
@@ -29,7 +29,7 @@ export default function AddUser({ show, close, onSuccess }) {
     // handle click add account
     const handleClickAddAccount = async () => {
         inputFocusRef.current.focus()
-        const response = await signInService(
+        const response = await sendOtpForCreateAccount(
             {
                 name : informations.name,
                 email : informations.email,

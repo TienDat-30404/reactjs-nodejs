@@ -10,9 +10,9 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 function LoginModal({ show, handleClose, switchSignIn }) {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const [userName, setUserName] = useState('')
   const [password, setPassword] = useState('')
-  const dataLogin = { email, password }
+  const dataLogin = { userName, password }
   const [errors, setErrors] = useState({})
   const saveTokenOnRedux = useSaveTokenOnRedux();
   console.log("cliendtId", process.env.REACT_APP_CLIENTID_AUTH)
@@ -72,7 +72,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
     }
   }
   const handleCloseModal = () => {
-    setEmail('')
+    setUserName('')
     setPassword('')
     setErrors({})
     handleClose()
@@ -113,14 +113,14 @@ function LoginModal({ show, handleClose, switchSignIn }) {
             <h3 className='fw-bold'>Hello, </h3>
             <h3 onClick={() => handleClickLoginGoogle()} className='fw-bold'>Welcome Back </h3>
             <div className='mb-2'>
-              <label htmlFor="inputPassword5" className="form-label">Email</label>
+              <label htmlFor="inputPassword5" className="form-label">UserName</label>
               <InputComponent
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                value={userName}
+                onChange={e => setUserName(e.target.value)}
                 type="text"
-                className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                className={`form-control ${errors.userName ? 'is-invalid' : ''}`}
               />
-              {errors.email && <ErrorMessageInput errors={errors} field="email" />}
+              {errors.userName && <ErrorMessageInput errors={errors} field="userName" />}
             </div>
             <div>
               <label htmlFor="inputPassword5" className="form-label">Password</label>

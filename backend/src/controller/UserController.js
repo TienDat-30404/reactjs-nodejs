@@ -1,5 +1,6 @@
 const User = require('../model/UserModel')
-
+const Account = require('../model/AccountModel')
+const Role = require('../model/RoleModel')
 const cloudinary = require('../config/cloudinary');
 const { generateToken, generateRefreshToken } = require('../utils/jwt')
 const { hashPassword } = require('../utils/validate')
@@ -24,12 +25,12 @@ const createUser = async (req, res, next) => {
         await user.save();
 
         const users = await User.findById(user._id).populate('idRole');
-        let userObject = users.toObject();
-        if (userObject.idRole) {
-            userObject.role = userObject.idRole;
-            delete userObject.idRole;
+        let accountObject = users.toObject();
+        if (accountObject.idRole) {
+            accountObject.role = accountObject.idRole;
+            delete accountObject.idRole;
         }
-        res.status(200).json({ user: userObject });
+        res.status(200).json({ user: accountObject });
     } catch (error) {
         next(error);
     }
@@ -38,18 +39,22 @@ const createUser = async (req, res, next) => {
 
 // [POST] : /sign-up
 const loginUser = async (req, res, next) => {
-    const { email } = req.body
-    const isCheckUser = await User.findOne({ email })
+    const { userName } = req.body
+    const isCheckAccount = await Account.findOne({ userName })
+    if (isCheckAccount == null) {
+        return res.status(404).json({ message: "Tài khoản không tồn tại." });
+    }
+    const isCheckUser = await User.findOne({ idAccount: isCheckAccount._id })
     const avatar = isCheckUser.avatar
     const payloadToken = {
         idUser: isCheckUser._id,
         name: isCheckUser.name,
-        email: isCheckUser.email,
+        userName: isCheckAccount.userName,
         address: isCheckUser.address,
         phone: isCheckUser.phone,
         sex: isCheckUser.sex,
         date_of_birth: isCheckUser.date_of_birth,
-        idRole: isCheckUser.idRole,
+        idRole: isCheckAccount.idRole,
         avatar
     };
     console.log(payloadToken)
@@ -300,29 +305,41 @@ const searchUser = async (req, res, next) => {
 
 const authLoginGoogle = async (req, res, next) => {
     try {
-        const { name, email, idRole } = req.body
-        let idRolePermission;
-        if (idRole == null) {
-            idRolePermission = "672758398f3b3be36da846bd"
-        }
-        const user = new User({
-            name,
+        const { userName, name, email, typeLogin, idRole } = req.body
+        const typeOfLogin = typeLogin ? "google" : "normal"
+        const role = await Role.findOne({ name: "Customer" })
+        const roleDefault = idRole ? idRole : role._id
+        console.log(roleDefault)
+        const account = new Account({
+            userName,
             email,
-            idRole : idRolePermission
+            typeLogin : typeOfLogin,
+            idRole: roleDefault
         })
 
+        const savedAccount = await account.save();
+        const user = new User({
+            name,
+            idAccount: savedAccount._id
+        })
         await user.save();
-        const users = await User.findById(user._id).populate('idRole');
-        let userObject = users.toObject();
-        if (userObject.idRole) {
-            userObject.role = userObject.idRole;
-            delete userObject.idRole;
+        const accounts = await Account.findById(account._id).populate('idRole');
+        let accountObject = accounts.toObject();
+        if (accountObject.idRole) {
+            accountObject.role = accountObject.idRole;
+            delete accountObject.idRole;
         }
-        res.status(200).json({ user: userObject });
+
+        const userData = await User.findOne({idAccount : savedAccount._id})
+        if(userData)
+        {
+            accountObject.userInformation = userData
+        }
+        res.status(200).json({ account: accountObject });
     }
     catch (error) {
         console.error("Google token verification failed:", error);
-        res.status(400).json({ success: false, error: 'Dữ liệu không hợp lệ' });
+        res.status(400).json({ success: false, error: error});
     }
 }
 module.exports = { createUser, loginUser, updateUser, deleteUser, getAllUser, refreshToken, detailUser, logoutRefreshToken, changePassword, searchUser, authLoginGoogle }

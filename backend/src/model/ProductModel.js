@@ -3,12 +3,14 @@ const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema(
     {
-        name: { type: String, required: true, unique: true },
+        name: { type: String, required: true },
         image: { type: String, required: true },
         price: { type: Number, required: true },
         quantity: { type: Number, required: true },
         idCategory: { type: Schema.Types.ObjectId, ref: 'Category', required: true }, // Thay đổi ở đây
-        description: { type: String, required: true }
+        description: { type: String, required: true },
+        deletedAt : {type : Date, default : null}
+
     },
     {
         timestamps: true

@@ -28,8 +28,9 @@ export const loginGoogle = async (dataGoogle) => {
     return response.json()
 }
 
-export const signInService = async (dataSignIn) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-in`, {
+
+export const sendOtpForCreateAccount = async (dataSignIn) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/send-otp-signup`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -38,6 +39,18 @@ export const signInService = async (dataSignIn) => {
     });
     return response.json()
 }
+
+export const verifyOtpAgreeCreateAccount = async (data) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/verify-otp-signup`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    return response.json()
+}
+
 
 export const refreshTokenService = async () => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/refresh-token`, {

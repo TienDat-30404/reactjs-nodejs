@@ -1,34 +1,36 @@
 import React from 'react';
 import { useState, useCallback } from 'react';
-import {InputComponent} from '../../components/InputComponent';
+import { InputComponent } from '../../components/InputComponent';
 import { ErrorMessageInput } from '../../components/InputComponent';
-import { signInService } from '../../services/UserService';
+import { sendOtpForCreateAccount } from '../../services/UserService';
+import ModalOtp from './Otp';
 const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
+  const [userName, setUserName] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm_password, setConfirmPassword] = useState('')
   const [errors, setErrors] = useState({})
+  const [modalOtp, setModalOtp] = useState(false)
+  const userData = { userName, name, email, password, confirm_password };
   const handleClickSignIn = useCallback(async () => {
-    // const idRole = "672758398f3b3be36da846bb"
-    const userData = { name, email, password, confirm_password };
     try {
-      const response = await signInService(userData)
+      const response = await sendOtpForCreateAccount(userData)
       if (response.errors) {
         setErrors(response.errors);
       }
-      else {
-        alert('Đăng kí thành công');
+      if(!response.errors && response.status == 200) {
+        setModalOtp(true)
         setErrors('')
       }
     } catch (error) {
       console.error(error)
     }
-  }, [name, email, password, confirm_password])
+  }, [userName, name, email, password, confirm_password])
   // close login modal 
   const handleCloseModal = useCallback(() => {
+    setUserName('');
     setName('');
-    setEmail('');
     setPassword('');
     setConfirmPassword('');
     setErrors({});
@@ -41,19 +43,32 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
           <div style={{ width: '50%' }} className=''>
             <img width="100%" height="100%" src="https://images.pexels.com/photos/4321802/pexels-photo-4321802.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="" />
           </div>
+          <ModalOtp show={modalOtp} handleClose={() => setModalOtp(false)} data = {userData} />
           <div style={{ width: '50%' }} className='m-3'>
             <i onClick={handleCloseModal} className="bi bi-x-lg icon_close"></i>
             <h3 className='fw-bold'>Hello, Welcome Back </h3>
+            <div className='mb-2'>
+              <label htmlFor="inputPassword5" className="form-label">UserName</label>
+              <InputComponent
+                value={userName}
+                onChange={e => setUserName(e.target.value)}
+                type="text"
+                className={`form-control ${errors.userName ? 'is-invalid' : ''} `}
+              />
+              {errors.userName && <ErrorMessageInput errors={errors} field="userName" />}
+            </div>
+
             <div className='mb-2'>
               <label htmlFor="inputPassword5" className="form-label">Name</label>
               <InputComponent
                 value={name}
                 onChange={e => setName(e.target.value)}
                 type="text"
-                className={`form-control ${errors.name ? 'is-invalid' : ''} `} 
+                className={`form-control ${errors.name ? 'is-invalid' : ''}`} aria-describedby="passwordHelpBlock"
               />
               {errors.name && <ErrorMessageInput errors={errors} field="name" />}
             </div>
+
             <div className='mb-2'>
               <label htmlFor="inputPassword5" className="form-label">Email</label>
               <InputComponent
@@ -64,6 +79,7 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
               />
               {errors.email && <ErrorMessageInput errors={errors} field="email" />}
             </div>
+
             <div>
               <label htmlFor="inputPassword5" className="form-label">Password</label>
               <InputComponent
@@ -74,6 +90,7 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
               />
               {errors.password && <ErrorMessageInput errors={errors} field="password" />}
             </div>
+
             <div>
               <label htmlFor="inputPassword5" className="form-label">Confirm Password</label>
               <InputComponent

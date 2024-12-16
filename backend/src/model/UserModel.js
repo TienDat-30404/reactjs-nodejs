@@ -3,18 +3,14 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema(
     {
         name: { type: String, required: true,},
-
-        email: {type: String, required: true, unique: true,},
-
-        password: { type: String, default : ''},
-
-        confirm_password: {type: String, default : ''},
         address : {type : String, default : ''},
         phone : {type : String, default : ''},
         date_of_birth : {type : String, default : ''},
         sex : {type : String, default : ''},
         avatar : {type : String, default : ''},
-        idRole : {type: Schema.Types.ObjectId, required : true, default : 1, ref: 'Role'}
+        idAccount : {type: Schema.Types.ObjectId, required : true, default : 1, ref: 'Account'},
+        deletedAt : {type : Date, default : null}
+
     },
     { timestamps: true });
 
