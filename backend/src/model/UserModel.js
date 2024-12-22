@@ -14,13 +14,7 @@ const UserSchema = new Schema(
     },
     { timestamps: true });
 
-// Ẩn trường confirmPassword (không lưu vào db)
-UserSchema.pre('save', function (next) {
-    if (this.isModified('confirm_password')) {
-        this.confirm_password = undefined; // Đảm bảo xóa trường đúng tên
-    }
-    next();
-});
+
 
 
 const User = mongoose.model('User', UserSchema);

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const generateToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '10s',
+        expiresIn: '5s',
     });
 };
 
@@ -20,12 +20,14 @@ const refreshToken = async (token) => {
             const accessToken = generateRefreshToken({
                 idUser : user.idUser,
                 name : user.name,
+                userName : user.userName,
                 email : user.email,
-                idRole : user.idRole,
-                sex : user.sex,
+                typeLogin : user.typeLogin,
                 address : user.address,
                 phone : user.phone,
+                sex : user.sex,
                 date_of_birth : user.date_of_birth,
+                idRole : user.idRole,
                 avatar : user.avatar
             })
             resolve(accessToken)

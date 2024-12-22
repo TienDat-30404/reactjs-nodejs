@@ -3,7 +3,6 @@ import Cookies from 'js-cookie';
 export const getAllProduct = async (query) => {
     
     const url = `${process.env.REACT_APP_API_URL}/get-all-product?${query}`;
-    console.log(url)
     const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -39,8 +38,6 @@ export const deleteProduct = async (id) => {
             'Authorization': `Bearer ${token}`, 
         }
     })
-    console.log(id)
-    console.log(token)
     return response.json()
 }
 

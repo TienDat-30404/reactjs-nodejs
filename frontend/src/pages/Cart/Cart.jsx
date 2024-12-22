@@ -7,11 +7,11 @@ import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { useSaveCartOnRedux } from '../../until/tokenUser'
 import { useSelector, useDispatch } from 'react-redux'
+import { refreshTokenService } from '../../services/UserService'
 import { initDataCart, switchPage, updateQuantity, deleteCartRedux } from '../../redux/Cart/cartsSlice'
 export default function Cart() {
 
     const dispatch = useDispatch()
-
 
     const [cartsCheck, setCartsCheck] = useState([])
 
@@ -27,6 +27,7 @@ export default function Cart() {
     const fetchDataCarts = async () => {
         let query = `idUser=${idUser}&page=${page}&limit=${limit}`
         const response = await getAllCart(query)
+
         console.log(response)
         if (response) {
             dispatch(initDataCart(response))
@@ -57,8 +58,7 @@ export default function Cart() {
     const handleDeleteCart = async (idCart) => {
         const response = await deleteCart(idCart)
         if (response.success) {
-            if(carts.length - 1 < limit)
-            {
+            if (carts.length - 1 < limit) {
                 fetchDataCarts()
             }
 
@@ -92,7 +92,7 @@ export default function Cart() {
     }
 
     // total Price
-    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.product.price * cart.quantity), 0)
+    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity), 0)
 
     // switch payment
     const switchPayment = () => {
@@ -106,11 +106,12 @@ export default function Cart() {
             <div className='col-12 d-flex'>
                 <div className=' col-8 me-2'>
                     <div className='col-12 d-flex mb-3 bg-white px-2 py-2'>
-                        <div className='col-5 d-flex'>
+                        <div className='col-4 d-flex'>
                             <input style={{ width: '17px', height: '20px', marginRight: '7px' }} type="checkbox" name="" id="" />
                             <h6 style={{ fontWeight: '400', marginRight: '3px' }}>Tất cả</h6>
                             <h6 style={{ fontWeight: '400' }}>{totalProductInCart} sản phẩm</h6>
                         </div>
+                        <span className='col-1' style={{ fontSize: '14px', color: 'rgb(120, 120, 120)', fontWeight: '400' }}>Size</span>
                         <span className='col-2' style={{ fontSize: '14px', color: 'rgb(120, 120, 120)', fontWeight: '400' }}>Đơn giá</span>
                         <span className='col-2' style={{ fontSize: '14px', color: 'rgb(120, 120, 120)', fontWeight: '400' }}>Số lượng</span>
                         <span className='col-2' style={{ fontSize: '14px', color: 'rgb(120, 120, 120)', fontWeight: '400' }}>Thành tiền</span>
@@ -120,17 +121,19 @@ export default function Cart() {
                         <div>
                             {carts.map((cart, index) => (
                                 <div key={index} className='col-12 d-flex align-items-center bg-white px-2 py-2'>
-                                    <div className='d-flex align-items-center col-5'>
+                                    <div className='d-flex align-items-center col-4'>
                                         <input
                                             checked={cartsCheck.some(item => item._id === cart._id)}
                                             onChange={() => handleChangeCheckInput(cart)}
                                             style={{ width: '17px', height: '20px', marginRight: '8px' }}
                                             type="checkbox" name="" id=""
                                         />
-                                        <img width="75px" src={cart.product.image} alt="" />
-                                        <p>{cart.product.name}</p>
+                                        <img width="60px" src={cart?.attribute?.product?.image} alt="" />
+                                        <p>{cart?.attribute?.product?.name}</p>
                                     </div>
-                                    <span className='col-2 '>{(cart.product.price).toLocaleString('vi-VN')}đ</span>
+                                    <span className='col-1'>{cart?.attribute?.size?.name}</span>
+
+                                    <span className='col-2 '>{(cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier)?.toLocaleString('vi-VN')}đ</span>
                                     <div className='col-2'>
                                         <button
                                             disabled={cart.quantity === 1}
@@ -140,7 +143,7 @@ export default function Cart() {
                                             style={{ border: '1px solid #ccc', padding: '1px 8px', cursor: 'pointer' }}>
                                             -
                                         </button>
-                                        <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>{cart.quantity}</span>
+                                        <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>{cart?.quantity}</span>
                                         <button
                                             className='hover_quantity-cart'
                                             onClick={() => handleIncreaseQuantityCart(cart._id, cart.quantity + 1)}
@@ -148,7 +151,7 @@ export default function Cart() {
                                             +
                                         </button>
                                     </div>
-                                    <span className='col-2 text-danger fw-bold'>{(cart.product.price * cart.quantity).toLocaleString('vi-VN')}</span>
+                                    <span className='col-2 text-danger fw-bold'>{(cart?.attribute?.priceBought * cart?.attribute?.size.sizePriceMultiplier * cart?.quantity).toLocaleString('vi-VN')}</span>
                                     <i onClick={() => handleDeleteCart(cart._id)} style={{ cursor: 'pointer' }} className="col-2 bi bi-trash3 "></i>
                                 </div>
                             ))}

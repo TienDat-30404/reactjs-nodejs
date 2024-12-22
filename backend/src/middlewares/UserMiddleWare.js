@@ -58,9 +58,9 @@ const validateSignIn = async (req, res, next) => {
 
 // validate for login
 const validateLogin = async (req, res, next) => {
-    const { email, password } = req.body
-    const isCheckAccount = await Account.findOne({ email })
-
+    const { userName, password } = req.body
+    const isCheckAccount = await Account.findOne({ userName })
+    console.log(isCheckAccount)
     const errors = {}
 
     if (password == "") {
@@ -68,7 +68,7 @@ const validateLogin = async (req, res, next) => {
     }
 
     if (isCheckAccount == null) {
-        errors.email = "Email không chính xác"
+        errors.userName = "Tên tài khoản không chính xác"
     }
     else {
         const regexHashPassword = /^\$2[ayb]\$[0-9]{2}\$.{53}$/;
@@ -79,8 +79,8 @@ const validateLogin = async (req, res, next) => {
             }
         }
     }
-    if (email == "") {
-        errors.email = "Email không được để trống"
+    if (userName == "") {
+        errors.userName = "Vui lòng nhập tên tài khoản"
     }
     if (Object.keys(errors).length > 0) {
         return res.status(400).json({ errors })

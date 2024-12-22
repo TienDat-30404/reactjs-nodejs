@@ -12,26 +12,35 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
   const [confirm_password, setConfirmPassword] = useState('')
   const [errors, setErrors] = useState({})
   const [modalOtp, setModalOtp] = useState(false)
-  const userData = { userName, name, email, password, confirm_password };
+  const userData = { userName, name, email, password, confirm_password }
+  const [isLoading, setIsLoading] = useState(false);
   const handleClickSignIn = useCallback(async () => {
+    if (isLoading) {
+      return;
+    }
+
     try {
+      setIsLoading(true);
       const response = await sendOtpForCreateAccount(userData)
       if (response.errors) {
         setErrors(response.errors);
       }
-      if(!response.errors && response.status == 200) {
+      if (!response.errors && response.status == 200) {
         setModalOtp(true)
         setErrors('')
       }
     } catch (error) {
       console.error(error)
+    } finally {
+      setIsLoading(false)
     }
-  }, [userName, name, email, password, confirm_password])
+  }, [userName, name, email, password, confirm_password, isLoading])
   // close login modal 
   const handleCloseModal = useCallback(() => {
     setUserName('');
     setName('');
     setPassword('');
+    setEmail('')
     setConfirmPassword('');
     setErrors({});
     handleClose();
@@ -43,8 +52,8 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
           <div style={{ width: '50%' }} className=''>
             <img width="100%" height="100%" src="https://images.pexels.com/photos/4321802/pexels-photo-4321802.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="" />
           </div>
-          <ModalOtp show={modalOtp} handleClose={() => setModalOtp(false)} data = {userData} />
-          <div style={{ width: '50%' }} className='m-3'>
+          <ModalOtp show={modalOtp} close={() => setModalOtp(false)} data={userData} closeAllModals={handleCloseModal} />
+          <div style={{ width: '50%', position: 'relative' }} className='m-3'>
             <i onClick={handleCloseModal} className="bi bi-x-lg icon_close"></i>
             <h3 className='fw-bold'>Hello, Welcome Back </h3>
             <div className='mb-2'>
@@ -101,8 +110,17 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
               />
               {errors.confirm_password && <ErrorMessageInput errors={errors} field="confirm_password" />}
             </div>
+            {isLoading ? (
+              <div className="position-absolute top-50 start-50 translate-middle text-center w-100">
+                <div className="spinner-border text-primary" role="status"></div>
+                <h6 className="mb-2 fw-bold">Otp đang gửi đến email bạn...</h6>
+              </div>
+            ) : null}
 
-            <button onClick={handleClickSignIn} type="button" className="btn btn-info text-white w-100 mt-3 fw-bold">Sign Up</button>
+
+            <button onClick={handleClickSignIn} type="button" className="btn btn-info text-white w-100 mt-3 fw-bold" >
+              Sign Up
+            </button>
             <p className='mt-3 text-center'>If you already have an account? <a onClick={switchLogin} className='click_switch'>Click Here</a></p>
           </div>
         </div>

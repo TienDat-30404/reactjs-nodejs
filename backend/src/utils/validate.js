@@ -22,17 +22,7 @@ const validateNameProduct = async (name) => {
   return !existNameProduct
 }
 
-// validate Price Product 
-const validatePriceProduct = (price) => {
-  const isCheckTypeOfPrice = Number(price)
-  return isCheckTypeOfPrice
-}
 
-// valitdate TypeOf Quantity Product
-const validateTypeQuantityProduct = (quantity) => {
-  const isCheckTypeOfQuantity = Number.isInteger(quantity)
-  return isCheckTypeOfQuantity
-}
 
 
 // validate Name Product When handle update
@@ -77,8 +67,14 @@ const conditionChagePasswordMiddleware = (condition, middleware) => {
   };
 };
 
+// validate Name Category 
+const isCheckExistCategory = async (name) => {
+  const existNameCategory = await Category.findOne({ name }) 
+  return !existNameCategory
+}
+
 module.exports = {
-  validateEmail, hashPassword, validateNameProduct, validatePriceProduct, validateTypeQuantityProduct,
+  validateEmail, hashPassword, validateNameProduct,
   validateNameProductWhenUpdate, isCheckExistNameCategory, conditionLoginMiddleware, shouldUseValidation,
-  conditionChagePasswordMiddleware, shouldUseChangePassword
+  conditionChagePasswordMiddleware, shouldUseChangePassword, isCheckExistCategory
 }

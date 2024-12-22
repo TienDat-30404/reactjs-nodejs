@@ -7,18 +7,14 @@ export default function Product() {
     const [page, setPage] = useState(1)
     const limit = 5
     const [totalPage, setTotalPage] = useState(1)
-    // const [products, setProducts] = useState([])
 
 
     const dispatch = useDispatch()
     const products = useSelector(state => state.products.products)
-    console.log(products)
     useEffect(() => {
         const fetchDatasProduct = async () => {
             const listProduct = await getAllProduct(page, 'idProduct', 'asc',limit)
             console.log(listProduct)
-            // setProducts(listProduct)
-            // setTotalPage(initDataProduct(listProduct))
             if(listProduct)
             {
                 dispatch(initDataProduct(listProduct))
@@ -91,9 +87,9 @@ export default function Product() {
                             <CartProduct
                                 key={index}
                                 id={product._id}
-                                image={product.image}
+                                image={product?.image}
                                 name={product.name}
-                                price={(product.price).toLocaleString('vi-VN')}
+                                price={(product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN')}
                             />
                         ))) :
                         <div className="loading">

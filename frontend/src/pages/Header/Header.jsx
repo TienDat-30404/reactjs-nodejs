@@ -45,8 +45,6 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
             if (isAuthenticated && userData) {
                 const query = `idUser=${idUser}`
                 const response = await getAllCart(query)
-                console.log(idUser)
-                console.log(response)
                 if (response) {
                     dispatch(initDataCart(response))
                 }

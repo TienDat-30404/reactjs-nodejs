@@ -1,28 +1,28 @@
 import Cookies from 'js-cookie'
-export const loginService = async (dataLogin, isValidate) => {
+export const loginService = async (data, isValidate) => {
     const params = new URLSearchParams({});
     if (isValidate) {
         params.append('validate_login', true)
     }
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-up?${params.toString()}`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/sign-in?${params.toString()}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dataLogin),
+        body: JSON.stringify(data),
         credentials: 'include' 
     })
 
     return response.json()
 }
 
-export const loginGoogle = async (dataGoogle) => {
+export const loginGoogle = async (data) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/google`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dataGoogle),
+        body: JSON.stringify(data),
         credentials: 'include' 
     });
     return response.json()
@@ -114,7 +114,6 @@ export const changePassword = async (id, data, isChange) => {
         },
         body: JSON.stringify(data)
     })
-    console.log(params.toString())
     return response.json()
 }
 

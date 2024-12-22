@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { loginSuccess } from "../redux/Auth/authSlice";
 import { useDispatch } from "react-redux";
 import { refreshTokenService } from "../services/UserService";
-import {  useEffect } from "react";
+import { useEffect } from "react";
 export const useAuthHandler = () => {
     const dispatch = useDispatch();
     const saveTokenOnRedux = useSaveTokenOnRedux();
@@ -16,31 +16,33 @@ export const useAuthHandler = () => {
         } else {
             await handleRefreshToken();
         }
-    
     };
-
-    useEffect(() => {
-        checkAndUpdateToken();
-    }, []);
 
     const handleRefreshToken = async () => {
         try {
             const refreshToken = await refreshTokenService()
+            console.log(refreshToken)
             if (refreshToken.success) {
                 setCookieForToken(refreshToken.tokenNew);
-                // saveTokenOnRedux(jwtDecode(refreshToken.tokenNew));
+                saveTokenOnRedux(jwtDecode(refreshToken.tokenNew));
                 dispatch(loginSuccess({ dataLogin: jwtDecode(refreshToken.tokenNew) }));
-
             }
 
         } catch (error) {
             console.log(error);
         }
     };
+  
+
+
+    useEffect(() => {
+        checkAndUpdateToken();
+    }, []);
 
 
 
- 
+
+
 
     return { checkAndUpdateToken };
 };

@@ -62,7 +62,8 @@ export default function ProductSale() {
                             id={product._id}
                             image={product.image}
                             name={product.name}
-                            price={(product.price).toLocaleString('vi-VN')}
+                            priceNotDiscount={(product?.discount ? product?.productAttributes[0]?.priceBought * product?.productAttributes[0]?.size.sizePriceMultiplier  : "")}
+                            price={(product?.productAttributes[0]?.priceBought * product?.productAttributes[0]?.size.sizePriceMultiplier).toLocaleString('vi-VN')}
                             widthImage="100px"
                             heightImage="200px"
                         />

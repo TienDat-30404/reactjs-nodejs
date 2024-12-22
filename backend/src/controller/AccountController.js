@@ -5,6 +5,69 @@ const { hashPassword } = require('../utils/validate')
 const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 const redisClient = require('../utils/redisClient');
+const { OAuth2Client } = require("google-auth-library");
+const errorHandler = require('http-errors')
+const { generateToken, generateRefreshToken } = require('../utils/jwt')
+
+
+
+const getAllUser = async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 10
+        const startPage = (page - 1) * limit
+        const objectFilter = {deletedAt : null}
+        if (req.query.idUser) {
+            objectFilter._id = req.query.idUser
+        }
+        if (req.query.name) {
+            objectFilter.name = req.query.name
+        }
+        if (req.query.email) {
+            objectFilter.email = req.query.email
+        }
+        if (req.query.phone) {
+            objectFilter.phone = req.query.phone
+        }
+        const totalUser = Object.keys(objectFilter).length === 0
+            ? await User.countDocuments({deletedAt : null})
+            : await User.countDocuments(objectFilter);
+        const totalPage = Math.ceil(totalUser / limit);
+
+        let users = await User.find(objectFilter)
+            .skip(startPage)
+            .limit(limit)
+            .populate({
+                path : 'idAccount',
+                populate : {
+                    path : 'idRole',
+                    model : 'Role'
+                }
+            })
+            .lean()
+        users = users.map(user => {
+            if (user.idAccount) {
+                user.account = user.idAccount;
+                delete user.idAccount;
+            }
+            user.account.role = user.account.idRole
+            delete user.account.idRole
+
+            return user;
+        });
+        return res.status(200).json({
+            page,
+            totalPage,
+            limit,
+            totalUser,
+            users
+        })
+    }
+    catch (err) {
+        next(err)
+    }
+}
+
 // [POST] : /sign-in
 const sendOtpForCreateAccount = async (req, res, next) => {
     try {
@@ -93,5 +156,84 @@ const verifyOtpForCreateAccount = async (req, res, next) => {
 }
 
 
+const authLoginGoogle = async (req, res, next) => {
+    try {
+        const { userName, email, typeLogin="google", name, idRole } = req.body
+        const role = await Role.findOne({ name: "Customer" })
+        const roleDefault = idRole ? idRole : role._id
+        const account = new Account({
+            userName,
+            email,
+            typeLogin : typeLogin,
+            idRole: roleDefault
+        })
 
-module.exports = { sendOtpForCreateAccount, verifyOtpForCreateAccount }
+        const savedAccount = await account.save();
+        const user = new User({
+            name,
+            idAccount: savedAccount._id
+        })
+        await user.save();
+        const accounts = await Account.findById(account._id).populate('idRole');
+        let accountObject = accounts.toObject();
+        if (accountObject.idRole) {
+            accountObject.role = accountObject.idRole;
+            delete accountObject.idRole;
+        }
+
+        const userData = await User.findOne({idAccount : savedAccount._id})
+        if(userData)
+        {
+            accountObject.userInformation = userData
+        }
+        res.status(200).json({ account: accountObject });
+    }
+    catch (error) {
+        console.error("Google token verification failed:", error);
+        res.status(400).json({ success: false, error: error});
+    }
+}
+
+
+
+// [POST] : /sign-in
+const loginUser = async (req, res, next) => {
+    const { userName } = req.body
+    const isCheckAccount = await Account.findOne({ userName })
+    if (isCheckAccount == null) {
+        return res.status(404).json({ message: "Tài khoản không tồn tại." });
+    }
+    const isCheckUser = await User.findOne({ idAccount: isCheckAccount._id })
+    const avatar = isCheckUser.avatar
+    const payloadToken = {
+        idUser: isCheckUser._id,
+        name: isCheckUser.name,
+        userName: isCheckAccount.userName,
+        email : isCheckAccount.email,
+        typeLogin : isCheckAccount.typeLogin,
+        address: isCheckUser.address,
+        phone: isCheckUser.phone,
+        sex: isCheckUser.sex,
+        date_of_birth: isCheckUser.date_of_birth,
+        idRole: isCheckAccount.idRole,
+        avatar
+    };
+
+    const accessToken = generateToken(payloadToken)
+    const refreshToken = generateRefreshToken(payloadToken)
+    // Lưu refresh token vào cookie
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,   // Cookie chỉ có thể được truy cập bởi server, ko thể truy cập qua client(chẳng hạn Cookies.get('refreshToken'))
+        Secure: true,  // Chỉ gửi cookie qua HTTPS (bật trong môi trường production)
+        sameSite: 'strict', // Chỉ cho phép gửi cookie khi đến từ cùng một site (tăng cường bảo mật)
+        maxAge: 24 * 60 * 60 * 1000 // Thời gian sống của cookie (1 ngày trong ví dụ này)
+    });
+    return res.status(200).json({
+        token: accessToken,
+        message: 'Đăng nhập thành công',
+        avatar: avatar,
+        refreshToken
+    })
+}
+
+module.exports = {getAllUser, sendOtpForCreateAccount, verifyOtpForCreateAccount, authLoginGoogle, loginUser }

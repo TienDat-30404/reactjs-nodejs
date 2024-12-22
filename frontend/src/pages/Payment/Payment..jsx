@@ -12,9 +12,10 @@ export default function Payment() {
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const location = useLocation();
     let { cartsCheck } = location.state || {};
-    console.log(cartsCheck)
+    console.log("payments", cartsCheck)
     // total Price
-    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart.product.price * cart.quantity), 0)
+    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity), 0)
+
 
     const [errors, setErrors] = useState({})
     const [provinces, setProvinces] = useState([])

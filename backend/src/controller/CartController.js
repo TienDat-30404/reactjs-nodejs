@@ -1,18 +1,72 @@
 const Cart = require('../model/CartModel')
-const Product = require('../model/ProductModel')
-const Category = require('../model/CategoryModel')
-// [GET] /add-product
+
+
 const addCart = async (req, res, next) => {
     try {
-        const { idUser, idProduct, quantity } = req.body
-        const newCart = new Cart({ idUser, idProduct, quantity })
-        await newCart.save()
-        const populatedCart = await Cart.findById(newCart._id).populate('idProduct');
+        const { idUser, idAttribute } = req.body
+        const carts = await Cart.find({})
+        const isCheckCartOfUser = carts.find(cart => {
+            return cart.idUser.toString() === idUser && cart.idAttribute.toString() === idAttribute
+        })
+        let newCart;
+        if(isCheckCartOfUser)
+        {
+            // console.log("isCheckCartOfUser", isCheckCartOfUser._id.toString())
+            // await Cart.updateOne({_id : isCheckCartOfUser._id.toString()}, {
+            //     idUser,
+            //     idAttribute,
+            //     quantity : isCheckCartOfUser.quantity + 1
+            // })
+            return res.status(400).json({
+                message : "Sản phẩm đã được thêm vào giỏ hàng",
+                status : 400
+            })
+        }
+        else 
+        {
+            console.log("add success", "123")
+            newCart = new Cart({ idUser, idAttribute })
+            await newCart.save()
+        }
+        const idCart = isCheckCartOfUser ? isCheckCartOfUser._id.toString() : newCart._id
+        console.log("idCart", idCart)
+        let cart = await Cart.findOne({ _id: idCart })
+            .populate({
+                path: 'idAttribute',
+                populate:
+                    [
+                        {
+                            path: 'idProduct',
+                            model: 'Product',
+                            populate: {
+                                path: 'idCategory',
+                                model: 'Category'
+                            }
+                        },
+                        {
+                            path: 'idSize',
+                            model: 'Size'
+
+                        }
+                    ]
+            }).lean()
+
+        if(cart.idAttribute && cart.idAttribute.idProduct)
+        {
+            cart.attribute = cart.idAttribute
+            cart.idAttribute.product = cart.idAttribute.idProduct
+            cart.idAttribute.idProduct.category = cart.idAttribute.idProduct.idCategory
+            cart.idAttribute.size = cart.idAttribute.idSize
+            delete cart.idAttribute.idProduct.idCategory
+            delete cart.idAttribute.idSize
+            delete cart.idAttribute.idProduct
+            delete cart.idAttribute
+        }
+
+
 
         return res.status(200).json({
-            idUser: populatedCart.idUser,
-            product: populatedCart.idProduct,
-            quantity: populatedCart.quantity,
+            cart
         });
     }
     catch (error) {
@@ -34,21 +88,51 @@ const getAllCart = async (req, res, next) => {
             .skip(startPage)
             .limit(limit)
             .sort(objectSort)
-            .populate('idProduct')
+            .populate({
+                path: 'idAttribute',
+                populate:
+                    [
+                        {
+                            path: 'idProduct',
+                            model: 'Product',
+                            populate: {
+                                path: 'idCategory',
+                                model: 'Category'
+                            }
+                        },
+                        {
+                            path: 'idSize',
+                            model: 'Size'
+
+                        }
+                    ]
+            })
             .lean()
 
-        for (const cart of carts) {
-            if (cart.idProduct) {
-                cart.product = cart.idProduct;
-                delete cart.idProduct;
-
-                if (cart.product && cart.product.idCategory) {
-                    const category = await Category.findById(cart.product.idCategory); 
-                    cart.product.category = category;
-                    delete cart.product.idCategory
-                }
+        carts = carts.map(cart => {
+            if(cart.idAttribute && cart.idAttribute.idProduct && cart.idAttribute.idProduct.idCategory)
+            {
+                cart.idAttribute.idProduct.category = cart.idAttribute.idProduct.idCategory
             }
-        }
+            if (cart.idAttribute && cart.idAttribute.idProduct) {
+                cart.idAttribute.product = cart.idAttribute.idProduct;
+            }
+            if(cart.idAttribute && cart.idAttribute.idSize)
+            {
+                cart.idAttribute.size = cart.idAttribute.idSize
+            }
+
+            cart.attribute = cart.idAttribute;
+
+            if (cart.idAttribute && cart.idAttribute.idProduct) {
+                delete cart.idAttribute.idProduct.idCategory
+                delete cart.idAttribute.idProduct;
+                delete cart.idAttribute.idSize
+                delete cart.idAttribute;
+            }
+
+            return cart;
+        })
 
         const totalProductInCart = (await Cart.find({ idUser: idUser })).length
         const totalPage = Math.ceil(totalProductInCart / limit)

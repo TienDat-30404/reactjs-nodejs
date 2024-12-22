@@ -12,12 +12,9 @@ export default function Detail() {
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const idUser = isAuthenticated && userData.dataLogin.idUser
 
-    const [show, setShow] = useState({
-        display: false,
-        status: 'success',
-    })
-    const [details, setDetail] = useState([])
 
+    const [details, setDetail] = useState([])
+    const [size, setSize] = useState(0)
     const dispatch = useDispatch()
     const carts = useSelector(state => state.carts.carts)
     const totalProductInCart = useSelector(state => state.carts.totalProductInCart)
@@ -25,30 +22,38 @@ export default function Detail() {
     useEffect(() => {
         const fetchDataDetailProduct = async () => {
             const detailProduct = await getDetailProduct(_id)
+            console.log(detailProduct)
             setDetail(detailProduct)
         }
         fetchDataDetailProduct()
     }, [_id])
 
-
+    const handleSelectedSize = (id) => {
+        setSize(id)
+    }
 
     // add product on cart
     const handleAddCart = async () => {
 
-        const isCheckExistCart = carts.find(cart => cart.product._id == _id)
-        console.log(isCheckExistCart)
-        if (isCheckExistCart) {
-            toast.error("Sản phẩm đã được thêm vào giỏ hàng")
-            return
-        }
+        // const isCheckExistCart = carts.find(cart => cart.product._id == _id)
+        // console.log(isCheckExistCart)
+        // if (isCheckExistCart) {
+        //     toast.error("Sản phẩm đã được thêm vào giỏ hàng")
+        //     return
+        // }
 
         const response = await addCart({
             idUser: idUser,
-            idProduct: _id,
+            idAttribute: details?.detailProduct?.productAttributes[size]._id,
             quantity: 1
         })
-
-        if (response) {
+        if(response.status === 400)
+        {
+            toast.error(response.message)
+            return;
+        }
+        else {
+            console.log(response)
             dispatch(addCartRedux({
                 cart: response,
                 totalProductInCart: totalProductInCart + 1
@@ -75,10 +80,9 @@ export default function Detail() {
                 pauseOnHover
                 theme="light"
             />
-
             {details && details.detailProduct ? (
 
-                <div style={{ marginLeft: '10px', marginRight: '10px' }} className="row col-12 rounded-3">
+                <div className="row col-12 rounded-3 p-3">
 
                     <div className="col-3 row d-flex align-items-center bg-white rounded-3 me-3">
                         <div style={{ padding: '10px' }}>
@@ -119,7 +123,7 @@ export default function Detail() {
                                 <div className='border-space'></div>
                                 <p style={{ marginTop: '2px' }} className='mb-0 me-2'>Đã bán 5000+</p>
                             </div>
-                            <h4 className='mt-2'>{(details.detailProduct.price).toLocaleString('vi-VN')}₫</h4>
+                            {/* <h4 className='mt-2'>{(details.detailProduct.price).toLocaleString('vi-VN')}₫</h4> */}
                         </div>
 
                         <div className='bg-white p-3'>
@@ -174,14 +178,22 @@ export default function Detail() {
                                 <div style={{ width: '100%', height: '1px', backgroundColor: '#777' }} className="b"></div>
                             </div>
                         </div>
-                        <h6 className='mt-2 mb-0'>Số lượng</h6>
+                        <h6 className='mt-2 mb-0'>Kích thước</h6>
                         <div className='mt-3 click_number'>
-                            <button type="button" className="btn" disabled>-</button>
-                            <button type="button" className="btn ms-1">1</button>
-                            <button type="button" className="btn ms-1 ">+</button>
+                            {details?.detailProduct?.productAttributes.map((attribute, index) => (
+                                <>
+                                    <button 
+                                    onClick={() => handleSelectedSize(index)} 
+
+                                    type="button" 
+                                    className={`btn me-2 ${index === size ? 'bg-secondary text-white' : ''}`} >
+                                        {attribute.size.name}
+                                    </button>
+                                </>
+                            ))}
                         </div>
                         <h6 className='mt-3 mb-0'>Tạm tính</h6>
-                        <h4 className='mt-3 mb-0'>1.000.000₫</h4>
+                        <h4 className='mt-3 mb-0'>{(details?.detailProduct?.productAttributes[size].priceBought * details?.detailProduct?.productAttributes[size].size.sizePriceMultiplier).toLocaleString('vi-VN')}đ</h4>
                         <div className='d-flex flex-column mt-3'>
                             <button type="button" className="btn btn-danger">Mua ngay</button>
                             <button onClick={handleAddCart} type="button" className="btn border-primary bg-white text-primary mt-2">Thêm vào giỏ</button>

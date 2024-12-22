@@ -6,6 +6,8 @@ const OrderRouter = require('./OrderRouter')
 const RoleRouter = require('./RoleRouter')
 const MessageRouter = require('./MessageRouter')
 const AccountRouter = require('./AccountRouter')
+const SizeRouter = require('./SizeRouter')
+const DiscountRouter = require('./DiscountRouter')
 const routes = (app) => {
     app.use('/', UserRouter)
     app.use('/', ProductRouter)
@@ -15,5 +17,7 @@ const routes = (app) => {
     app.use('/', RoleRouter)
     app.use('/', MessageRouter)
     app.use('/', AccountRouter)
+    app.use('/', SizeRouter)
+    app.use('/', DiscountRouter)
 }
 module.exports = routes

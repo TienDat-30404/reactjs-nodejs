@@ -4,9 +4,9 @@ const addCategory = async (req, res, next) => {
     try 
     {
         const {name, image} = req.body
-        const newCategory = new Category({name, image})
-        await newCategory.save()
-        return res.status(200).json(Category)
+        const category = new Category({name, image})
+        await category.save()
+        return res.status(200).json({category})
     }
     catch(error)
     {
@@ -33,6 +33,20 @@ const getAllCategory = async (req, res, next) => {
     })
 }
 
+const updateCategory = async(req, res, next) => {
+    const idCategory = req.params._id
+    console.log(idCategory)
+    const { name }  = req.body 
+    console.log(name)
+    const category = await Category.updateOne({_id : idCategory}, {
+        name
+    })
+    return res.status(200).json({
+        category,
+        message : "Chỉnh sửa thể loại thành công"
+    })
+}
+
 // detail category 
 const detailCategory = async(req, res, next) => {
     const idCategory = req.params.idCategory
@@ -42,4 +56,4 @@ const detailCategory = async(req, res, next) => {
     })
 }
 
-module.exports = {addCategory, getAllCategory, detailCategory}
+module.exports = {addCategory, getAllCategory, detailCategory, updateCategory}

@@ -15,29 +15,29 @@ function LoginModal({ show, handleClose, switchSignIn }) {
   const dataLogin = { userName, password }
   const [errors, setErrors] = useState({})
   const saveTokenOnRedux = useSaveTokenOnRedux();
-  console.log("cliendtId", process.env.REACT_APP_CLIENTID_AUTH)
 
   const handleLoginGoogle = async (response) => {
-
     if (response.error) {
       console.error("Login failed:", response.error);
       return;
     }
     const token = response.credential;
     console.log("token", token)
-    const dataLogin = {
-      name: jwtDecode(token).name,
-      email: jwtDecode(token).email
-    }
+
     try {
-      const response = await loginGoogle(dataLogin)
-      loginService({
-        email: jwtDecode(token).email
+      const responseAuth = await loginGoogle({
+        userName: jwtDecode(token).name,
+        email: jwtDecode(token).email,
+        name :  jwtDecode(token).name
       })
+
+      const responseUserData = await loginService({
+        userName: jwtDecode(token).name
+      })
+      console.log("responseUserData", responseUserData)
       toast.success("Đăng nhập thành công")
-      setCookieForToken(token)
-      saveTokenOnRedux(jwtDecode(token))
-      localStorage.setItem('avatar', jwtDecode(token).picture)
+      setCookieForToken(responseUserData.token)
+      saveTokenOnRedux(jwtDecode(responseUserData.token))
       navigate('/')
 
     } catch (err) {

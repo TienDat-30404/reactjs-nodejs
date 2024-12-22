@@ -13,7 +13,7 @@ const addOrder = async (req, res, next) => {
         const orderDetails = products.map(product => {
             return {
                 idOrder: newOrder._id,
-                idProduct: product._id,
+                idAttribute: product.attribute._id,
                 quantity: product.quantity
             }
         })

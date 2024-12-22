@@ -1,73 +1,9 @@
 const Product = require('../model/ProductModel')
+const Size = require('../model/SizeModel')
+const ProductAttribute = require('../model/ProductAttribute')
 const cloudinary = require('../config/cloudinary');
+const mongoose = require('mongoose')
 
-// [GET] /add-product
-
-const addProduct = async (req, res, next) => {
-    try {
-        const { name, price, quantity, idCategory, description } = req.body
-        const result = await cloudinary.uploader.upload(req.file.path);
-        // console.log(result)
-        if (!req.file) {
-            return res.status(400).json({ error: "File image is required." });
-        }
-        const newProduct = new Product({ name, image: result.secure_url, price, quantity, idCategory, description })
-        await newProduct.save()
-        return res.status(200).json({ newProduct })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-
-// [PUT] /update-product/:idProduct
-const updateProduct = async (req, res, next) => {
-    const idProduct = req.params._id
-    console.log(idProduct)
-
-    const { name, price, quantity, idCategory, description } = req.body
-    const product = await Product.findOne({ _id: idProduct })
-    const newData = {
-        name: name,
-        image: product.image,
-        price: price,
-        quantity: quantity,
-        idCategory: idCategory,
-        description: description,
-    };
-    if (req.file) {
-        const fileImage = await cloudinary.uploader.upload(req.file.path);
-        newData.image = fileImage.secure_url
-    }
-    await Product.updateOne({ _id: idProduct }, newData)
-    return res.status(200).json({
-        newData,
-        message: "Update Successfully"
-    })
-
-}
-
-// [DELETE] /delete-product/:idProduct
-const deleteProduct = async (req, res, next) => {
-    try {
-        const idProduct = req.params.idProduct
-        const delProduct = await Product.deleteOne({ _id: idProduct })
-        if (delProduct.deletedCount > 0) {
-            return res.status(200).json({
-                message: "Delete Product Successfully"
-            })
-        }
-        else {
-            return res.status(400).json({
-                message: "Delete product Fail"
-            })
-        }
-    }
-    catch (error) {
-        next(error)
-    }
-
-}
 const getAllProduct = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -79,7 +15,7 @@ const getAllProduct = async (req, res, next) => {
         const objectSort = {};
         objectSort[sortBy] = type;
 
-        const objectFilter = {};
+        const objectFilter = { deletedAt: null };
         if (req.query.idProduct) {
             objectFilter._id = req.query.idProduct;
         }
@@ -103,7 +39,7 @@ const getAllProduct = async (req, res, next) => {
         }
 
         const totalProduct = Object.keys(objectFilter).length === 0
-            ? await Product.countDocuments({})
+            ? await Product.countDocuments({ deletedAt: null })
             : await Product.countDocuments(objectFilter);
 
         let products;
@@ -113,15 +49,28 @@ const getAllProduct = async (req, res, next) => {
                 .limit(limit)
                 .sort(objectSort)
                 .populate('idCategory')
+                .populate({
+                    path: 'productAttributes', // Populate từ ProductAttribute
+                    populate: {
+                        path: 'idSize', // Populate từ Size thông qua idSize trong ProductAttribute
+                        model: 'Size', // Chỉ rõ model là Size
+                    },
+                })
+                .populate('discount')
                 .lean();
         } else {
             products = await Product.find(objectFilter)
                 .sort(objectSort)
                 .populate('idCategory')
+
                 .lean();
         }
 
         products = products.map(product => {
+            product.productAttributes.map(item => {
+                item.size = item.idSize
+                delete item.idSize
+            })
             if (product.idCategory) {
                 product.category = product.idCategory;
                 delete product.idCategory;
@@ -143,13 +92,198 @@ const getAllProduct = async (req, res, next) => {
     }
 };
 
+const addProduct = async (req, res, next) => {
+    const session = await mongoose.startSession();
+    session.startTransaction()
+    try {
+        const { name, idCategory, description, sizes } = req.body
+        // const result = await cloudinary.uploader.upload(req.file.path);
+        // // console.log(result)
+        // if (!req.file) {
+        //     return res.status(400).json({ error: "File image is required." });
+        // }
+        const dataProduct = new Product(
+            {
+                name,
+                // image: result.secure_url, 
+                idCategory,
+                description,
+            }
+        )
+        const savedProduct = await dataProduct.save()
+        const size = await Size.findOne({ name: 'L' })
+        const selectedSize = sizes ? sizes : size._id;
+
+        if (!selectedSize || !Array.isArray(selectedSize) || selectedSize.length === 0) {
+            return res.status(400).json({ message: "Vui lòng chọn thuộc tính sản phẩm" });
+        }
+        const productAttributesPromises = selectedSize.map(async (idSize) => {
+            const productAttribute = new ProductAttribute({
+                idProduct: savedProduct._id,
+                idSize: idSize,
+                quantity: 0
+            });
+            await productAttribute.save();
+        });
+
+        await Promise.all(productAttributesPromises);
+        let product = await Product.findOne({ _id: savedProduct._id })
+            .populate('idCategory')
+            .populate(
+                {
+                    path: 'productAttributes',
+                    populate: {
+                        path: 'idSize',
+                        model: 'Size'
+                    }
+                }
+            )
+        product = product.toObject()
+        product.productAttributes.map(item => {
+            if (item.idSize) {
+                item.size = item.idSize
+                delete item.idSize
+            }
+            return item
+        })
+        if (product.idCategory) {
+            product.category = product.idCategory;
+            delete product.idCategory;
+        }
+
+        await session.commitTransaction()
+        session.endSession()
+
+        console.log("product", product)
+        return res.status(200).json({ product })
+    }
+    catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        next(error);
+    }
+}
+
+// [PUT] /update-product/:_id
+const updateProduct = async (req, res, next) => {
+    const idProduct = req.params._id
+
+    const { name, idCategory, description, sizes } = req.body
+
+    await Product.updateOne({ _id: idProduct }, {
+        name,
+        // image : product.image,  
+        idCategory,
+        description
+    })
+
+    if (sizes && sizes.length > 0) {
+        for (let i = 0; i < sizes.length; i++) {
+            try {
+                const productAttribute = new ProductAttribute({
+                    idProduct,
+                    idSize: sizes[i],
+                    quantity: 0,
+                })
+                await productAttribute.save()
+            }
+            catch (error) {
+                return res.status(400).json(
+                    {
+                        message: "Lỗi khi lưu productAttribute"
+                    }
+                )
+            }
+        }
+    }
+
+    let product = await Product.findOne({ _id: idProduct })
+        .populate('idCategory')
+        .populate(
+            {
+                path: 'productAttributes',
+                populate: {
+                    path: 'idSize',
+                    model: 'Size'
+                }
+            }
+        )
+    product = product.toObject()
+    product.productAttributes.map(item => {
+        if (item.idSize) {
+            item.size = item.idSize
+            delete item.idSize
+        }
+        return item
+    })
+    if (product.idCategory) {
+        product.category = product.idCategory;
+        delete product.idCategory;
+    }
+
+    return res.status(200).json({
+        product,
+        message: "Update Successfully"
+    })
+
+}
+
+// [DELETE] /delete-product/:idProduct
+const deleteProduct = async (req, res, next) => {
+    const session = await mongoose.startSession();
+    session.startTransaction()
+    try {
+        const idProduct = req.params.idProduct
+        const result = await Product.updateOne({ _id: idProduct }, {
+            deletedAt: new Date()
+        })
+
+        await ProductAttribute.updateMany({ idProduct: idProduct }, {
+            deletedAt: new Date()
+        })
+        await session.commitTransaction()
+        session.endSession()
+        return res.status(200).json({ message: "Xóa thành công" })
+    }
+    catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        next(error);
+    }
+
+}
+
+
 
 
 // [GET] /detail-product/:idProduct
 const getDetailProduct = async (req, res, next) => {
     try {
         const idProduct = req.params._id
-        const detailProduct = await Product.findOne({ _id: idProduct })
+        let detailProduct = await Product.findOne({ _id: idProduct })
+            .populate('idCategory')
+            .populate(
+                {
+                    path: 'productAttributes',
+                    populate: {
+                        path: 'idSize',
+                        model: 'Size'
+                    }
+                }
+            )
+            
+        detailProduct = detailProduct.toObject()
+        detailProduct.productAttributes.map(item => {
+            if (item.idSize) {
+                item.size = item.idSize
+                delete item.idSize
+            }
+            return item
+        })
+        if (detailProduct.idCategory) {
+            detailProduct.category = detailProduct.idCategory;
+            delete detailProduct.idCategory;
+        }
         if (detailProduct == null) {
             return res.status(400).json({
                 message: "Fail Detail Product"
