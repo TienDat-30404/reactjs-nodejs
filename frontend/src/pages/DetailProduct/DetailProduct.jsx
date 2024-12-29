@@ -6,9 +6,11 @@ import { addCart } from '../../services/CartService';
 import { useSelector, useDispatch } from 'react-redux';
 import { addCartRedux } from '../../redux/Cart/cartsSlice';
 import { toast, ToastContainer } from 'react-toastify';
+import Review from './Review';
 
 export default function Detail() {
     const { _id } = useParams();
+    console.log(_id)
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const idUser = isAuthenticated && userData.dataLogin.idUser
 
@@ -18,7 +20,7 @@ export default function Detail() {
     const dispatch = useDispatch()
     const carts = useSelector(state => state.carts.carts)
     const totalProductInCart = useSelector(state => state.carts.totalProductInCart)
-
+    const [show, setShow] = useState(true)
     useEffect(() => {
         const fetchDataDetailProduct = async () => {
             const detailProduct = await getDetailProduct(_id)
@@ -34,21 +36,12 @@ export default function Detail() {
 
     // add product on cart
     const handleAddCart = async () => {
-
-        // const isCheckExistCart = carts.find(cart => cart.product._id == _id)
-        // console.log(isCheckExistCart)
-        // if (isCheckExistCart) {
-        //     toast.error("Sản phẩm đã được thêm vào giỏ hàng")
-        //     return
-        // }
-
         const response = await addCart({
             idUser: idUser,
             idAttribute: details?.detailProduct?.productAttributes[size]._id,
             quantity: 1
         })
-        if(response.status === 400)
-        {
+        if (response.status === 400) {
             toast.error(response.message)
             return;
         }
@@ -63,6 +56,8 @@ export default function Detail() {
         toast.success("Thêm vào giỏ hàng thành công")
     }
 
+    const totalReview = details?.detailProduct?.reviews?.length > 0 ? (details?.detailProduct?.reviews?.reduce((sum, review) => sum + review?.rating, 0) / details?.detailProduct?.reviews?.length).toFixed(2) : 0
+    console.log(Math.ceil(totalReview))
     return (
         <div className="container mt-3 detail">
 
@@ -84,21 +79,23 @@ export default function Detail() {
 
                 <div className="row col-12 rounded-3 p-3">
 
-                    <div className="col-3 row d-flex align-items-center bg-white rounded-3 me-3">
-                        <div style={{ padding: '10px' }}>
-                            <img
-                                style={{ objectFit: 'contain' }}
-                                height="300px"
-                                width="100%"
-                                src={details.detailProduct.image}
-                            />
-                        </div>
-                        <div className="nav ms-2 benefit">
-                            <h6>Đặc điểm nổi bật</h6>
-                            <div className='d-flex '>
-                                <i style={{ width: '10px' }} className="bi bi-check-circle me-2"></i>
-                                {details.detailProduct.description}
+                    <div className="col-3 row  bg-white rounded-3 me-3">
+                        <div>
+                            <div style={{ padding: '10px' }}>
+                                <img
+                                    style={{ objectFit: 'contain' }}
+                                    height="300px"
+                                    width="100%"
+                                    src={details.detailProduct.image}
+                                />
                             </div>
+                            {/* <div className="nav ms-2 benefit">
+                                <h6>Đặc điểm nổi bật</h6>
+                                <div className='d-flex '>
+                                    <i style={{ width: '10px' }} className="bi bi-check-circle me-2"></i>
+                                    {details.detailProduct.description}
+                                </div>
+                            </div> */}
                         </div>
                     </div>
 
@@ -112,14 +109,25 @@ export default function Detail() {
                             </div>
                             <h5 className='mt-2'>{details.detailProduct.name}</h5>
                             <div className='d-flex align-items-center'>
-                                <p style={{ marginTop: '2px' }} className='mb-0 me-2'>4.8</p>
-                                <div className='me-2'>
-                                    <i style={{ fontSize: "13px", color: "orange" }} className="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "13px", color: "orange" }} className="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "13px", color: "orange" }} className="bi bi-star-fill"></i>
-                                    <i style={{ fontSize: "13px", color: "orange" }} className="bi bi-star-half"></i>
-                                </div>
-                                <p style={{ marginTop: '2px' }} className='mb-0 me-2'>(140)</p>
+                                <p style={{ marginTop: '2px' }} className='mb-0 me-2'>{totalReview}</p>
+
+                                {Array.from({ length: 5 }, (_, index) => {
+                                    if (index + 1 < totalReview) {
+                                        return <i key={index} style={{ fontSize: "12px", color: "orange" }} className="bi bi-star-fill"></i>;
+                                    }
+                                    else if (totalReview >= Math.floor(totalReview) + 0.5 && totalReview > index) {
+                                        return <i style={{ fontSize: "13px", color: "orange" }} className="bi bi-star-half"></i>
+                                    }
+                                    else {
+                                        return <i key={index} style={{ fontSize: "12px", color: "orange" }} className="bi bi-star"></i>;
+                                    }
+                                })}
+                                <p className='me-2 ms-1'>
+                                    (
+                                    {details?.detailProduct?.reviews?.length > 0 ? 
+                                        details?.detailProduct?.reviews?.length : 0
+                                    })
+                                </p>
                                 <div className='border-space'></div>
                                 <p style={{ marginTop: '2px' }} className='mb-0 me-2'>Đã bán 5000+</p>
                             </div>
@@ -175,32 +183,63 @@ export default function Detail() {
                                     <i style={{ fontSize: "13px", color: "orange" }} className="bi bi-star-fill"></i>
                                     <h6 style={{ fontSize: '13px', marginBottom: '0px' }} classN ame='fw-bold me-2 '>5.4tr+ đánh giá</h6>
                                 </div>
-                                <div style={{ width: '100%', height: '1px', backgroundColor: '#777' }} className="b"></div>
+                                <div style={{ width: '100%', height: '1px', backgroundColor: '#777' }} className=""></div>
                             </div>
                         </div>
                         <h6 className='mt-2 mb-0'>Kích thước</h6>
                         <div className='mt-3 click_number'>
                             {details?.detailProduct?.productAttributes.map((attribute, index) => (
                                 <>
-                                    <button 
-                                    onClick={() => handleSelectedSize(index)} 
+                                    <button
+                                        onClick={() => handleSelectedSize(index)}
 
-                                    type="button" 
-                                    className={`btn me-2 ${index === size ? 'bg-secondary text-white' : ''}`} >
+                                        type="button"
+                                        className={`btn me-2 ${index === size ? 'bg-secondary text-white' : ''}`} >
                                         {attribute.size.name}
                                     </button>
                                 </>
                             ))}
                         </div>
                         <h6 className='mt-3 mb-0'>Tạm tính</h6>
-                        <h4 className='mt-3 mb-0'>{(details?.detailProduct?.productAttributes[size].priceBought * details?.detailProduct?.productAttributes[size].size.sizePriceMultiplier).toLocaleString('vi-VN')}đ</h4>
+                        <div className="d-flex align-items-center">
+                            {details?.detailProduct?.discount?.length > 0 ? (
+                                <div className='d-flex align-items-center'>
+                                    <h5 className='py-2 text-decoration-line-through text-danger'>{(details?.detailProduct?.productAttributes[size].priceBought * details?.detailProduct?.productAttributes[size].size.sizePriceMultiplier).toLocaleString('vi-VN')}đ</h5>
+                                    <h6 className='me-5'>-{((1 - details?.detailProduct?.discount[0].discountValue) * 100).toFixed(0)}%</h6>
+                                </div>
+                            ) : ""}
+
+                            <h5
+                                className='py-2 text-danger'>
+                                {(details?.detailProduct?.productAttributes[size].priceBought * details?.detailProduct?.productAttributes[size].size.sizePriceMultiplier *
+                                    (details?.detailProduct?.discount.length > 0 ?
+                                        details?.detailProduct?.discount[0].discountValue : 1
+                                    )
+                                )
+                                    .toLocaleString('vi-VN')}đ
+                            </h5>
+                        </div>
                         <div className='d-flex flex-column mt-3'>
                             <button type="button" className="btn btn-danger">Mua ngay</button>
                             <button onClick={handleAddCart} type="button" className="btn border-primary bg-white text-primary mt-2">Thêm vào giỏ</button>
                             <button type="button" className="btn border-primary bg-white text-primary mt-2">Mua trước trả sau</button>
                         </div>
                     </div>
+                    <ul className='d-flex align-items-center list-unstyled mt-2'>
+                        <li style={{ cursor: 'pointer' }} onClick={() => setShow(true)} className={`${show ? 'fw-light' : ""}`}>Mô tả</li>
+                        <li style={{ cursor: 'pointer' }} onClick={() => setShow(false)} className={`px-3 ${!show ? 'fw-light' : ""}`}>Nhận xét</li>
+                    </ul>
+                    <div className={`bg-white mt-2 py-3 ${show ? 'd-block' : 'd-none'}`}>
+                        <p>{details?.detailProduct?.description}</p>
+
+                    </div>
+                    <div className={`bg-white mt-2 ${!show ? 'd-block' : 'd-none'}`}>
+                        <Review idProduct={_id} />
+
+                    </div>
                 </div>
+
+
             ) : (
                 <div className="loading">
                     <div className="spinner"></div>

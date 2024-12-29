@@ -1,5 +1,6 @@
 const Order = require('../model/OrderModel')
 const Cart = require('../model/CartModel')
+const Voucher = require('../model/VoucherModel')
 const Product = require('../model/ProductModel')
 const OrderDetail = require('../model/OrderDetailModel')
 const { default: mongoose } = require('mongoose')
@@ -20,7 +21,6 @@ const addOrder = async (req, res, next) => {
         await OrderDetail.insertMany(orderDetails)
         const cartIds = products.map(product => product._id)
         await Cart.deleteMany({ _id: { $in: cartIds } })
-
         await session.commitTransaction()
         session.endSession()
         return res.status(200).json({ newOrder, orderDetails })

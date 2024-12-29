@@ -18,8 +18,8 @@ export default function Category() {
 
   useEffect(() => {
     if (_id) {
-      dispatch(switchPage(1)); 
-      setIsPageReset(true); 
+      dispatch(switchPage(1));
+      setIsPageReset(true);
     }
   }, [_id, dispatch]);
 
@@ -32,7 +32,7 @@ export default function Category() {
         if (response) {
           dispatch(initDataProduct(response));
         }
-        setIsPageReset(false); 
+        setIsPageReset(false);
       }
     };
     fetchDatasProduct()
@@ -56,12 +56,39 @@ export default function Category() {
     <div className='col-9-5 row'>
       {
         products.map((product, index) => (
+          // <CartProduct
+          //   key={index}
+          //   id={product._id}
+          //   image={product.image}
+          //   name={product.name}
+          //   price={(product.price).toLocaleString('vi-VN')}
+          // />
           <CartProduct
             key={index}
             id={product._id}
             image={product.image}
             name={product.name}
-            price={(product.price).toLocaleString('vi-VN')}
+            priceNotDiscount={
+              product?.discount && product?.discount?.length > 0 ?
+                (product?.productAttributes[0]?.priceBought * product?.productAttributes[0]?.size.sizePriceMultiplier).toLocaleString('vi-VN') + "đ"
+                :
+                ""
+            }
+            percentDiscount={
+              product?.discount && product?.discount?.length > 0 ?
+                ((1 - product.discount[0].discountValue) * 100).toFixed(0) + "%"
+                :
+                ""
+            }
+            price=
+            {
+              product?.discount && product?.discount.length > 0 ?
+                (product?.productAttributes[0]?.priceBought * product?.productAttributes[0]?.size.sizePriceMultiplier * product.discount[0].discountValue).toLocaleString('vi-VN')
+                :
+                (product?.productAttributes[0]?.priceBought * product?.productAttributes[0]?.size.sizePriceMultiplier).toLocaleString('vi-VN')
+            }
+            widthImage="100px"
+            heightImage="200px"
           />
         ))
       }

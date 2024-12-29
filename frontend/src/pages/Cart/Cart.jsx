@@ -92,7 +92,14 @@ export default function Cart() {
     }
 
     // total Price
-    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity), 0)
+    const totalPrice = cartsCheck.reduce((sum, cart) =>
+        sum +
+        (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity *
+            (cart?.attribute?.product?.discount?.length > 0 ? 
+                cart?.attribute?.product.discount[0].discountValue : 1
+            )
+        )
+        , 0)
 
     // switch payment
     const switchPayment = () => {
@@ -133,7 +140,14 @@ export default function Cart() {
                                     </div>
                                     <span className='col-1'>{cart?.attribute?.size?.name}</span>
 
-                                    <span className='col-2 '>{(cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier)?.toLocaleString('vi-VN')}đ</span>
+                                    <span
+                                        className='col-2 '>
+                                        {(cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier *
+                                            (cart?.attribute?.product?.discount?.length > 0 ?
+                                                cart?.attribute?.product?.discount[0]?.discountValue : 1
+                                            ))
+                                            ?.toLocaleString('vi-VN')}đ
+                                    </span>
                                     <div className='col-2'>
                                         <button
                                             disabled={cart.quantity === 1}
@@ -151,7 +165,15 @@ export default function Cart() {
                                             +
                                         </button>
                                     </div>
-                                    <span className='col-2 text-danger fw-bold'>{(cart?.attribute?.priceBought * cart?.attribute?.size.sizePriceMultiplier * cart?.quantity).toLocaleString('vi-VN')}</span>
+                                    <span
+                                        className='col-2 text-danger fw-bold'>
+                                        {(cart?.attribute?.priceBought * cart?.attribute?.size.sizePriceMultiplier * cart?.quantity *
+                                            (cart?.attribute?.product?.discount?.length > 0 ?
+                                                cart?.attribute?.product?.discount[0]?.discountValue : 1
+                                            )
+                                        )
+                                            .toLocaleString('vi-VN')}
+                                    </span>
                                     <i onClick={() => handleDeleteCart(cart._id)} style={{ cursor: 'pointer' }} className="col-2 bi bi-trash3 "></i>
                                 </div>
                             ))}

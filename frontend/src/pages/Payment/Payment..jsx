@@ -14,7 +14,14 @@ export default function Payment() {
     let { cartsCheck } = location.state || {};
     console.log("payments", cartsCheck)
     // total Price
-    const totalPrice = cartsCheck.reduce((sum, cart) => sum + (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity), 0)
+    const totalPrice = cartsCheck.reduce((sum, cart) =>
+        sum +
+        (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity *
+            (cart?.attribute?.product?.discount?.length > 0 ?
+                cart?.attribute?.product.discount[0].discountValue : 1
+            )
+        )
+        , 0)
 
 
     const [errors, setErrors] = useState({})
@@ -385,26 +392,3 @@ export default function Payment() {
 }
 
 
-/*
-    {
-    "idUser": 1,
-    "idStaff": 2,
-    "totalPrice": 150000,
-    "phone" : "434242",
-    "address": "123 Đường ABC, Quận 1, TP.HCM",
-    "paymentMethod": "credit_card",
-    "bankAccount": "1234567890",
-    "products": [
-        {
-            "idProduct": 1,
-            "quantity": 2,
-            "price": 50000
-        },
-        {
-            "idProduct": 2,
-            "quantity": 1,
-            "price": 50000
-        }
-    ]
-}
- */

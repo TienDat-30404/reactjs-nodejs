@@ -5,7 +5,7 @@ import cartsReducer from './Cart/cartsSlice'
 import categoriesReducer from './Category/categoriesSlice'
 import usersReducer from './User/usersSlice'
 import rolesReducer from './Role/rolesSlice'
-
+import reviewsReducer from './Review/reviewsSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -13,6 +13,7 @@ export default configureStore({
     carts : cartsReducer,
     categories : categoriesReducer,
     users : usersReducer,
-    roles : rolesReducer
+    roles : rolesReducer,
+    reviews : reviewsReducer
   }
 })

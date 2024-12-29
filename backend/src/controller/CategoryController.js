@@ -35,9 +35,7 @@ const getAllCategory = async (req, res, next) => {
 
 const updateCategory = async(req, res, next) => {
     const idCategory = req.params._id
-    console.log(idCategory)
     const { name }  = req.body 
-    console.log(name)
     const category = await Category.updateOne({_id : idCategory}, {
         name
     })

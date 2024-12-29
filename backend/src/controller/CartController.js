@@ -9,8 +9,7 @@ const addCart = async (req, res, next) => {
             return cart.idUser.toString() === idUser && cart.idAttribute.toString() === idAttribute
         })
         let newCart;
-        if(isCheckCartOfUser)
-        {
+        if (isCheckCartOfUser) {
             // console.log("isCheckCartOfUser", isCheckCartOfUser._id.toString())
             // await Cart.updateOne({_id : isCheckCartOfUser._id.toString()}, {
             //     idUser,
@@ -18,18 +17,15 @@ const addCart = async (req, res, next) => {
             //     quantity : isCheckCartOfUser.quantity + 1
             // })
             return res.status(400).json({
-                message : "Sản phẩm đã được thêm vào giỏ hàng",
-                status : 400
+                message: "Sản phẩm đã được thêm vào giỏ hàng",
+                status: 400
             })
         }
-        else 
-        {
-            console.log("add success", "123")
+        else {
             newCart = new Cart({ idUser, idAttribute })
             await newCart.save()
         }
         const idCart = isCheckCartOfUser ? isCheckCartOfUser._id.toString() : newCart._id
-        console.log("idCart", idCart)
         let cart = await Cart.findOne({ _id: idCart })
             .populate({
                 path: 'idAttribute',
@@ -38,10 +34,16 @@ const addCart = async (req, res, next) => {
                         {
                             path: 'idProduct',
                             model: 'Product',
-                            populate: {
-                                path: 'idCategory',
-                                model: 'Category'
-                            }
+                            populate: [
+                                {
+                                    path: 'discount',
+                                    model: 'Discount'
+                                },
+                                {
+                                    path: 'idCategory',
+                                    model: 'Category'
+                                }
+                            ]
                         },
                         {
                             path: 'idSize',
@@ -51,8 +53,7 @@ const addCart = async (req, res, next) => {
                     ]
             }).lean()
 
-        if(cart.idAttribute && cart.idAttribute.idProduct)
-        {
+        if (cart.idAttribute && cart.idAttribute.idProduct) {
             cart.attribute = cart.idAttribute
             cart.idAttribute.product = cart.idAttribute.idProduct
             cart.idAttribute.idProduct.category = cart.idAttribute.idProduct.idCategory
@@ -95,10 +96,17 @@ const getAllCart = async (req, res, next) => {
                         {
                             path: 'idProduct',
                             model: 'Product',
-                            populate: {
-                                path: 'idCategory',
-                                model: 'Category'
-                            }
+                            populate: [
+                                {
+                                    path: 'discount',
+                                    model: 'Discount'
+                                },
+                                {
+                                    path: 'idCategory',
+                                    model: 'Category'
+                                }
+                            ]
+
                         },
                         {
                             path: 'idSize',
@@ -110,15 +118,13 @@ const getAllCart = async (req, res, next) => {
             .lean()
 
         carts = carts.map(cart => {
-            if(cart.idAttribute && cart.idAttribute.idProduct && cart.idAttribute.idProduct.idCategory)
-            {
+            if (cart.idAttribute && cart.idAttribute.idProduct && cart.idAttribute.idProduct.idCategory) {
                 cart.idAttribute.idProduct.category = cart.idAttribute.idProduct.idCategory
             }
             if (cart.idAttribute && cart.idAttribute.idProduct) {
                 cart.idAttribute.product = cart.idAttribute.idProduct;
             }
-            if(cart.idAttribute && cart.idAttribute.idSize)
-            {
+            if (cart.idAttribute && cart.idAttribute.idSize) {
                 cart.idAttribute.size = cart.idAttribute.idSize
             }
 

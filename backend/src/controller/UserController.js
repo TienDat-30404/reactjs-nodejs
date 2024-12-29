@@ -9,8 +9,6 @@ const { OAuth2Client } = require("google-auth-library");
 const errorHandler = require('http-errors')
 
 
-
-
 // [PUT] : /update-user/:id
 const updateUser = async (req, res, next) => {
     try {
@@ -111,7 +109,6 @@ const detailUser = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
     try {
         const token = req.cookies.refreshToken
-        console.log(token)
         if (!token) {
             return res.status(401)
         }

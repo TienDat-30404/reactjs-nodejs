@@ -22,12 +22,18 @@ ProductSchema.virtual('productAttributes', {
     localField: '_id',      
     foreignField: 'idProduct', 
 });
-
 ProductSchema.virtual('discount', {
     ref: 'Discount', 
     localField: '_id',      
     foreignField: 'idProduct', 
 });
+
+ProductSchema.virtual('reviews', {
+    ref : 'Review',
+    localField : '_id',
+    foreignField : 'idProduct'
+})
+
 
 const Product = mongoose.model('Product', ProductSchema);
 module.exports = Product;

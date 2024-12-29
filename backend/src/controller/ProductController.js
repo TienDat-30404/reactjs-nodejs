@@ -13,7 +13,7 @@ const getAllProduct = async (req, res, next) => {
         const sortBy = req.query.sortBy || 'idProduct';
         const type = req.query.type === "asc" ? 1 : -1; // Tăng dần hoặc giảm dần
         const objectSort = {};
-        objectSort[sortBy] = type;
+        objectSort[sortBy] = type;  
 
         const objectFilter = { deletedAt: null };
         if (req.query.idProduct) {
@@ -49,6 +49,8 @@ const getAllProduct = async (req, res, next) => {
                 .limit(limit)
                 .sort(objectSort)
                 .populate('idCategory')
+
+                .populate('discount')
                 .populate({
                     path: 'productAttributes', // Populate từ ProductAttribute
                     populate: {
@@ -56,7 +58,6 @@ const getAllProduct = async (req, res, next) => {
                         model: 'Size', // Chỉ rõ model là Size
                     },
                 })
-                .populate('discount')
                 .lean();
         } else {
             products = await Product.find(objectFilter)
@@ -154,7 +155,6 @@ const addProduct = async (req, res, next) => {
         await session.commitTransaction()
         session.endSession()
 
-        console.log("product", product)
         return res.status(200).json({ product })
     }
     catch (error) {
@@ -262,6 +262,8 @@ const getDetailProduct = async (req, res, next) => {
         const idProduct = req.params._id
         let detailProduct = await Product.findOne({ _id: idProduct })
             .populate('idCategory')
+            .populate('discount')
+            .populate('reviews')
             .populate(
                 {
                     path: 'productAttributes',

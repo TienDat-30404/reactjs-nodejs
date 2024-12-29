@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-export default function CartProduct({id, image, name, priceNotDiscount, price, width, height, widthImage, heightImage }) {
+export default function CartProduct({id, image, name, priceNotDiscount, percentDiscount, price, width, height, widthImage, heightImage }) {
     const navigate = useNavigate()
     const switchDetailProduct = () => {
         navigate(`/detail/${id}`)
@@ -19,9 +19,12 @@ export default function CartProduct({id, image, name, priceNotDiscount, price, w
                     <i style={{ fontSize: "11px", color: "orange" }} className="bi bi-star-fill"></i>
                     <i style={{ fontSize: "11px", color: "orange" }} className="bi bi-star-half"></i>
                 </div>
-                {priceNotDiscount && (
-                    <p style={{ fontSize: "16px" }} className="text-decoration-line-through fw-bold">{priceNotDiscount}đ</p>
-                )}
+                {priceNotDiscount ? (
+                    <div className='d-flex'>
+                        <p style={{ fontSize: "16px" }} className="text-decoration-line-through text-danger fw-bold me-2">{priceNotDiscount}</p>
+                        <p>-{percentDiscount}</p>
+                    </div>
+                ) : ""}
 
                 <p style={{ fontSize: "16px" }} className="text-danger fw-bold">{price}đ</p>
             </div>

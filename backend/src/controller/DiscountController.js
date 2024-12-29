@@ -1,4 +1,6 @@
 const Discount = require('../model/DiscountModel')
+
+
 const addDiscount = async(req, res, next) => {
     try 
     {

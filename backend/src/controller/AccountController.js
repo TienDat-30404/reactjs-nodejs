@@ -78,7 +78,6 @@ const sendOtpForCreateAccount = async (req, res, next) => {
 
         // Lưu OTP và thông tin tạm thời vào Redis
         await redisClient.setEx(`otp:${email}`, 300, otp); // Lưu 5 phút
-
         // Gửi OTP qua email
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
