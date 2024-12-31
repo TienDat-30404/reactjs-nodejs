@@ -204,14 +204,14 @@ export default function Detail() {
                         <div className="d-flex align-items-center">
                             {details?.detailProduct?.discount?.length > 0 ? (
                                 <div className='d-flex align-items-center'>
-                                    <h5 className='py-2 text-decoration-line-through text-danger'>{(details?.detailProduct?.productAttributes[size].priceBought * details?.detailProduct?.productAttributes[size].size.sizePriceMultiplier).toLocaleString('vi-VN')}đ</h5>
+                                    <h5 className='py-2 text-decoration-line-through text-danger'>{(details?.detailProduct?.productAttributes[size].priceBought).toLocaleString('vi-VN')}đ</h5>
                                     <h6 className='me-5'>-{((1 - details?.detailProduct?.discount[0].discountValue) * 100).toFixed(0)}%</h6>
                                 </div>
                             ) : ""}
 
                             <h5
                                 className='py-2 text-danger'>
-                                {(details?.detailProduct?.productAttributes[size].priceBought * details?.detailProduct?.productAttributes[size].size.sizePriceMultiplier *
+                                {(details?.detailProduct?.productAttributes[size].priceBought *
                                     (details?.detailProduct?.discount.length > 0 ?
                                         details?.detailProduct?.discount[0].discountValue : 1
                                     )

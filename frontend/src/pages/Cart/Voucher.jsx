@@ -43,7 +43,7 @@ function Voucher(cartsCheck) {
           <Modal.Title>Áp dụng Voucher</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {vouchers && vouchers.length > 0 ? (
+          {vouchers && vouchers?.length > 0 ? (
             vouchers.map((voucher, index) => (
               <div className="card p-2 mb-3" key={index}>
                 <div className='d-flex align-items-center '>

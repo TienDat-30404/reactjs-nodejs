@@ -17,7 +17,7 @@ export default function Payment() {
     // total Price
     const totalPrice = cartsCheck.reduce((sum, cart) =>
         sum +
-        (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity *
+        (cart?.attribute?.priceBought * cart?.quantity *
             (cart?.attribute?.product?.discount?.length > 0 ?
                 cart?.attribute?.product.discount[0].discountValue : 1
             ) * 

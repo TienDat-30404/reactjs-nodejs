@@ -63,7 +63,7 @@ export default function ProductSale() {
                             name={product.name}
                             priceNotDiscount={
                                 product?.discount && product?.discount?.length > 0 ?
-                                    (product?.productAttributes[0]?.priceBought * product?.productAttributes[0]?.size.sizePriceMultiplier).toLocaleString('vi-VN') + "đ"
+                                    (product?.productAttributes[0]?.priceBought ).toLocaleString('vi-VN') + "đ"
                                     :
                                     ""
                             }
@@ -76,9 +76,9 @@ export default function ProductSale() {
                             price=
                             {
                                 product?.discount && product?.discount.length > 0 ?
-                                    (product?.productAttributes[0]?.priceBought * product?.productAttributes[0]?.size.sizePriceMultiplier * product.discount[0].discountValue).toLocaleString('vi-VN')
+                                    (product?.productAttributes[0]?.priceBought * product.discount[0].discountValue).toLocaleString('vi-VN')
                                     :
-                                    (product?.productAttributes[0]?.priceBought * product?.productAttributes[0]?.size.sizePriceMultiplier).toLocaleString('vi-VN')
+                                    (product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN')
                             }
                             widthImage="100px"
                             heightImage="200px"

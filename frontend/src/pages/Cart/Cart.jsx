@@ -95,16 +95,20 @@ export default function Cart() {
     // total Price
     const totalPrice = cartsCheck.reduce((sum, cart) =>
         sum +
-        (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity *
+        (cart?.attribute?.priceBought * cart?.quantity *
             (cart?.attribute?.product?.discount?.length > 0 ?
                 cart?.attribute?.product.discount[0].discountValue : 1
             )
-            // * 
-            // (useVoucher?.length > 0 ? 
-            //     (1 - useVoucher[0]?.discountVoucher) : 1
-            //  )
         )
         , 0)
+    // * cart?.attribute?.product?.discount?.discountValue
+    const totalPriceDiscountProduct = cartsCheck.reduce((sum, cart) =>
+        sum +
+        (
+            cart?.attribute?.product?.discount?.length > 0 ?
+                (1 - cart?.attribute?.product?.discount[0]?.discountValue) * cart?.attribute?.priceBought
+                : 0
+        ), 0)
 
     // switch payment
     const switchPayment = () => {
@@ -116,6 +120,19 @@ export default function Cart() {
     const handleDeleteUserVoucher = () => {
         dispatch(removeUseVoucher())
     }
+
+    const handleCheckAllCart = () => {
+        if(cartsCheck.length > 0)
+        {
+            setCartsCheck([])
+        }
+        else 
+        {
+            setCartsCheck(carts)
+        }
+    }
+
+   
     return (
         <div className='col-12 container mt-4'>
             <h3 style={{ fontSize: '21px', fontWeight: '500', fontFamily: 'Georgia, serif', width: '100%' }}>GIỎ HÀNG</h3>
@@ -123,7 +140,10 @@ export default function Cart() {
                 <div className=' col-8 me-2'>
                     <div className='col-12 d-flex mb-3 bg-white px-2 py-2'>
                         <div className='col-4 d-flex'>
-                            <input style={{ width: '17px', height: '20px', marginRight: '7px' }} type="checkbox" name="" id="" />
+                            <input
+                                onChange={() => handleCheckAllCart()}
+                                style={{ width: '17px', height: '20px', marginRight: '7px' }}
+                                type="checkbox" name="" id="" />
                             <h6 style={{ fontWeight: '400', marginRight: '3px' }}>Tất cả</h6>
                             <h6 style={{ fontWeight: '400' }}>{totalProductInCart} sản phẩm</h6>
                         </div>
@@ -151,7 +171,7 @@ export default function Cart() {
 
                                     <span
                                         className='col-2 '>
-                                        {(cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier *
+                                        {(cart?.attribute?.priceBought *
                                             (cart?.attribute?.product?.discount?.length > 0 ?
                                                 cart?.attribute?.product?.discount[0]?.discountValue : 1
                                             ))
@@ -176,7 +196,7 @@ export default function Cart() {
                                     </div>
                                     <span
                                         className='col-2 text-danger fw-bold'>
-                                        {(cart?.attribute?.priceBought * cart?.attribute?.size.sizePriceMultiplier * cart?.quantity *
+                                        {(cart?.attribute?.priceBought * cart?.quantity *
                                             (cart?.attribute?.product?.discount?.length > 0 ?
                                                 cart?.attribute?.product?.discount[0]?.discountValue : 1
                                             )
@@ -212,7 +232,7 @@ export default function Cart() {
                     <div className='bg-white py-2 px-3'>
                         <div className='d-flex justify-content-between'>
                             <p style={{ fontSize: '14px', fontWeight: '500' }}>Tiki khuyến mãi</p>
-                            <p style={{ fontSize: '14px' }}>Có thể chọn 2</p>
+                            <p style={{ fontSize: '14px' }}>Có thể chọn {carts.length}</p>
                         </div>
                         <div className='d-flex align-items-center mt-3' >
                             <i style={{ fontSize: '20px', color: 'blue' }} className="bi bi-ticket-perforated"></i>
@@ -228,12 +248,12 @@ export default function Cart() {
                                             " (voucher giảm giá " + (useVoucher[0]?.discountVoucher * 100).toFixed(1) + "% tổng hóa đơn)"
                                         }
                                     </p>
-                                    <i onClick={() => handleDeleteUserVoucher()} style = {{ cursor : 'pointer' }} class="bi bi-x fs-5 ms-2 cursor-pointer"></i>
+                                    <i onClick={() => handleDeleteUserVoucher()} style={{ cursor: 'pointer' }} class="bi bi-x fs-5 ms-2 cursor-pointer"></i>
                                 </div>
                             ) :
-                                <p className='ms-2 text-primary'>      
-                
-                                    <Voucher cartsCheck = {cartsCheck} />
+                                <p className='ms-2 text-primary'>
+
+                                    <Voucher cartsCheck={cartsCheck} />
                                 </p>
                             }
                         </div>
@@ -241,10 +261,20 @@ export default function Cart() {
                     <div className='mt-2 bg-white px-3 py-2'>
                         <div className='d-flex justify-content-between'>
                             <p style={{ fontSize: '14px', color: '#888' }}>Tạm tính</p>
+                            <p>
+                                {
+                                    useVoucher && useVoucher?.length > 0 ? (
+                                        totalPrice * (1 - useVoucher[0]?.discountVoucher)
+                                    ) :
+                                        totalPrice
+                                }
+                            </p>
                         </div>
                         <div className='d-flex justify-content-between mt-1 mb-2'>
                             <p style={{ fontSize: '14px', color: '#888' }}>Giảm giá</p>
-                            <p style={{ fontSize: '14px' }}>0đ</p>
+                            <p style={{ fontSize: '14px' }}>
+                                {(totalPriceDiscountProduct).toLocaleString('vi-VN')}
+                            </p>
                         </div>
                         <div className="border-top border-gray"></div>
                         <div className='d-flex justify-content-between mt-1 mb-2'>
