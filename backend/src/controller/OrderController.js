@@ -8,9 +8,13 @@ const addOrder = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction()
     try {
-        const { idUser, totalPrice, address, phone, paymentMethod, bankAccount, products } = req.body
+        const { idUser, totalPrice, address, phone, paymentMethod, bankAccount, products, useVoucher } = req.body
+        // order
+        const orders = await Order.find({ idUser: idUser }).lean();
         const newOrder = new Order({ idUser, totalPrice, address, phone, paymentMethod, bankAccount, products })
         await newOrder.save()
+
+        // orderDetail
         const orderDetails = products.map(product => {
             return {
                 idOrder: newOrder._id,
@@ -19,8 +23,48 @@ const addOrder = async (req, res, next) => {
             }
         })
         await OrderDetail.insertMany(orderDetails)
+
+        // cart
         const cartIds = products.map(product => product._id)
         await Cart.deleteMany({ _id: { $in: cartIds } })
+        console.log("useVoucher", useVoucher)
+        // delete voucher when use 
+        if (useVoucher?.length > 0) {
+            const voucher = await Voucher.updateOne({ _id: useVoucher[0]?._id }, {
+                status: 0
+            })
+        }
+
+        //  add voucher 
+        let totalPriceOrderOfUser = 0
+        if (orders && orders.length > 0) {
+            totalPriceOrderOfUser = orders.reduce((sum, order) => sum + (order.totalPrice), totalPrice)
+        }
+        else {
+            totalPriceOrderOfUser = totalPrice
+        }
+
+        let vouchersOfUser = await Voucher.find({ idUser: idUser });
+        const priceRewardVoucher = 1000000;
+        let currentDiscount = vouchersOfUser?.length > 0
+            ? vouchersOfUser[vouchersOfUser.length - 1]?.discountVoucher
+            : 0.005;
+        for (var i = 1; i <= (Math.floor(totalPriceOrderOfUser) / priceRewardVoucher) - vouchersOfUser?.length; i++) {
+            currentDiscount += 0.005;
+
+            const voucher = new Voucher({
+                idUser,
+                discountVoucher: currentDiscount.toFixed(3),
+                description: "giảm giá "
+                    + ((currentDiscount * 100).toFixed(1))
+                    + "% khi mua hàng đạt mốc " + (vouchersOfUser?.length + i)
+                    + " triệu "
+            });
+
+            await voucher.save();
+        }
+
+
         await session.commitTransaction()
         session.endSession()
         return res.status(200).json({ newOrder, orderDetails })
@@ -33,7 +77,53 @@ const addOrder = async (req, res, next) => {
 }
 
 const getAllOrder = async (req, res, next) => {
-    const orders = await Order.find({})
+    let orders = await Order.find({})
+        .populate('idUser')
+        .populate('idStaff')
+        .populate({
+            path: 'orderDetails',
+            populate: {
+                path: 'idAttribute',
+                model: 'ProductAttribute',
+                populate: [
+                    {
+                        path: 'idProduct',
+                        model: 'Product'
+                    },
+                    {
+                        path: 'idSize',
+                        model: 'Size'
+                    }
+                ]
+
+            }
+        })
+        .lean()
+
+    orders = orders.map(order => {
+
+        order.user = order.idUser
+        order.staff = order.idStaff
+
+        order.orderDetails.map((item, index) => {
+            if (item?.idAttribute && item?.idAttribute.idProduct && item?.idAttribute?.idSize) {
+                console.log(index, item.idAttribute)
+                item.idAttribute.product = item.idAttribute.idProduct
+                item.idAttribute.size = item.idAttribute.idSize
+
+                delete item.idAttribute.idProduct
+                delete item.idAttribute.idSize
+            }
+            item.attribute = item.idAttribute
+            delete item.idAttribute
+        })
+
+        delete order.idUser
+        delete order.idStaff
+        return order
+    })
+
+
     return res.status(200).json({ orders })
 }
 
@@ -72,11 +162,10 @@ const confirmOrder = async (req, res, next) => {
             idStaff: idStaff,
         }
     }
-    else 
-    {
+    else {
         data = {
-            isStatus : isStatus,
-            idStaff : null
+            isStatus: isStatus,
+            idStaff: null
         }
     }
     try {

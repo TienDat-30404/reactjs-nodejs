@@ -8,6 +8,7 @@ import { addOrder } from '../../services/OrderService';
 import { toast, ToastContainer } from 'react-toastify';
 export default function Payment() {
     const nagigate = useNavigate()
+    const useVoucher = useSelector(state => state?.vouchers?.useVoucher)
     let { isAuthenticated, userData, dataCart } = useSelector(state => state.auth)
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const location = useLocation();
@@ -19,7 +20,12 @@ export default function Payment() {
         (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity *
             (cart?.attribute?.product?.discount?.length > 0 ?
                 cart?.attribute?.product.discount[0].discountValue : 1
+            ) * 
+            (
+                useVoucher?.length > 0 ? 
+                (1 - useVoucher[0]?.discountVoucher) : 1
             )
+
         )
         , 0)
 
@@ -124,18 +130,19 @@ export default function Payment() {
         const response = await addOrder({
             idUser,
             totalPrice,
-            phone: informations.phone,
+            phone: informations?.phone,
             address:
-                informations.province && informations.district && informations.ward && informations.address
-                    ? ` ${provinces.find(province => province.id === informations.province).name}, ${districts.find(district => district.id === informations.district).name}, ${wards.find(ward => ward.id === informations.ward).name}, ${informations.address}`
+                informations?.province && informations?.district && informations?.ward && informations?.address
+                    ? ` ${provinces.find(province => province?.id === informations?.province)?.name}, ${districts.find(district => district?.id === informations?.district)?.name}, ${wards.find(ward => ward?.id === informations?.ward)?.name}, ${informations?.address}`
                     :
                     "",
-            paymentMethod: informations.paymentMethod ?
-                banks.find(bank => bank.id === parseInt(informations.paymentMethod)).name : 'Thanh toán sau khi nhận hàng',
+            paymentMethod: informations?.paymentMethod ?
+                banks.find(bank => bank?.id === parseInt(informations?.paymentMethod))?.name : 'Thanh toán sau khi nhận hàng',
 
-            bankAccount: informations.bankAccount,
+            bankAccount: informations?.bankAccount,
             products: cartsCheck,
-            totalPrice: totalPrice
+            totalPrice: totalPrice,
+            useVoucher : useVoucher
 
         })
         console.log(response)
@@ -148,7 +155,7 @@ export default function Payment() {
             return
         }
         const idProductCartCheck = new Set(cartsCheck.map(item => item.idProduct));
-        dataCart = dataCart.carts.filter(item => !idProductCartCheck.has(item.idProduct));
+        dataCart = dataCart?.carts?.filter(item => !idProductCartCheck.has(item.idProduct));
         toast("Đặt hàng thành công")
         setTimeout(() => {
             nagigate('/')

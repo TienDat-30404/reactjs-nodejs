@@ -22,6 +22,7 @@ ProductSchema.virtual('productAttributes', {
     localField: '_id',      
     foreignField: 'idProduct', 
 });
+
 ProductSchema.virtual('discount', {
     ref: 'Discount', 
     localField: '_id',      

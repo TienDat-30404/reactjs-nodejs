@@ -5,6 +5,7 @@ const VoucherSchema = Schema(
         idUser : {type : Schema.Types.ObjectId, ref : 'User'},
         discountVoucher : {type : Number, default : 0.02},
         description : {type : String},
+        status : {type : Number, default : 1},
         deletedAt : {type : Date, default : null}
     }, 
     {

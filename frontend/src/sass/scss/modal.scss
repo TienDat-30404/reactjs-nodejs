@@ -1,0 +1,17 @@
+.modal-wide .modal-dialog {
+  max-width: 45%; 
+  margin: auto; 
+}
+
+.modal-wide .modal-content {
+  height: 500px;
+  overflow-y: auto; 
+}
+.modal-header,
+.modal-footer {
+  position: sticky;
+  top: 0; 
+  bottom: 0; 
+  z-index: 10; 
+  background-color: #fff; 
+}

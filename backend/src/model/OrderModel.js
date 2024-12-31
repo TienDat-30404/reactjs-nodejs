@@ -15,7 +15,11 @@ const OrderSchema = new Schema(
     },
     { timestamps: true });
 
-
+OrderSchema.virtual('orderDetails', {
+    ref : 'OrderDetail', 
+    localField : '_id',
+    foreignField : 'idOrder'
+})
 
 const Order = mongoose.model('Order', OrderSchema);
 module.exports = Order;

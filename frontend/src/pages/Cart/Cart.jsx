@@ -1,14 +1,13 @@
 import React, { useCallback } from 'react'
 import { useState, useEffect } from 'react'
-import CartProduct from '../../components/CartProduct'
-import { getAllProduct } from '../../services/ProductService'
 import { getAllCart, deleteCart, updateQuantityCart } from '../../services/CartService'
 import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
-import { useSaveCartOnRedux } from '../../until/tokenUser'
 import { useSelector, useDispatch } from 'react-redux'
-import { refreshTokenService } from '../../services/UserService'
-import { initDataCart, switchPage, updateQuantity, deleteCartRedux } from '../../redux/Cart/cartsSlice'
+import { initDataCart, switchPage, updateQuantity } from '../../redux/Cart/cartsSlice'
+import Voucher from './Voucher'; // Import component Voucher
+import { removeUseVoucher } from '../../redux/Voucher/vouchersSlice'
+
 export default function Cart() {
 
     const dispatch = useDispatch()
@@ -19,6 +18,8 @@ export default function Cart() {
     const page = useSelector(state => state.carts.page)
     const totalPage = useSelector(state => state.carts.totalPage)
     // const limit = useSelector(state => state.carts.limit)
+    const useVoucher = useSelector(state => state?.vouchers?.useVoucher)
+    console.log(useVoucher)
     const limit = 2;
     const totalProductInCart = useSelector(state => state.carts.totalProductInCart)
     const { idUser } = useParams()
@@ -95,9 +96,13 @@ export default function Cart() {
     const totalPrice = cartsCheck.reduce((sum, cart) =>
         sum +
         (cart?.attribute?.priceBought * cart?.attribute?.size?.sizePriceMultiplier * cart?.quantity *
-            (cart?.attribute?.product?.discount?.length > 0 ? 
+            (cart?.attribute?.product?.discount?.length > 0 ?
                 cart?.attribute?.product.discount[0].discountValue : 1
             )
+            // * 
+            // (useVoucher?.length > 0 ? 
+            //     (1 - useVoucher[0]?.discountVoucher) : 1
+            //  )
         )
         , 0)
 
@@ -106,6 +111,10 @@ export default function Cart() {
         if (cartsCheck.length > 0) {
             navigate('/payment', { state: { cartsCheck } })
         }
+    }
+
+    const handleDeleteUserVoucher = () => {
+        dispatch(removeUseVoucher())
     }
     return (
         <div className='col-12 container mt-4'>
@@ -207,13 +216,31 @@ export default function Cart() {
                         </div>
                         <div className='d-flex align-items-center mt-3' >
                             <i style={{ fontSize: '20px', color: 'blue' }} className="bi bi-ticket-perforated"></i>
-                            <p style={{ fontWeight: '500', fontSize: '14px', fontWeight: '400', cursor: 'pointer' }} className='ms-2 text-primary'>Chọn hoặc nhập Khuyến mãi khác </p>
+                            {useVoucher && useVoucher[0]?.discountVoucher ? (
+                                <div className='d-flex align-items-center'>
+                                    <p style={{ fontWeight: '500', fontSize: '14px', fontWeight: '400', cursor: 'pointer' }} className='ms-2 text-danger'>
+
+                                        {"-" + (totalPrice * useVoucher[0]?.discountVoucher).toLocaleString('vi-VN') + "đ"}
+
+                                    </p>
+                                    <p style={{ fontWeight: '500', fontSize: '14px', fontWeight: '400', cursor: 'pointer' }} className='ms-2 text-primary'>
+                                        {
+                                            " (voucher giảm giá " + (useVoucher[0]?.discountVoucher * 100).toFixed(1) + "% tổng hóa đơn)"
+                                        }
+                                    </p>
+                                    <i onClick={() => handleDeleteUserVoucher()} style = {{ cursor : 'pointer' }} class="bi bi-x fs-5 ms-2 cursor-pointer"></i>
+                                </div>
+                            ) :
+                                <p className='ms-2 text-primary'>      
+                
+                                    <Voucher cartsCheck = {cartsCheck} />
+                                </p>
+                            }
                         </div>
                     </div>
                     <div className='mt-2 bg-white px-3 py-2'>
                         <div className='d-flex justify-content-between'>
                             <p style={{ fontSize: '14px', color: '#888' }}>Tạm tính</p>
-                            {/* <p style={{ fontSize: '14px' }}>{totalPrice.toLocaleString('vi-VN')}đ</p> */}
                         </div>
                         <div className='d-flex justify-content-between mt-1 mb-2'>
                             <p style={{ fontSize: '14px', color: '#888' }}>Giảm giá</p>
@@ -223,7 +250,13 @@ export default function Cart() {
                         <div className='d-flex justify-content-between mt-1 mb-2'>
                             <p style={{ fontSize: '14px', fontWeight: '500' }}>Tổng tiền</p>
                             {cartsCheck.length > 0 ? (
-                                <p style={{ color: 'red', fontWeight: '500', fontSize: '20px' }}>{totalPrice.toLocaleString('vi-VN')}đ</p>
+                                <p style={{ color: 'red', fontWeight: '500', fontSize: '20px' }}>
+                                    {(totalPrice * (
+                                        useVoucher?.length > 0 ? (1 - useVoucher[0].discountVoucher) : 1
+                                    ))
+                                        .toLocaleString('vi-VN')}
+                                    đ
+                                </p>
                             ) :
                                 <p style={{ fontSize: '14px' }}>Vui lòng chọn sản phẩm nếu có</p>
                             }

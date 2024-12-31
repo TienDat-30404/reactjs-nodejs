@@ -6,6 +6,7 @@ import categoriesReducer from './Category/categoriesSlice'
 import usersReducer from './User/usersSlice'
 import rolesReducer from './Role/rolesSlice'
 import reviewsReducer from './Review/reviewsSlice'
+import vouchersReducer from './Voucher/vouchersSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -14,6 +15,7 @@ export default configureStore({
     categories : categoriesReducer,
     users : usersReducer,
     roles : rolesReducer,
-    reviews : reviewsReducer
+    reviews : reviewsReducer,
+    vouchers : vouchersReducer
   }
 })
