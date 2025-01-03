@@ -3,7 +3,6 @@ const Size = require('../model/SizeModel')
 const ProductAttribute = require('../model/ProductAttribute')
 const cloudinary = require('../config/cloudinary');
 const mongoose = require('mongoose')
-
 const getAllProduct = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -11,67 +10,76 @@ const getAllProduct = async (req, res, next) => {
         const startPage = (page - 1) * limit;
 
         const sortBy = req.query.sortBy || 'idProduct';
-        const type = req.query.type === "asc" ? 1 : -1; // Tăng dần hoặc giảm dần
+        const type = req.query.type === "asc" ? 1 : -1;
         const objectSort = {};
-        objectSort[sortBy] = type;  
+        objectSort[sortBy] = type;
 
-        const objectFilter = { deletedAt: null };
+        const objectFilter = {};
+
         if (req.query.idProduct) {
             objectFilter._id = req.query.idProduct;
         }
         if (req.query.idCategory) {
             objectFilter.idCategory = req.query.idCategory;
         }
-
         if (req.query.search) {
-            objectFilter.name = new RegExp(req.query.search, 'i');
+            objectFilter.name = { $regex: req.query.search, $options: 'i' };
         }
 
+        let productIds = null;
         if (req.query.priceFrom && req.query.priceTo) {
             const priceFrom = parseFloat(req.query.priceFrom);
             const priceTo = parseFloat(req.query.priceTo);
-            objectFilter.price = { $gte: priceFrom, $lte: priceTo };
+            let query = { priceBought: { $gte: priceFrom, $lte: priceTo } }
+            if (sortBy && type) {
+                query = ProductAttribute.find(query).sort(objectSort)
+            }
+            else 
+            {
+                query = ProductAttribute.find(query)
+            }
+
+            const attributes = await query.select('idProduct');
+            productIds = attributes.map(attr => attr.idProduct);
+        }
+        else if(sortBy && type)
+        {
+            const attributes = await ProductAttribute.find({}).sort(objectSort).select('idProduct')
+            productIds = attributes.map(attr => attr.idProduct);
+
         }
 
-        if (req.query.quantity) {
-            const quantity = parseInt(req.query.quantity);
-            objectFilter.quantity = { $lte: quantity };
+        if (productIds) {
+            objectFilter._id = { $in: productIds };
         }
+        const totalProduct = await Product.countDocuments(objectFilter);
 
-        const totalProduct = Object.keys(objectFilter).length === 0
-            ? await Product.countDocuments({ deletedAt: null })
-            : await Product.countDocuments(objectFilter);
-
-        let products;
-        if (page) {
-            products = await Product.find(objectFilter)
-                .skip(startPage)
-                .limit(limit)
-                .sort(objectSort)
-                .populate('idCategory')
-
-                .populate('discount')
-                .populate({
-                    path: 'productAttributes', // Populate từ ProductAttribute
-                    populate: {
-                        path: 'idSize', // Populate từ Size thông qua idSize trong ProductAttribute
-                        model: 'Size', // Chỉ rõ model là Size
-                    },
-                })
-                .lean();
-        } else {
-            products = await Product.find(objectFilter)
-                .sort(objectSort)
-                .populate('idCategory')
-
-                .lean();
-        }
-
-        products = products.map(product => {
-            product.productAttributes.map(item => {
-                item.size = item.idSize
-                delete item.idSize
+        let products = await Product.find(objectFilter)
+            .skip(startPage)
+            .limit(limit)
+            .populate('idCategory')
+            .populate('discount')
+            .populate({
+                path: 'productAttributes',
+                populate: {
+                    path: 'idSize',
+                    model: 'Size',
+                },
             })
+            .lean();
+
+        if (productIds) {
+            const productIdsString = productIds.map(id => id.toString());
+            products = products.sort((a, b) =>
+                productIdsString.indexOf(a._id.toString()) - productIdsString.indexOf(b._id.toString())
+            );
+        }
+
+        const formattedProducts = products.map(product => {
+            product.productAttributes.map(item => {
+                item.size = item.idSize;
+                delete item.idSize;
+            });
             if (product.idCategory) {
                 product.category = product.idCategory;
                 delete product.idCategory;
@@ -79,9 +87,9 @@ const getAllProduct = async (req, res, next) => {
             return product;
         });
 
-        const totalPage = page ? Math.ceil(totalProduct / limit) : 'all';
+        const totalPage = Math.ceil(totalProduct / limit);
         return res.status(200).json({
-            products,
+            products: formattedProducts,
             page,
             totalProduct,
             totalPage,
@@ -89,9 +97,10 @@ const getAllProduct = async (req, res, next) => {
             limit,
         });
     } catch (error) {
-        next(error);
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 };
+
 
 const addProduct = async (req, res, next) => {
     const session = await mongoose.startSession();
@@ -273,7 +282,7 @@ const getDetailProduct = async (req, res, next) => {
                     }
                 }
             )
-            
+
         detailProduct = detailProduct.toObject()
         detailProduct.productAttributes.map(item => {
             if (item.idSize) {

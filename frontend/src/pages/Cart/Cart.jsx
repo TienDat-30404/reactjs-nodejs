@@ -19,7 +19,6 @@ export default function Cart() {
     const totalPage = useSelector(state => state.carts.totalPage)
     // const limit = useSelector(state => state.carts.limit)
     const useVoucher = useSelector(state => state?.vouchers?.useVoucher)
-    console.log(useVoucher)
     const limit = 2;
     const totalProductInCart = useSelector(state => state.carts.totalProductInCart)
     const { idUser } = useParams()
@@ -28,8 +27,6 @@ export default function Cart() {
     const fetchDataCarts = async () => {
         let query = `idUser=${idUser}&page=${page}&limit=${limit}`
         const response = await getAllCart(query)
-
-        console.log(response)
         if (response) {
             dispatch(initDataCart(response))
         }

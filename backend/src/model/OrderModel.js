@@ -4,6 +4,7 @@ const OrderSchema = new Schema(
     {
         idUser : {type: Schema.Types.ObjectId, ref : 'User', required : true},
         idStaff : {type: Schema.Types.ObjectId, ref : 'User', default : null},
+        idVoucher : {type : Schema.Types.ObjectId, ref : 'Voucher', default : null},
         totalPrice : {type : Number, required : true},
         phone : {type : String, required : true},
         address : {type : String, required : true},

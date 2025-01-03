@@ -1,29 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import ImageComponent from '../../components/ImageComponent'
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { InputComponent } from '../../components/InputComponent';
 import { ErrorMessageInput } from '../../components/InputComponent';
 import { addOrder } from '../../services/OrderService';
 import { toast, ToastContainer } from 'react-toastify';
+import { addVoucher, deleteVoucher } from '../../redux/Voucher/vouchersSlice';
+import { removeUseVoucher } from '../../redux/Voucher/vouchersSlice';
 export default function Payment() {
+    const dispatch = useDispatch()
     const nagigate = useNavigate()
     const useVoucher = useSelector(state => state?.vouchers?.useVoucher)
     let { isAuthenticated, userData, dataCart } = useSelector(state => state.auth)
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const location = useLocation();
     let { cartsCheck } = location.state || {};
-    console.log("payments", cartsCheck)
     // total Price
     const totalPrice = cartsCheck.reduce((sum, cart) =>
         sum +
         (cart?.attribute?.priceBought * cart?.quantity *
             (cart?.attribute?.product?.discount?.length > 0 ?
                 cart?.attribute?.product.discount[0].discountValue : 1
-            ) * 
+            ) *
             (
-                useVoucher?.length > 0 ? 
-                (1 - useVoucher[0]?.discountVoucher) : 1
+                useVoucher?.length > 0 ?
+                    (1 - useVoucher[0]?.discountVoucher) : 1
             )
 
         )
@@ -142,7 +144,7 @@ export default function Payment() {
             bankAccount: informations?.bankAccount,
             products: cartsCheck,
             totalPrice: totalPrice,
-            useVoucher : useVoucher
+            useVoucher: useVoucher
 
         })
         console.log(response)
@@ -154,12 +156,20 @@ export default function Payment() {
             alert("Lỗi khi thanh toán")
             return
         }
-        const idProductCartCheck = new Set(cartsCheck.map(item => item.idProduct));
-        dataCart = dataCart?.carts?.filter(item => !idProductCartCheck.has(item.idProduct));
-        toast("Đặt hàng thành công")
-        setTimeout(() => {
-            nagigate('/')
-        }, 2500)
+        if(response && response.status === 201)
+        {
+            const idProductCartCheck = new Set(cartsCheck.map(item => item.idProduct));
+            dataCart = dataCart?.carts?.filter(item => !idProductCartCheck.has(item.idProduct));
+            dispatch(deleteVoucher(useVoucher[0]?._id))
+            dispatch(removeUseVoucher())
+            response.voucherAdded.map((voucher) => {
+                dispatch(addVoucher(voucher))
+            })
+            toast("Đặt hàng thành công")
+            setTimeout(() => {
+                nagigate('/')
+            }, 2500)
+        }
     }
     return (
         <div>

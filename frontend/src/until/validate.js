@@ -37,7 +37,5 @@ const createQueryStringForSearch = (nameSearch, idCategory, priceFrom, priceTo) 
 }
 
 
-const validateAddProduct = () => {
-    
-}
+
 export {validateSearchAdvanced, createQueryStringForSearch}

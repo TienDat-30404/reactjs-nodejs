@@ -21,7 +21,6 @@ export const useAuthHandler = () => {
     const handleRefreshToken = async () => {
         try {
             const refreshToken = await refreshTokenService()
-            console.log(refreshToken)
             if (refreshToken.success) {
                 setCookieForToken(refreshToken.tokenNew);
                 saveTokenOnRedux(jwtDecode(refreshToken.tokenNew));
@@ -34,15 +33,9 @@ export const useAuthHandler = () => {
     };
   
 
-
     useEffect(() => {
         checkAndUpdateToken();
     }, []);
-
-
-
-
-
 
     return { checkAndUpdateToken };
 };

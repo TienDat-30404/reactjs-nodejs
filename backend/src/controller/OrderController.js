@@ -3,6 +3,7 @@ const Cart = require('../model/CartModel')
 const Voucher = require('../model/VoucherModel')
 const Product = require('../model/ProductModel')
 const OrderDetail = require('../model/OrderDetailModel')
+const Notification = require('../model/NotificationModel')
 const { default: mongoose } = require('mongoose')
 const addOrder = async (req, res, next) => {
     const session = await mongoose.startSession();
@@ -11,7 +12,7 @@ const addOrder = async (req, res, next) => {
         const { idUser, totalPrice, address, phone, paymentMethod, bankAccount, products, useVoucher } = req.body
         // order
         const orders = await Order.find({ idUser: idUser }).lean();
-        const newOrder = new Order({ idUser, totalPrice, address, phone, paymentMethod, bankAccount, products })
+        const newOrder = new Order({ idUser, totalPrice, address, phone, paymentMethod, bankAccount, products, idVoucher: useVoucher[0]?._id })
         await newOrder.save()
 
         // orderDetail
@@ -27,7 +28,6 @@ const addOrder = async (req, res, next) => {
         // cart
         const cartIds = products.map(product => product._id)
         await Cart.deleteMany({ _id: { $in: cartIds } })
-        console.log("useVoucher", useVoucher)
         // delete voucher when use 
         if (useVoucher?.length > 0) {
             const voucher = await Voucher.updateOne({ _id: useVoucher[0]?._id }, {
@@ -35,7 +35,7 @@ const addOrder = async (req, res, next) => {
             })
         }
 
-        //  add voucher 
+        //  add voucher && add notification when receive voucher
         let totalPriceOrderOfUser = 0
         if (orders && orders.length > 0) {
             totalPriceOrderOfUser = orders.reduce((sum, order) => sum + (order.totalPrice), totalPrice)
@@ -49,6 +49,8 @@ const addOrder = async (req, res, next) => {
         let currentDiscount = vouchersOfUser?.length > 0
             ? vouchersOfUser[vouchersOfUser.length - 1]?.discountVoucher
             : 0.005;
+        let voucherAdded = []
+        let notificationAdded = []
         for (var i = 1; i <= (Math.floor(totalPriceOrderOfUser) / priceRewardVoucher) - vouchersOfUser?.length; i++) {
             currentDiscount += 0.005;
 
@@ -60,14 +62,25 @@ const addOrder = async (req, res, next) => {
                     + "% khi mua hàng đạt mốc " + (vouchersOfUser?.length + i)
                     + " triệu "
             });
-
             await voucher.save();
+            voucherAdded.push(voucher)
+            
+
+            const notification = new Notification({
+                idUser,
+                content: "Chúc mừng bạn nhận được voucher giảm giá " +
+                    ((currentDiscount * 100).toFixed(1))
+                    + "% khi mua hàng đạt mốc " + (vouchersOfUser?.length + i)
+                    + " triệu "
+            })
+            notificationAdded.push(notification)
+            await notification.save()
         }
 
 
         await session.commitTransaction()
         session.endSession()
-        return res.status(200).json({ newOrder, orderDetails })
+        return res.status(200).json({ newOrder, orderDetails, voucherAdded, notificationAdded, status : 201 })
     }
     catch (error) {
         await session.abortTransaction();
@@ -80,6 +93,7 @@ const getAllOrder = async (req, res, next) => {
     let orders = await Order.find({})
         .populate('idUser')
         .populate('idStaff')
+        .populate('idVoucher')
         .populate({
             path: 'orderDetails',
             populate: {
@@ -104,6 +118,7 @@ const getAllOrder = async (req, res, next) => {
 
         order.user = order.idUser
         order.staff = order.idStaff
+        order.voucher = order.idVoucher
 
         order.orderDetails.map((item, index) => {
             if (item?.idAttribute && item?.idAttribute.idProduct && item?.idAttribute?.idSize) {
@@ -120,6 +135,7 @@ const getAllOrder = async (req, res, next) => {
 
         delete order.idUser
         delete order.idStaff
+        delete order.idVoucher
         return order
     })
 

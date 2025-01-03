@@ -27,6 +27,7 @@ export default function Search() {
     useEffect(() => {
         const fetchDatasSearchProduct = async () => {
             var query = `page=${page}&sortBy=${sort}&type=${type}&limit=${limit}`
+            console.log(query)
             if (idCategory) {
                 query += `&idCategory=${idCategory}`
             }
@@ -40,6 +41,7 @@ export default function Search() {
                 query += `&priceTo=${priceTo}`
             }
             const response = await getAllProduct(query)
+            console.log("response", response)
             if (response) {
                 dispatch(initDataProduct(response))
             }
@@ -67,12 +69,12 @@ export default function Search() {
 
     // arrange price
     const handleSortChange = (e) => {
-        if (e.target.value === "priceAsc") {
-            setSort('price');
+        if (e.target.value === "priceBoughtAsc") {
+            setSort('priceBought');
             setType('asc')
         }
-        else if (e.target.value === 'priceDesc') {
-            setSort('price')
+        else if (e.target.value === 'priceBoughtDesc') {
+            setSort('priceBought')
             setType('desc')
         }
         else {
@@ -80,7 +82,9 @@ export default function Search() {
             setType('asc')
         }
         dispatch(switchPage(1))
+        
     }
+
     return (
         <div className="container d-flex">
             <div className="row col-12 mt-2">
@@ -132,9 +136,9 @@ export default function Search() {
                     <div className='d-flex align-items-center mt-2'>
                         <p style={{ fontSize: '16px', color: '#888', fontWeight: '400' }}>Sắp xếp</p>
                         <select className='ms-3 rounded-3 py-1' name="" id="" value={`${sort}${type === 'asc' ? 'Asc' : 'Desc'}`} onChange={handleSortChange}>
-                            <option value="">Phổ biến</option>
-                            <option value="priceAsc">Giá thấp đến cao</option>
-                            <option value="priceDesc">Giá cao đến thấp</option>
+                            <option value="">Mặc định</option>
+                            <option value="priceBoughtAsc">Giá thấp đến cao</option>
+                            <option value="priceBoughtDesc">Giá cao đến thấp</option>
                         </select>
                     </div>
                 </div>
@@ -144,14 +148,29 @@ export default function Search() {
                             <div className='d-flex'>
                                 {products.map((product, index) => (
                                     <CartProduct
+                                        key={index}
                                         id={product._id}
-                                        ket={index}
-                                        width="300px"
-                                        widthImage="300px"
-                                        heightImage="300px"
-                                        name={product.name}
                                         image={product.image}
-                                        price={(product.price).toLocaleString('vi-VN')}
+                                        name={product.name}
+                                        priceNotDiscount={
+                                            product?.discount && product?.discount?.length > 0 ?
+                                                (product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN') + "đ"
+                                                :
+                                                ""
+                                        }
+                                        percentDiscount={
+                                            product?.discount && product?.discount?.length > 0 ?
+                                                ((1 - product.discount[0].discountValue) * 100).toFixed(0) + "%"
+                                                :
+                                                ""
+                                        }
+                                        price=
+                                        {
+                                            product?.discount && product?.discount.length > 0 ?
+                                                (product?.productAttributes[0]?.priceBought * product.discount[0].discountValue).toLocaleString('vi-VN')
+                                                :
+                                                (product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN')
+                                        }
                                     />
                                 ))}
                             </div>

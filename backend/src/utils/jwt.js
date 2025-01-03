@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const generateToken = (payload) => {
     return jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: '5s',
+        expiresIn: '15s',
     });
 };
 
@@ -11,13 +11,19 @@ const generateRefreshToken = (payload) => {
     });
 };
 
+const generateAccessToken = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: '15s',
+    });
+};
+
 const refreshToken = async (token) => {
     return new Promise((resolve, reject) => {
         jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, user) => {
             if (err) {
                 return reject(err);
             }
-            const accessToken = generateRefreshToken({
+            const accessToken = generateAccessToken({
                 idUser : user.idUser,
                 name : user.name,
                 userName : user.userName,

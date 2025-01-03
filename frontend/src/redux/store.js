@@ -7,6 +7,7 @@ import usersReducer from './User/usersSlice'
 import rolesReducer from './Role/rolesSlice'
 import reviewsReducer from './Review/reviewsSlice'
 import vouchersReducer from './Voucher/vouchersSlice'
+import notificationsReducer from './Notification/notificationsSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -16,6 +17,7 @@ export default configureStore({
     users : usersReducer,
     roles : rolesReducer,
     reviews : reviewsReducer,
-    vouchers : vouchersReducer
+    vouchers : vouchersReducer,
+    notifications : notificationsReducer
   }
 })

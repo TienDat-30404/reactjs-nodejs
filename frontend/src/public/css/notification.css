@@ -1,0 +1,13 @@
+.notification {
+  width: 400px;
+  z-index: 3;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: 600px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/*# sourceMappingURL=notification.css.map */

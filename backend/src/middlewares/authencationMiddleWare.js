@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
+const refreshTokenJWT = require('../utils/jwt')
+
 const authencationMiddleWare = (req, res, next) => {
-    // Kiểm tra sự tồn tại của tiêu đề Authorization
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
         return res.status(401).json({
@@ -9,9 +10,7 @@ const authencationMiddleWare = (req, res, next) => {
         });
     }
 
-    // Tách token từ tiêu đề Authorization
     const token = authHeader.split(' ')[1];
-    console.log(token)
     if (!token) {
         return res.status(401).json({
             status: "Error",
@@ -19,7 +18,6 @@ const authencationMiddleWare = (req, res, next) => {
         });
     }
 
-    // Xác thực token
     jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, user) => {
         if (err) {
             console.log(err.message)
@@ -29,9 +27,8 @@ const authencationMiddleWare = (req, res, next) => {
             });
         }
 
-        // Kiểm tra vai trò của người dùng
         if (user.idRole === 0) {
-            req.user = user; // Lưu thông tin người dùng vào req để sử dụng sau
+            req.user = user; 
             next();
         } else if (user.idRole === 1) {
             return res.status(403).json({
@@ -44,4 +41,42 @@ const authencationMiddleWare = (req, res, next) => {
         }
     });
 };
-module.exports = authencationMiddleWare
+
+
+const authenticateToken = async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        let accessToken = authHeader && authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
+            
+        } catch (err) {
+            if (err.name === 'TokenExpiredError') {
+                const refreshToken = req.cookies.refreshToken;
+                if (!refreshToken) {
+                    return res.status(403).json({ message: 'Refresh token not found' });
+                }
+                try 
+                {
+                    const newAccessToken = await refreshTokenJWT.refreshToken(refreshToken);
+                    decoded = jwt.verify(newAccessToken, process.env.JWT_SECRET);
+                    res.setHeader('Authorization', `Bearer ${newAccessToken}`);
+                }
+                catch(err)
+                {
+                    return res.status(403).json({ message: 'Invalid refresh token' });
+
+                }
+            } else {
+                return res.status(403).json({ message: 'Invalid access token' });
+            }
+        }
+        req.user = decoded;
+        next();
+    } catch (err) {
+        next(err); 
+    }
+};
+
+module.exports = {authencationMiddleWare, authenticateToken}

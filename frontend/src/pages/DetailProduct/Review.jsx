@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 import { addReview, getAllReviewOfProduct } from '../../services/ReviewService'
-import dayjs from 'dayjs';
+import { formatTime } from '../../until/function'
 
 export default function Review({ idProduct }) {
   const dispatch = useDispatch()
@@ -55,17 +55,7 @@ export default function Review({ idProduct }) {
     return () => window.removeEventListener("scroll", debouncedLoadMoreReviews);
   }, [idProduct, loadMoreReviews])
 
-  const formatTime = (createdAt) => {
-    const now = dayjs();
-    const diffMinutes = now.diff(dayjs(createdAt), 'minute');
-    const diffHours = now.diff(dayjs(createdAt), 'hour');
-    const diffDays = now.diff(dayjs(createdAt), 'day');
-
-    if (diffMinutes < 1) return "Vừa xong";
-    if (diffMinutes < 60) return `${diffMinutes} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    return `${diffDays} ngày trước`;
-  };
+  
 
   const handleClick = (index) => {
     setRating(rating === index ? 0 : index);

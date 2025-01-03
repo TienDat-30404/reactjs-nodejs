@@ -13,16 +13,22 @@ import { switchPage } from "../../redux/Products/productsSlice";
 import { getAllCart } from "../../services/CartService";
 import { initDataCart } from "../../redux/Cart/cartsSlice";
 import { toast } from "react-toastify";
+import { getNotificationOfUser } from "../../services/NotificationService";
+import { initDataNotification } from "../../redux/Notification/notificationsSlice";
+import Notification from "./Notification";
 const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
     const [showModal, setShowModal] = useState(false);
     const displaySearchAdvanced = () => {
         setShowModal(true);
     };
-
+    const [showNotification, setShowNotification] = useState(false)
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [word, setWord] = useState('');
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const notifications = useSelector(state => state?.notifications?.data)
+    const totalNotification = useSelector(state => state?.notifications.totalNotification)
+    const limit = useSelector(state => state?.notifications?.limit)
     const idUser = isAuthenticated && userData.dataLogin.idUser
     const handleClickLogout = () => {
         toast.success("Đang đăng xuất")
@@ -43,15 +49,41 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     useEffect(() => {
         const fetchDatasCart = async () => {
             if (isAuthenticated && userData) {
-                const query = `idUser=${idUser}`
-                const response = await getAllCart(query)
-                if (response) {
-                    dispatch(initDataCart(response))
+                try {
+                    const response = await getAllCart(`idUser=${idUser}`)
+                    if (response) {
+                        dispatch(initDataCart(response))
+                    }
+                }
+                catch (err) {
+                    console.error("Error fetching data cart :", err);
                 }
             }
         }
         fetchDatasCart()
     }, [idUser])
+
+    useEffect(() => {
+        const fetchDataNotification = async () => {
+            const response = await getNotificationOfUser(`limit=${limit}`)
+            if (response) {
+                console.log(response)
+                dispatch(initDataNotification(response))
+            }
+        }
+        fetchDataNotification()
+
+        // const fetchDataNotification = async () => {
+        //     let response = await getNotificationOfUser(`limit=${limit}`)
+        //     setTimeout(() => {
+        //         if (response) {
+        //             console.log(response)
+        //             dispatch(initDataNotification(response))
+        //         }
+        //     }, 200)
+        // }
+        // fetchDataNotification()
+    }, [limit])
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -99,7 +131,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
         dispatch(switchPage(1))
         navigate(`/search?find=${word}`)
     }
-
+    
     return (
         <div>
             <div className="bg-white">
@@ -203,6 +235,22 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                             </span>
                                                         )}
                                                     </button>
+                                                </li>
+                                                <li  style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
+                                                    <i onClick={() => setShowNotification(!showNotification)} style={{ cursor: "pointer" }} class="bi bi-bell btn position-relative">
+                                                        {idUser && (
+                                                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                                {notifications ? (
+                                                                    totalNotification
+                                                                ) :
+                                                                    <div className="position-absolute top-50 start-50 translate-middle text-center w-100">
+                                                                        <div className="spinner-border text-primary" role="status"></div>
+                                                                    </div>
+                                                                }
+                                                            </span>
+                                                        )}
+                                                    </i>
+                                                    <Notification show={showNotification} data1 = {notifications} />
                                                 </li>
                                             </ul>
                                         </div>
