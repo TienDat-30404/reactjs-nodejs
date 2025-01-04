@@ -13,8 +13,6 @@ import { switchPage } from "../../redux/Products/productsSlice";
 import { getAllCart } from "../../services/CartService";
 import { initDataCart } from "../../redux/Cart/cartsSlice";
 import { toast } from "react-toastify";
-import { getNotificationOfUser } from "../../services/NotificationService";
-import { initDataNotification } from "../../redux/Notification/notificationsSlice";
 import Notification from "./Notification";
 const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
     const [showModal, setShowModal] = useState(false);
@@ -27,9 +25,9 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     const [word, setWord] = useState('');
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const notifications = useSelector(state => state?.notifications?.data)
-    const totalNotification = useSelector(state => state?.notifications.totalNotification)
-    const limit = useSelector(state => state?.notifications?.limit)
+    const totalNotificationNotRead = useSelector(state => state?.notifications.totalNotificationNotRead)
     const idUser = isAuthenticated && userData.dataLogin.idUser
+
     const handleClickLogout = () => {
         toast.success("Đang đăng xuất")
         setTimeout(() => {
@@ -63,27 +61,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
         fetchDatasCart()
     }, [idUser])
 
-    useEffect(() => {
-        const fetchDataNotification = async () => {
-            const response = await getNotificationOfUser(`limit=${limit}`)
-            if (response) {
-                console.log(response)
-                dispatch(initDataNotification(response))
-            }
-        }
-        fetchDataNotification()
-
-        // const fetchDataNotification = async () => {
-        //     let response = await getNotificationOfUser(`limit=${limit}`)
-        //     setTimeout(() => {
-        //         if (response) {
-        //             console.log(response)
-        //             dispatch(initDataNotification(response))
-        //         }
-        //     }, 200)
-        // }
-        // fetchDataNotification()
-    }, [limit])
+  
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -241,7 +219,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                         {idUser && (
                                                             <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                                                 {notifications ? (
-                                                                    totalNotification
+                                                                    totalNotificationNotRead
                                                                 ) :
                                                                     <div className="position-absolute top-50 start-50 translate-middle text-center w-100">
                                                                         <div className="spinner-border text-primary" role="status"></div>
@@ -250,7 +228,7 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                             </span>
                                                         )}
                                                     </i>
-                                                    <Notification show={showNotification} data1 = {notifications} />
+                                                    <Notification show={showNotification}/>
                                                 </li>
                                             </ul>
                                         </div>
@@ -289,3 +267,6 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
 };
 
 export default Header;
+
+// const debouncedLoadMoreReviews = debounce(() => loadMoreData(limit, totalReview, loadMoreReview, dispatch), 200);
+//     window.addEventListener("scroll", debouncedLoadMoreReviews);

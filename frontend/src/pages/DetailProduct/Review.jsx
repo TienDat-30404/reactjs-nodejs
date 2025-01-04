@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 import { addReview, getAllReviewOfProduct } from '../../services/ReviewService'
 import { formatTime } from '../../until/function'
+import { useLoadMoreData, debounce} from '../../until/function'
 
 export default function Review({ idProduct }) {
   const dispatch = useDispatch()
@@ -17,22 +18,7 @@ export default function Review({ idProduct }) {
   const [content, setContent] = useState("")
   const [rating, setRating] = useState(0);
 
-  const debounce = (func, delay) => {
-    let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => func(...args), delay);
-    };
-  };
-
-  const loadMoreReviews = useCallback(() => {
-    const scrollPosition = window.scrollY + window.innerHeight
-    const bottomPosition = document.documentElement.scrollHeight
-    if (scrollPosition >= bottomPosition * 0.95 && limit < totalReview) {
-      dispatch(loadMoreReview())
-      console.log("loadMore")
-    }
-  }, [limit])
+  const loadMoreData = useLoadMoreData()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,11 +35,11 @@ export default function Review({ idProduct }) {
     }
     fetchData()
     
-    const debouncedLoadMoreReviews = debounce(loadMoreReviews, 200);
+    const debouncedLoadMoreReviews = debounce(() => loadMoreData(limit, totalReview, loadMoreReview, dispatch), 200);
     window.addEventListener("scroll", debouncedLoadMoreReviews);
 
     return () => window.removeEventListener("scroll", debouncedLoadMoreReviews);
-  }, [idProduct, loadMoreReviews])
+  }, [idProduct, limit, loadMoreData])
 
   
 
