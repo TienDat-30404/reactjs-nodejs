@@ -1,24 +1,31 @@
 import React, { useRef, useEffect, useState } from "react";
-import { InputComponent } from "../../components/InputComponent";
-import ButtonComponent from "../../components/ButtonComponent";
-import ImageComponent from "../../components/ImageComponent";
+import { InputComponent } from "../../../components/InputComponent";
+import ButtonComponent from "../../../components/ButtonComponent";
+import ImageComponent from "../../../components/ImageComponent";
 import HeaderSupport from "./HeaderSupport";
 import { useNavigate } from "react-router-dom";
-import '../../public/css/header.css';
+import '../../../public/css/header.css';
 import { useSelector, useDispatch } from 'react-redux';
-import { logoutSuccess } from "../../redux/Auth/authSlice";
-import { logoutUser } from "../../services/UserService";
+import { logoutSuccess } from "../../../redux/Auth/authSlice";
+import { logoutUser } from "../../../services/UserService";
 import SearchAdvanced from "./SearchAdvanced";
-import { switchPage } from "../../redux/Products/productsSlice";
-import { getAllCart } from "../../services/CartService";
-import { initDataCart } from "../../redux/Cart/cartsSlice";
+import { switchPage } from "../../../redux/Products/productsSlice";
+import { getAllCart } from "../../../services/CartService";
+import { initDataCart } from "../../../redux/Cart/cartsSlice";
 import { toast } from "react-toastify";
-import Notification from "./Notification";
-const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogout }) => {
+import LoginModal from "../../../pages/Login/Login";
+import Notification1 from "./Notification";
+import { ToastContainer } from "react-toastify";
+import SignUpModal from "../../../pages/SignUp/SignUp";
+const Header = () => {
+
     const [showModal, setShowModal] = useState(false);
     const displaySearchAdvanced = () => {
         setShowModal(true);
     };
+    const [showModalLogin, setShowModalLogin] = useState(false)
+    const [showModalSignUp, setShowModalSignUp] = useState(false)
+    const [showProfile, setShowProfile] = useState(false)
     const [showNotification, setShowNotification] = useState(false)
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -26,16 +33,14 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const notifications = useSelector(state => state?.notifications?.data)
     const totalNotificationNotRead = useSelector(state => state?.notifications.totalNotificationNotRead)
-    const idUser = isAuthenticated && userData.dataLogin.idUser
+    const idUser = isAuthenticated && userData?.dataLogin?.idUser
 
-    const handleClickLogout = () => {
-        toast.success("Đang đăng xuất")
-        setTimeout(() => {
-            toast.success("Đăng xuất thành công. Chúc bạn một ngày tốt lành")
-            logoutUser();
-            dispatch(logoutSuccess());
-            navigate('/')
-        }, 2500)
+    const handleClickLogout = async () => {
+        setShowProfile(false)
+        toast.success("Đăng xuất thành công")
+        await logoutUser()
+        dispatch(logoutSuccess());
+        navigate('/')
     };
 
     const avatarRef = useRef(null);
@@ -61,31 +66,31 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
         fetchDatasCart()
     }, [idUser])
 
-  
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (avatarRef.current && !avatarRef.current.contains(event.target)) {
-                setStatusHiddenLogout(false);
-            }
-            if (modalRef.current && !modalRef.current.contains(event.target)) {
-                setShowModal(false);
-            }
-        };
 
-        const handleClickInsideHeader = (event) => {
-            if (headerRef.current && headerRef.current.contains(event.target)) {
-                setShowModal(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        document.addEventListener("mousedown", handleClickInsideHeader);
+    // useEffect(() => {
+    //     const handleClickOutside = (event) => {
+    //         if (avatarRef.current && !avatarRef.current.contains(event.target)) {
+    //             setStatusHiddenLogout(false);
+    //         }
+    //         if (modalRef.current && !modalRef.current.contains(event.target)) {
+    //             setShowModal(false);
+    //         }
+    //     };
 
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            document.addEventListener("mousedown", handleClickInsideHeader);
-        };
-    }, [setStatusHiddenLogout]);
+    //     const handleClickInsideHeader = (event) => {
+    //         if (headerRef.current && headerRef.current.contains(event.target)) {
+    //             setShowModal(false);
+    //         }
+    //     };
+    //     document.addEventListener("mousedown", handleClickOutside);
+    //     document.addEventListener("mousedown", handleClickInsideHeader);
+
+    //     return () => {
+    //         document.removeEventListener("mousedown", handleClickOutside);
+    //         document.addEventListener("mousedown", handleClickInsideHeader);
+    //     };
+    // }, [setStatusHiddenLogout]);
 
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
@@ -109,7 +114,16 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
         dispatch(switchPage(1))
         navigate(`/search?find=${word}`)
     }
-    
+
+    const handleNagivateSignUp = () => {
+        setShowModalLogin(false)
+        setShowModalSignUp(true)
+    }
+    const handleSwitchLogin = () => {
+        setShowModalLogin(true)
+        setShowModalSignUp(false)
+    }
+
     return (
         <div>
             <div className="bg-white">
@@ -157,48 +171,54 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                             type='button'
                                             content={<span className="navbar-toggler-icon"></span>}
                                         />
+                                        {!idUser && (
+                                            <LoginModal show={showModalLogin} handleClose={() => setShowModalLogin(false)} switchSignIn={() => handleNagivateSignUp()}/>
+                                        )}
                                         <div className="collapse navbar-collapse" id="navbarSupportedContent">
                                             <ul className="navbar-nav me-auto mb-2 mb-lg-0 menu-directional">
-                                                <li ref={avatarRef} style={{ cursor: "pointer" }} onClick={DisplayLoginOrLogout} className="nav-item me-4 d-flex flex-column align-items-center ms-4">
+                                                <li ref={avatarRef} style={{ cursor: "pointer" }} className="nav-item me-4 d-flex flex-column align-items-center ms-4">
                                                     <div className="d-flex align-items-center">
                                                         {isAuthenticated ? (
-                                                            <>
-                                                                {userData && userData.dataLogin.avatar ? (
+                                                            <div onClick={() => setShowProfile(!showProfile)} className="d-flex align-items-center">
+                                                                {userData && userData?.dataLogin?.avatar == "" ? (
                                                                     <ImageComponent
-                                                                        src={userData && userData.dataLogin.avatar != "" ? localStorage.getItem("avatar") : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
+                                                                        src={userData && userData?.dataLogin?.avatar != "" ? userData?.dataLogin?.avatar : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
                                                                         width="30px"
                                                                         height="30px"
                                                                         borderRadius="5px"
                                                                     />
                                                                 ) :
                                                                     <ImageComponent
-                                                                        src={userData && userData.dataLogin.picture != "" ? localStorage.getItem("avatar") : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
+                                                                        src={userData && userData.dataLogin.picture != "" ? userData?.dataLogin?.avatar : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
                                                                         width="30px"
                                                                         height="30px"
                                                                         borderRadius="5px"
                                                                     />
                                                                 }
                                                                 <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">{userData.dataLogin.name}</p>
-                                                            </>
+                                                            </div>
                                                         ) :
                                                             (
-                                                                <>
+                                                                <div onClick={() => setShowModalLogin(!showModalLogin)} className="d-flex align-items-center">
                                                                     <i className="bi bi-person-circle"></i>
                                                                     <p data-bs-toggle="modal" data-bs-target="#modal_account" className="nav-link ff">Tài khoản</p>
-                                                                </>
+                                                                </div>
                                                             )}
                                                     </div>
-                                                    <div className={`info-avatar ${statusHiddenLogout ? 'd-block' : 'd-none'}`} style={{ zIndex: '3', boxShadow: '0px 0px 10px 0px', backgroundColor: 'white', position: 'absolute', left: '12%', top: '80%', width: '200px' }}>
-                                                        <div className="d-flex align-items-center p-2 ">
-                                                            <i className="bi bi-person-gear me-2"></i>
-                                                            <p onClick={() => navigate('/profile-user')}>Thông tin cá nhân</p>
+                                                    {idUser && (
+                                                        <div className={`info-avatar ${showProfile ? 'd-block' : 'd-none'}`} style={{ zIndex: '3', boxShadow: '0px 0px 10px 0px', backgroundColor: 'white', position: 'absolute', left: '12%', top: '80%', width: '200px' }}>
+                                                            <div className="d-flex align-items-center p-2 ">
+                                                                <i className="bi bi-person-gear me-2"></i>
+                                                                <p onClick={() => navigate('/profile')}>Thông tin cá nhân</p>
+                                                            </div>
+                                                            <div className="d-flex align-items-center p-2">
+                                                                <i className="bi bi-box-arrow-right me-2"></i>
+                                                                <p onClick={() => handleClickLogout()}>Đăng xuất</p>
+                                                            </div>
                                                         </div>
-                                                        <div className="d-flex align-items-center p-2">
-                                                            <i className="bi bi-box-arrow-right me-2"></i>
-                                                            <p onClick={() => handleClickLogout()}>Đăng xuất</p>
-                                                        </div>
-                                                    </div>
+                                                    )}
                                                 </li>
+
                                                 <li onClick={switchCart} style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
                                                     <i className="bi bi-cart-check-fill"></i>
                                                     <button className="btn position-relative">
@@ -214,11 +234,11 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                         )}
                                                     </button>
                                                 </li>
-                                                <li  style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
+                                                <li style={{ cursor: "pointer" }} className="nav-item d-flex align-items-center ms-4 ">
                                                     <i onClick={() => setShowNotification(!showNotification)} style={{ cursor: "pointer" }} class="bi bi-bell btn position-relative">
                                                         {idUser && (
                                                             <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                                                {notifications ? (
+                                                                {idUser ? (
                                                                     totalNotificationNotRead
                                                                 ) :
                                                                     <div className="position-absolute top-50 start-50 translate-middle text-center w-100">
@@ -228,10 +248,16 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                                                             </span>
                                                         )}
                                                     </i>
-                                                    <Notification show={showNotification}/>
+                                                    <Notification1 show={showNotification} />
                                                 </li>
                                             </ul>
                                         </div>
+
+                                        <SignUpModal 
+                                            show = {showModalSignUp} 
+                                            handleClose = {() => setShowModalSignUp(false)} 
+                                            switchLogin = {() => handleSwitchLogin()}
+                                        />
                                     </div>
                                 </nav>
                             </div>
@@ -262,11 +288,23 @@ const Header = ({ DisplayLoginOrLogout, statusHiddenLogout, setStatusHiddenLogou
                 <div className="border-top border-gray"></div>
                 <HeaderSupport />
             </div>
+            <ToastContainer
+                className="text-base"
+                fontSize="10px"
+                position="top-right"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     )
 };
 
 export default Header;
 
-// const debouncedLoadMoreReviews = debounce(() => loadMoreData(limit, totalReview, loadMoreReview, dispatch), 200);
-//     window.addEventListener("scroll", debouncedLoadMoreReviews);

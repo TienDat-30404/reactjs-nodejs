@@ -4,7 +4,7 @@ import { InputComponent } from '../../components/InputComponent';
 import { ErrorMessageInput } from '../../components/InputComponent';
 import { sendOtpForCreateAccount } from '../../services/UserService';
 import ModalOtp from './Otp';
-const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
+const SignUpModal = React.memo(({ show, handleClose, switchLogin }) => {
   const [userName, setUserName] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -45,6 +45,7 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
     setErrors({});
     handleClose();
   }, [handleClose]);
+
   return (
     <div className={`modal bg- ${show ? 'd-block' : 'd-none'}  modal-display`} >
       <div className='modal_base'>
@@ -131,4 +132,4 @@ const SignInModal = React.memo(({ show, handleClose, switchLogin }) => {
   );
 })
 
-export default SignInModal;
+export default SignUpModal;

@@ -12,7 +12,6 @@ export default function InformationSecurityProfile() {
     const { isAuthenticated, userData } = useSelector((state) => state.auth);
     const [dataUser, setDataUser] = useState({
         email: '',
-        phone: ''
     })
 
     const [showModal, setShowModal] = useState(false)
@@ -27,15 +26,13 @@ export default function InformationSecurityProfile() {
     const [errors, setErrors] = useState({})
     const displayDefaultInformation = useCallback(() => {
         if (isAuthenticated && userData?.dataLogin) {
-            const { email, phone } = userData.dataLogin
+            const { email} = userData.dataLogin
             setDataUser({
                 email,
-                phone
             })
         } else {
             setDataUser({
                 email: '',
-                phone: ''
             })
         }
     }, [isAuthenticated, userData])
@@ -87,7 +84,6 @@ export default function InformationSecurityProfile() {
     const handleSaveChanges = () => {
         if (dataUpdate) {
             const formData = new FormData()
-            formData.append('phone', dataUpdate.phone)
             formData.append('email', dataUpdate.email)
             fetchApiUpdateUser(userData.dataLogin.idUser, formData);
         }
@@ -102,27 +98,7 @@ export default function InformationSecurityProfile() {
     };
     return (
         <div className='col-6 bg-white py-2 '>
-            <p className='' style={{ color: '#777' }}>Số điện thoại và email</p>
-            <div className='d-flex justify-content-between mt-4'>
-                <div className='d-flex'>
-                    <i className="bi bi-telephone me-2"></i>
-                    <div>
-                        <p className='mb-1'>Số điện thoại</p>
-                        <InputComponent
-                            name='phone'
-                            value={dataUser.phone}
-                            onChange={handleChangeInput}
-                            style={{ height: '30px' }}
-                            type="text"
-                            className={`form-control flex-grow-1 ${errors.phone ? 'is-invalid' : ''}`}
-                            aria-describedby="passwordHelpBlock"
-                        />
-                        {errors.phone && <ErrorMessageInput errors={errors} field="phone" />}
-
-                    </div>
-                </div>
-                <button onClick={handleSaveChanges} style={{ color: 'blue' }} className='btn border-primary'>Cập nhật</button>
-            </div>
+            
             <div className='d-flex justify-content-between mt-4'>
                 <div className='d-flex'>
                     <i className="bi bi-envelope me-2"></i>

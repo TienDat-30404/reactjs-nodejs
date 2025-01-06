@@ -56,13 +56,7 @@ export default function Category() {
     <div className='col-9-5 row'>
       {
         products.map((product, index) => (
-          // <CartProduct
-          //   key={index}
-          //   id={product._id}
-          //   image={product.image}
-          //   name={product.name}
-          //   price={(product.price).toLocaleString('vi-VN')}
-          // />
+          
           <CartProduct
             key={index}
             id={product._id}

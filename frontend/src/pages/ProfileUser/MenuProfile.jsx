@@ -12,9 +12,13 @@ export default function MenuProfile() {
   return (
     <div className='col-3 px-'>
       <div className='d-flex mb-2'>
-        <p onClick = {switchToHomePage} style={{ fontSize: '15px', cursor : 'pointer' }} className='fw-light me-2 switch_homepage-profile'>Trang chủ</p>
+        <p onClick={switchToHomePage} style={{ fontSize: '15px', cursor: 'pointer' }} className='fw-light me-2 switch_homepage-profile'>Trang chủ</p>
         <i style={{ fontSize: '15px' }} className="bi bi-chevron-right me-2"></i>
-        <p style={{ fontSize: '15px', color: 'rgb(56, 56, 61)', fontWeight: '300' }}>Thông tin tài khoản </p>
+        <p
+          style={{ fontSize: '15px', color: 'rgb(56, 56, 61)', fontWeight: '300' }}
+        >
+          Thông tin tài khoản
+        </p>
       </div>
       <div className='d-flex align-items-center'>
         <img style={{ borderRadius: '10px' }} width="43px" height="43px" src="https://salt.tikicdn.com/desktop/img/avatar.png" alt="" />
@@ -24,16 +28,16 @@ export default function MenuProfile() {
             <>
               <p style={{ color: 'rgb(56, 56, 61)', fontWeight: '300', fontFamily: 'Inter,Helvetica,Arial,sans-serif' }}>{userData.dataLogin.name}</p>
             </>
-          ) 
-          : 
-          (
-            <p style={{ color: 'rgb(56, 56, 61)', fontWeight: '300', fontFamily: 'Inter,Helvetica,Arial,sans-serif' }}></p>
           )
-          } 
+            :
+            (
+              <p style={{ color: 'rgb(56, 56, 61)', fontWeight: '300', fontFamily: 'Inter,Helvetica,Arial,sans-serif' }}></p>
+            )
+          }
         </div>
       </div>
       <ul className="nav flex-column">
-        <li className="nav-item d-flex align-items-center">
+        <li onClick={() => navigate('/profile')} className="nav-item d-flex align-items-center">
           <i className="bi bi-person "></i>
           <a className="nav-link disabled " href="#">Thông tin tài khoản</a>
         </li>
@@ -61,7 +65,7 @@ export default function MenuProfile() {
           <i className="bi bi-chat-square-heart"></i>
           <a className="nav-link disabled" aria-disabled="true">Đánh giá sản phẩm</a>
         </li>
-        <li className="nav-item d-flex align-items-center">
+        <li onClick={() => navigate('/favorite')} className="nav-item d-flex align-items-center">
           <i className="bi bi-heart-fill"></i>
           <a className="nav-link disabled" aria-disabled="true">Sản phẩm yêu thích</a>
         </li>

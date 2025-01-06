@@ -62,9 +62,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 45px;
   overflow: hidden;
-  max-height: 55px; /* Adjust based on font size and line height */
 }
 
 p {

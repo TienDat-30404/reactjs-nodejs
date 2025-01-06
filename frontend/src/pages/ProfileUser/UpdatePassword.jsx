@@ -37,17 +37,16 @@ export default function UpdatePassword({ show, closeModal }) {
     const handleSaveChanges = async () => {
 
         if (userData && isAuthenticated) {
-
-            const response = await changePassword(userData.dataLogin.idUser,
+            const response = await changePassword(userData.dataLogin.idAccount,
             {
                 email: userData.dataLogin.email,
                 oldPassword: dataPassword.oldPassword,
                 password: dataPassword.password,
                 confirmPassword: dataPassword.confirmPassword
             }, true)
+            console.log(response)
             if(response.errors)
             {
-
                 setErrors(response.errors)
                 return
             }
@@ -58,7 +57,7 @@ export default function UpdatePassword({ show, closeModal }) {
             }
         }
     };
-    
+    console.log(errors)
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="modal-dialog update-user">

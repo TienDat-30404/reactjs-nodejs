@@ -8,6 +8,7 @@ import rolesReducer from './Role/rolesSlice'
 import reviewsReducer from './Review/reviewsSlice'
 import vouchersReducer from './Voucher/vouchersSlice'
 import notificationsReducer from './Notification/notificationsSlice'
+import favoritesReducer from './Favorite/favoritesSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -18,6 +19,7 @@ export default configureStore({
     roles : rolesReducer,
     reviews : reviewsReducer,
     vouchers : vouchersReducer,
-    notifications : notificationsReducer
+    notifications : notificationsReducer,
+    favorites : favoritesReducer
   }
 })

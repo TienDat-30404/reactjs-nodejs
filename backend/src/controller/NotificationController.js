@@ -2,7 +2,8 @@ const Notification = require('../model/NotificationModel')
 const getNotificationOfUser = async (req, res, next) => {
     try {
 
-        const idUser = req.user.idUser
+        // const idUser = req.user.idUser
+        const idUser = req.query.idUser
         const page = Math.max(1, parseInt(req.query.page) || 1);
         const limit = Math.max(1, parseInt(req.query.limit) || 5);
 
@@ -27,7 +28,7 @@ const getNotificationOfUser = async (req, res, next) => {
         })
     }
     catch (err) {
-        console.error(`Error fetching notifications for user ${idUser}:`, err.message);
+        console.error(`Error fetching notifications for user :`, err.message);
         return res.status(500).json({ message: 'Failed to fetch notifications', error: err.message });
     }
 
@@ -35,7 +36,7 @@ const getNotificationOfUser = async (req, res, next) => {
 
 const readNotification = async (req, res, next) => {
     try {
-        const idNotification = req.query.idNotification
+        const {idNotification} = req.body
         const response = await Notification.updateOne({ _id: idNotification }, {
             isRead: true
         })

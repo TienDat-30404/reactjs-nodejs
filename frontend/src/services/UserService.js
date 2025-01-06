@@ -10,7 +10,7 @@ export const loginService = async (data, isValidate) => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-        credentials: 'include' 
+        credentials: 'include'
     })
 
     return response.json()
@@ -23,7 +23,7 @@ export const loginGoogle = async (data) => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-        credentials: 'include' 
+        credentials: 'include'
     });
     return response.json()
 }

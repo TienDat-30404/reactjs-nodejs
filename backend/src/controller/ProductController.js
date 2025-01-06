@@ -34,16 +34,14 @@ const getAllProduct = async (req, res, next) => {
             if (sortBy && type) {
                 query = ProductAttribute.find(query).sort(objectSort)
             }
-            else 
-            {
+            else {
                 query = ProductAttribute.find(query)
             }
 
             const attributes = await query.select('idProduct');
             productIds = attributes.map(attr => attr.idProduct);
         }
-        else if(sortBy && type)
-        {
+        else if (sortBy && type) {
             const attributes = await ProductAttribute.find({}).sort(objectSort).select('idProduct')
             productIds = attributes.map(attr => attr.idProduct);
 
@@ -52,53 +50,55 @@ const getAllProduct = async (req, res, next) => {
         if (productIds) {
             objectFilter._id = { $in: productIds };
         }
-        const totalProduct = await Product.countDocuments(objectFilter);
 
-        let products = await Product.find(objectFilter)
-            .skip(startPage)
-            .limit(limit)
-            .populate('idCategory')
-            .populate('discount')
-            .populate({
-                path: 'productAttributes',
-                populate: {
-                    path: 'idSize',
-                    model: 'Size',
-                },
-            })
-            .lean();
+        let [products, totalProduct] = await Promise.all([
+            Product.find(objectFilter)
+                .skip(startPage)
+                .limit(limit)
+                .populate('idCategory')
+                .populate('discount')
+                .populate({
+                    path: 'productAttributes',
+                    populate: {
+                        path: 'idSize',
+                        model: 'Size',
+                    },
+                })
+                .lean(),
+            Product.countDocuments(objectFilter)
+        ])
 
-        if (productIds) {
-            const productIdsString = productIds.map(id => id.toString());
-            products = products.sort((a, b) =>
-                productIdsString.indexOf(a._id.toString()) - productIdsString.indexOf(b._id.toString())
-            );
-        }
+if (productIds) {
+    const productIdsString = productIds.map(id => id.toString());
+    products = products.sort((a, b) =>
+        productIdsString.indexOf(a._id.toString()) - productIdsString.indexOf(b._id.toString())
+    );
+}
 
-        const formattedProducts = products.map(product => {
-            product.productAttributes.map(item => {
-                item.size = item.idSize;
-                delete item.idSize;
-            });
-            if (product.idCategory) {
-                product.category = product.idCategory;
-                delete product.idCategory;
-            }
-            return product;
-        });
-
-        const totalPage = Math.ceil(totalProduct / limit);
-        return res.status(200).json({
-            products: formattedProducts,
-            page,
-            totalProduct,
-            totalPage,
-            objectSort,
-            limit,
-        });
-    } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+const formattedProducts = products.map(product => {
+    product.productAttributes.map(item => {
+        item.size = item.idSize;
+        delete item.idSize;
+    });
+    if (product.idCategory) {
+        product.category = product.idCategory;
+        delete product.idCategory;
     }
+    return product;
+});
+
+const totalPage = Math.ceil(totalProduct / limit);
+return res.status(200).json({
+    products: formattedProducts,
+    page,
+    totalProduct,
+    totalPage,
+    objectSort,
+    limit,
+});
+    } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+}
 };
 
 

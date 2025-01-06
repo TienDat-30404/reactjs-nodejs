@@ -9,14 +9,8 @@ import './public/css/profile.css'
 import './public/css/admin.css'
 import { useEffect } from 'react';
 import { useAuthHandler } from './until/manageToken';
-import DefaultComponent from './components/DefaultComponent';
-import Right from './pages/Content/Right/Right';
-import Body from './pages/Content/Body';
-import CategoryByProduct from './pages/Content/Right/CategoryByProduct/CategoryByProduct';
-import Admin from './pages/Admin/Admin';
 import "react-toastify/dist/ReactToastify.css";
-
-// import Component from './pages/Component';
+import { privateRoutes } from './routes/privateRoutes';
 function App() {
   const { checkAndUpdateToken } = useAuthHandler();
 
@@ -28,35 +22,30 @@ function App() {
     <div className='div_biggest'>
       <Router>
         <Routes>
-          {routes.map((route) => {
+          
+
+          {privateRoutes.map((route, i) => {
             const Page = route.page
-            const isCheckPage = route.isPageUser
-            const Layout = route.isShowHeader ? DefaultComponent : Fragment
-            const Content = route.isShowProduct ? Right : CategoryByProduct
-            const ShowBody = route.isShowBody ? Body : Fragment
-            const isCheckBody = route.isShowBody
-            const isCheckPageAdmin = route.isShowLeftAdmin
-            const PageAdmin = route.isShowLeftAdmin ? Admin : Fragment
+            let Layout = route.layout
+            if(route.layout)
+            {
+              Layout = route.layout
+            }
+            else if(route.layout == null)
+            {
+              Layout = Fragment
+            }
             return (
-              <Route key={route.path} path={route.path} element={
-                <Layout>
-                  {/* <Component /> */}
-                  {isCheckPage ? (
-                    isCheckBody ? (
-                      <ShowBody right={<Content />} />
-                    ) : (
+              <Route
+                key={i}
+                path={route.path}
+                element={
+                    <Layout>
                       <Page />
-                    )
-                  ) : (
-                    isCheckPageAdmin ? (
-                      <PageAdmin right={<Page />} />
-                    ) : (
-                      <Fragment />
-                    )
-                  )}
-                </Layout>
-              } />
-            )
+                    </Layout>
+                }
+              />
+            );
           })}
         </Routes>
       </Router>

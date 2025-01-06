@@ -1,11 +1,14 @@
 import React from 'react'
-import Left from './Left/Left'
+import Header from '../components/Header/Header'
+import MenuProfile from '../../pages/ProfileUser/MenuProfile'
 import { ToastContainer } from 'react-toastify'
-const Body = ({ right }) => {
+export default function ProfileLayout({ children }) {
     return (
-        <div className='mt-3'>
-            <div className="container">
-                <div className=" col-12 row ">
+        <div>
+
+            <Header />
+            <div className="container d-flex">
+                <div className="row col-12 mt-2">
                     <ToastContainer
                         className="text-base"
                         fontSize="10px"
@@ -20,12 +23,10 @@ const Body = ({ right }) => {
                         pauseOnHover
                         theme="light"
                     />
-                    <Left />
-                    {right}
+                    <MenuProfile />
+                    {children}
                 </div>
             </div>
         </div>
     )
 }
-
-export default Body

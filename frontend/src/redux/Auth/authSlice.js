@@ -26,10 +26,21 @@ export const authSlice = createSlice({
         state.isAuthenticated = false
         state.userData = null
         state.dataCart = null
+    },
+
+    updateProfile : (state, action) => {
+      state.userData.dataLogin = {
+        ...state.userData,
+        name : action.payload.name,
+        address : action.payload.address,
+        phone : action.payload.phone,
+        date_of_birth : action.payload.date_of_birth,
+        sex : action.payload.sex
+      }
     }
   }
 })
 
-export const { loginSuccess, logoutSuccess, resetCartRedux} = authSlice.actions
+export const { loginSuccess, logoutSuccess, resetCartRedux, updateProfile} = authSlice.actions
 
 export default authSlice.reducer

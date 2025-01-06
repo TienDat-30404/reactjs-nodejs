@@ -12,9 +12,10 @@ export default function InformationBasicProfile() {
     const [dataUser, setDataUser] = useState({
         name: '',
         address: '',
+        phone: '',
         date_of_birth: '',
         sex: '',
-        avatar : '',
+        avatar: '',
     })
     const [errors, setErrors] = useState({})
     const [dataUpdate, setDataUpdate] = useState(null);
@@ -24,21 +25,23 @@ export default function InformationBasicProfile() {
     // display default information user 
     const displayDefaultInformation = useCallback(() => {
         if (isAuthenticated && userData?.dataLogin) {
-            const { name, address, date_of_birth, sex, avatar } = userData.dataLogin
+            const { name, address, phone, date_of_birth, sex, avatar } = userData.dataLogin
             setDataUser({
                 name,
                 address,
+                phone,
                 date_of_birth,
                 sex,
-                avatar 
+                avatar
             })
         } else {
             setDataUser({
                 name: '',
                 address: '',
+                phone: '',
                 date_of_birth: '',
                 sex: '',
-                avatar : ''
+                avatar: ''
             })
         }
     }, [isAuthenticated, userData])
@@ -50,17 +53,16 @@ export default function InformationBasicProfile() {
 
     useEffect(() => {
         if (isAuthenticated) {
-            const { email, phone } = userData.dataLogin
+            const { email } = userData.dataLogin
             setDataUpdate({
                 ...dataUser,
-                email,
-                phone
+                email
             })
         } else {
             setDataUpdate(null);
         }
     }, [isAuthenticated, userData, dataUser]);
-    
+
     const fetchApiUpdateUser = async (id, data) => {
         try {
             const resultUpdate = await updateUser(id, data)
@@ -72,25 +74,27 @@ export default function InformationBasicProfile() {
 
             if (resultUpdate.message) {
                 toast.success("Chỉnh sửa thành công")
+               
+                const resultTokenUpdate = await loginService({
+                    userName: userData.dataLogin.userName
+                })
+
+                setCookieForToken(resultTokenUpdate.token)
+                saveTokenOnRedux(jwtDecode(resultTokenUpdate.token))
                 setErrors({})
-                // window.location.reload()
             }
-           const refreshTokenWhenUpdate = {
-                email: userData.dataLogin.email,
-            }
-            const resultTokenUpdate = await loginService(refreshTokenWhenUpdate)
-            setCookieForToken(resultTokenUpdate.token)
-            saveTokenOnRedux(jwtDecode(resultTokenUpdate.token))
+
         } catch (error) {
-            console.log('Có lỗi xảy ra:', error);
+            console.log('Có lỗi xảy ra khi cập nhật profile: ', error);
         }
     };
 
-    const handleSaveChanges = async() => {
+    const handleSaveChanges = async () => {
         if (dataUpdate && userData.dataLogin.idUser) {
             var formData = new FormData()
             formData.append('name', dataUpdate.name)
             formData.append('address', dataUpdate.address)
+            formData.append('phone', dataUpdate.phone)
             formData.append('date_of_birth', dataUpdate.date_of_birth)
             formData.append('sex', dataUpdate.sex)
             formData.append('avatar', avatar)
@@ -141,7 +145,7 @@ export default function InformationBasicProfile() {
                     <div style={{ border: '4px solid rgb(194, 225, 255)', width: "100px", padding: '24px', borderRadius: '70px' }}>
                         <img
                             width="45px"
-                            src={userData ? userData.dataLogin.avatar  : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
+                            src={userData ? userData.dataLogin.avatar : "https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png"} alt=""
                         />
                     </div>
                     <div className='ms-3 flex-grow-1'>
@@ -171,11 +175,11 @@ export default function InformationBasicProfile() {
                     </div>
                 </div>
 
-                <InputComponent 
+                <InputComponent
                     name="avatar"
                     onChange={handleChangeFile}
-                    className = 'mt-3' 
-                    type="file" 
+                    className='mt-3'
+                    type="file"
                 />
 
                 <div className='d-flex align-items-center mt-4'>
@@ -186,6 +190,17 @@ export default function InformationBasicProfile() {
                         onChange={handleChangeInput}
                         type="date"
                         className={`form-control flex-grow-1 ${errors.date_of_birth ? 'is-invalid' : ''}`}
+                    />
+                </div>
+                <div className='d-flex align-items-center mt-4'>
+                    <p style={{ width: '85px' }} className='text-nowrap me-2'>Điện thoại</p>
+                    <InputComponent
+                        name='phone'
+                        value={dataUser.phone}
+                        onChange={handleChangeInput}
+                        style={{ height: '35px' }}
+                        type="text"
+                        className="form-control flex-grow-1"
                     />
                 </div>
                 {errors.date_of_birth && <ErrorMessageInput errors={errors} field="date_of_birth" />}

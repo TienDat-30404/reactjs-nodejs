@@ -1,11 +1,11 @@
 import React from 'react'
-import '../../public/css/notification.css'
+import '../../../public/css/notification.css'
 import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { formatTime } from '../../until/function';
-import { debounce, useLoadMoreData } from '../../until/function';
-import { readNotificationService, getNotificationOfUser } from '../../services/NotificationService';
-import { readNotificationRedux, initDataNotification, loadMoreNotification } from '../../redux/Notification/notificationsSlice';
+import { formatTime } from '../../../until/function';
+import { debounce, useLoadMoreData } from '../../../until/function';
+import { readNotificationRedux, initDataNotification, loadMoreNotification } from '../../../redux/Notification/notificationsSlice';
+import { getNotificationOfUserService, readNotificationService } from '../../../services/NotificationService';
 export default function Notification({ show }) {
     const dispatch = useDispatch()
     const loadMoreData = useLoadMoreData()
@@ -13,14 +13,13 @@ export default function Notification({ show }) {
     const data = useSelector(state => state?.notifications?.data)
     const limit = useSelector(state => state?.notifications?.limit)
     const totalNotification = useSelector(state => state?.notifications?.totalNotification)
+    const {isAuthenticated, userData} = useSelector(state => state.auth)
+    const idUser = isAuthenticated && userData?.dataLogin?.idUser
     useEffect(() => {
         const fetchDataNotification = async () => {
             let query = `limit=${limit}`
-            console.log("limit", limit)
-            console.log("totalNotification", totalNotification)
-            const response = await getNotificationOfUser(query)
+            const response = await getNotificationOfUserService(idUser, query)
             if (response) {
-                console.log(response)
                 dispatch(initDataNotification(response))
             }
         }
@@ -37,7 +36,9 @@ export default function Notification({ show }) {
     };
     const handleCheckReadNotification = async (index, id) => {
         if (data[index].isRead === false) {
-            const response = await readNotificationService(id)
+            const response = await readNotificationService({
+                idNotification : id
+            })
             console.log(response)
             if (response && response.status === 200) {
                 dispatch(readNotificationRedux(id))

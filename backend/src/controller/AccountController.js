@@ -5,6 +5,7 @@ const { hashPassword } = require('../utils/validate')
 const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 const redisClient = require('../utils/redisClient');
+
 const { OAuth2Client } = require("google-auth-library");
 const errorHandler = require('http-errors')
 const { generateToken, generateRefreshToken } = require('../utils/jwt')
@@ -46,12 +47,15 @@ const getAllUser = async (req, res, next) => {
             })
             .lean()
         users = users.map(user => {
-            if (user.idAccount) {
+            if (user?.idAccount) {
                 user.account = user.idAccount;
                 delete user.idAccount;
             }
-            user.account.role = user.account.idRole
-            delete user.account.idRole
+            if(user?.account)
+            {
+                user.account.role = user.account.idRole
+                delete user.account.idRole
+            }
 
             return user;
         });
@@ -215,6 +219,7 @@ const loginUser = async (req, res, next) => {
         sex: isCheckUser.sex,
         date_of_birth: isCheckUser.date_of_birth,
         idRole: isCheckAccount.idRole,
+        idAccount : isCheckAccount._id,
         avatar
     };
 
@@ -231,8 +236,29 @@ const loginUser = async (req, res, next) => {
         token: accessToken,
         message: 'Đăng nhập thành công',
         avatar: avatar,
-        refreshToken
     })
 }
 
-module.exports = {getAllUser, sendOtpForCreateAccount, verifyOtpForCreateAccount, authLoginGoogle, loginUser }
+const changePassword = async (req, res, next) => {
+    try {
+        const idAccount = req.params.idAccount
+        console.log(idAccount)
+        const { password } = req.body
+        const newPassword = hashPassword(password)
+        const response = await Account.updateOne({ _id: idAccount }, { $set: { password: newPassword } })
+        if(response.modifiedCount > 0)
+        {
+            return res.status(200).json({
+                message: "Change Password Successful"
+            })
+        }
+      
+    }
+    catch (error) {
+        return res.status(500).json({message : "Error when change password : ", error})
+    }
+};
+
+module.exports = {getAllUser, sendOtpForCreateAccount, verifyOtpForCreateAccount, authLoginGoogle, loginUser, 
+    changePassword
+ }

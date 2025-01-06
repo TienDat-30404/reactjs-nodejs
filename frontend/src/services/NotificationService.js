@@ -1,15 +1,15 @@
 import Cookies from 'js-cookie';
 
-export const getNotificationOfUser = async(query) => {
+export const getNotificationOfUserService = async(id, query) => {
     
     try 
     {
-        const token = Cookies.get('accessToken')
+        // const token = Cookies.get('accessToken')
        
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/get-notification-user?${query}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/get-notification-user?idUser=${id}&${query}`, {
             method : 'GET',
             headers : {
-                'Authorization' :  `Bearer ${token}`,
+                // 'Authorization' :  `Bearer ${token}`,
                 'Content-Type' : 'application/json'
             },
             credentials: 'include', 
@@ -25,11 +25,12 @@ export const getNotificationOfUser = async(query) => {
 export const readNotificationService = async(id) => {
     try 
     {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/read-notification?idNotification=${id}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/read-notification`, {
             method : 'PATCH',
             headers : {
                 'Content-Type' : 'application/json'
-            }
+            },
+            body : JSON.stringify(id)
         })
         return response.json()
     }

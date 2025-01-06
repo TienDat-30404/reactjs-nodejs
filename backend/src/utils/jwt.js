@@ -34,6 +34,7 @@ const refreshToken = async (token) => {
                 sex : user.sex,
                 date_of_birth : user.date_of_birth,
                 idRole : user.idRole,
+                idAccount : user.idAccount,
                 avatar : user.avatar
             })
             resolve(accessToken)

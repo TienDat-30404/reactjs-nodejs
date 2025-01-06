@@ -3,9 +3,6 @@ const router = express.Router()
 const {uploadAvatar} = require('../utils/multerConfig')
 const UserController = require('../controller/UserController')
 
-const {validateSignIn, validateLogin, validateUpdateUser, validateChangePassword, authLoginGoogle} = require('../middlewares/UserMiddleWare')
-const authencationMiddleWare = require('../middlewares/authencationMiddleWare')
-const {conditionLoginMiddleware, shouldUseValidation, conditionChagePasswordMiddleware, shouldUseChangePassword} = require('../utils/validate')
 
 // router.post('/sign-in',  UserController.createUser)
 // router.post('/sign-up', conditionLoginMiddleware(shouldUseValidation, validateLogin), UserController.loginUser)
@@ -14,7 +11,6 @@ router.delete('/delete-user/:idUser', UserController.deleteUser)
 router.post('/refresh-token', UserController.refreshToken)
 router.post('/logout-refresh-token', UserController.logoutRefreshToken)
 router.get('/detail-user/:idUser', UserController.detailUser)
-router.put('/change-password/:idUser', conditionChagePasswordMiddleware(shouldUseChangePassword, validateChangePassword), UserController.changePassword)
 router.get('/search-user', UserController.searchUser)
 // router.post('/auth/google', UserController.authLoginGoogle)
 module.exports = router

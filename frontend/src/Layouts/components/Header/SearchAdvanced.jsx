@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { forwardRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { InputComponent } from '../../components/InputComponent';
-import { getAllCategory } from '../../services/CategoryService';
-import { ErrorMessageInput } from '../../components/InputComponent';
-import { validateSearchAdvanced, createQueryStringForSearch } from '../../until/validate';
-import { handleChangeInput } from '../../until/function';
+import { InputComponent } from '../../../components/InputComponent';
+import { getAllCategory } from '../../../services/CategoryService';
+import { ErrorMessageInput } from '../../../components/InputComponent';
+import { validateSearchAdvanced, createQueryStringForSearch } from '../../../until/validate';
+import { handleChangeInput } from '../../../until/function';
 const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
     const navigate = useNavigate()
     const [categories, setCategories] = useState([])

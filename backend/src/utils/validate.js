@@ -53,7 +53,7 @@ const shouldUseValidation = (req) => {
 };
 
 const shouldUseChangePassword = (req) => {
-  return req.query.change=== 'true';
+  return req.query.change === 'true';
 };
 
 

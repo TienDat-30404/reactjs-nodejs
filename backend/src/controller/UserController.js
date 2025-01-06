@@ -1,38 +1,39 @@
 const User = require('../model/UserModel')
-const Account = require('../model/AccountModel')
-const Role = require('../model/RoleModel')
 const cloudinary = require('../config/cloudinary');
-const { generateToken, generateRefreshToken } = require('../utils/jwt')
-const { hashPassword } = require('../utils/validate')
 const refreshTokenJWT = require('../utils/jwt')
-const { OAuth2Client } = require("google-auth-library");
-const errorHandler = require('http-errors')
-
+const mongoose = require('mongoose')
 
 // [PUT] : /update-user/:id
 const updateUser = async (req, res, next) => {
     try {
         const idUser = req.params.idUser
-        const { name, email, address, phone, date_of_birth, sex, idRole } = req.body
+        if (!mongoose.Types.ObjectId.isValid(idUser)) {
+            return res.status(400).json({ message: "Invalid User ID" });
+        }
+        const { name, address, phone, date_of_birth, sex } = req.body
         const user = await User.findOne({ _id: idUser })
+                               
         const newData = {
             name: name,
-            email: email,
             address: address,
             phone: phone,
             date_of_birth: date_of_birth,
             sex: sex,
             avatar: user.avatar,
-            idRole: idRole
         };
         if (req.file) {
             const fielAvatar = await cloudinary.uploader.upload(req.file.path);
             newData.avatar = fielAvatar.secure_url
         }
-        await User.updateOne({ _id: idUser }, newData)
+        const dataUpdate = await User.findByIdAndUpdate(idUser, newData, {
+            new: true, 
+            runValidators: true, 
+        })
         return res.status(200).json({
+            message: "Update Successfully",
             newData,
-            message: "Update Successfully"
+            dataUpdate,
+            status : 200
         })
     }
     catch (error) {
@@ -114,7 +115,7 @@ const refreshToken = async (req, res, next) => {
         }
         const tokenNew = await refreshTokenJWT.refreshToken(token)
         return res.status(200).json({
-            refreshToken : token,
+            refreshToken: token,
             success: "Success",
             tokenNew
         })
@@ -144,20 +145,7 @@ const logoutRefreshToken = (req, res, next) => {
 
 
 
-const changePassword = async (req, res, next) => {
-    try {
-        const idUser = req.params.idUser
-        const { password } = req.body
-        const newPassword = hashPassword(password)
-        await User.updateOne({ _id: idUser }, { $set: { password: newPassword } })
-        return res.status(200).json({
-            message: "Change Password Successful"
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-};
+
 
 const searchUser = async (req, res, next) => {
     const { idUser, name, email, phone, idRole } = req.query
@@ -189,4 +177,4 @@ const searchUser = async (req, res, next) => {
 
 
 
-module.exports = {  updateUser, deleteUser, refreshToken, detailUser, logoutRefreshToken, changePassword, searchUser }
+module.exports = { updateUser, deleteUser, refreshToken, detailUser, logoutRefreshToken, searchUser }

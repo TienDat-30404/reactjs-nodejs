@@ -8,9 +8,9 @@ const validateSignIn = async (req, res, next) => {
     try {
         const { userName, name, email, password, confirm_password, idRole } = req.body
         const errors = {};
-        const existEmail = await Account.countDocuments({ email, deletedAt : null, typeLogin : "normal" })
+        const existEmail = await Account.countDocuments({ email, deletedAt: null, typeLogin: "normal" })
         console.log(existEmail)
-        const existUserName = await Account.countDocuments({ userName, deletedAt : null })
+        const existUserName = await Account.countDocuments({ userName, deletedAt: null })
         if (userName == "") {
             errors.userName = "Tên tài khoản không được để trống";
         }
@@ -134,38 +134,52 @@ const validateUpdateUser = async (req, res, next) => {
 }
 
 const validateChangePassword = async (req, res, next) => {
-    const { email, oldPassword, password, confirmPassword } = req.body
-    const isCheckUser = await User.findOne({ email })
+    try {
 
-    const errors = {}
+        const { email, oldPassword, password, confirmPassword } = req.body
 
-    if (password == "") {
-        errors.password = "Mật khẩu không được để trống"
-    }
+        const isCheckAccount = await Account.findOne({ email })
+        const errors = {}
 
-    if (isCheckUser == null) {
-        errors.email = "Email không chính xác"
-    }
-    else {
-        const regexHashPassword = /^\$2[ayb]\$[0-9]{2}\$.{53}$/;
-        if (!regexHashPassword.test(password)) {
-            const comparePassword = bcrypt.compareSync(oldPassword, isCheckUser.password);
-            if (!comparePassword) {
-                errors.oldPassword = "Mật khẩu cũ không chính xác"
+        if (!oldPassword) {
+            errors.oldPassword = "Mật khẩu hiện tại không được để trống"
+        }
+        if (!password) {
+            errors.password = "Mật khẩu không được để trống"
+        }
+        if (!confirmPassword) {
+            errors.confirmPassword = "Mật khẩu xác nhận không được để trống"
+        }
+        if (!email) {
+            errors.email = "Email không được để trống"
+        }
+        else {
+            if (isCheckAccount == null) {
+                errors.email = "Email không chính xác"
+            }
+            else {
+                
+                console.log(oldPassword)
+                const comparePassword = bcrypt.compareSync(oldPassword, isCheckAccount.password);
+                console.log(comparePassword)
+                if (!comparePassword) {
+                    errors.oldPassword = "Mật khẩu cũ không chính xác";
+                }
             }
         }
+
+
+        if (password !== confirmPassword) {
+            errors.confirmPassword = "Mật khẩu xác nhận không chính xác"
+        }
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({ errors })
+        }
+        next()
     }
-    if (confirmPassword === "") {
-        errors.confirmPasswrd = "Mật khẩu xác nhận không được để trống"
+    catch (error) {
+        next(error)
     }
-    if (password !== confirmPassword) {
-        errors.confirmPassword = "Mật khẩu xác nhận không chính xác"
-    }
-    if (Object.keys(errors).length > 0) {
-        return res.status(400).json({ errors })
-    }
-    console.log(errors)
-    next()
 }
 
 

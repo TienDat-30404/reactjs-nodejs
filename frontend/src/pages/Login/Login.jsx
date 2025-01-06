@@ -15,14 +15,14 @@ function LoginModal({ show, handleClose, switchSignIn }) {
   const dataLogin = { userName, password }
   const [errors, setErrors] = useState({})
   const saveTokenOnRedux = useSaveTokenOnRedux();
-
   const handleLoginGoogle = async (response) => {
     if (response.error) {
       console.error("Login failed:", response.error);
       return;
     }
     const token = response.credential;
-    console.log("token", token)
+
+    
 
     try {
       const responseAuth = await loginGoogle({
@@ -63,7 +63,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
         toast.success("Đăng nhập thành công")
         setCookieForToken(response.token)
         saveTokenOnRedux(jwtDecode(response.token))
-        localStorage.setItem('avatar', response.avatar)
+        // localStorage.setItem('avatar', response.avatar)
         navigate('/')
       }
     }
@@ -109,7 +109,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
             <img width="100%" height="100%" src="https://images.pexels.com/photos/4321802/pexels-photo-4321802.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="" />
           </div>
           <div style={{ width: '50%' }} className='m-3'>
-            <i onClick={handleCloseModal} className="bi bi-x-lg icon_close"></i>
+            <i onClick={() => handleCloseModal()} className="bi bi-x-lg icon_close"></i>
             <h3 className='fw-bold'>Hello, </h3>
             <h3 onClick={() => handleClickLoginGoogle()} className='fw-bold'>Welcome Back </h3>
             <div className='mb-2'>
