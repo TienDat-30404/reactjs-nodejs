@@ -28,10 +28,15 @@ export const favoritesSlice = createSlice({
             if(isCheckExistFavorite)
             {
                 state.data = state.data.filter(favorite => favorite._id != id)
+                state.totalFavorite -= 1
             }
+        },
+
+        addFavoriteRedux : (state, action) => {
+            state.data.push(action.payload)
         }
     }
 })
 
-export const {initDataFavorite, switchPage, deleteFavoriteReudx} = favoritesSlice.actions
+export const {initDataFavorite, switchPage, deleteFavoriteReudx, addFavoriteRedux} = favoritesSlice.actions
 export default favoritesSlice.reducer

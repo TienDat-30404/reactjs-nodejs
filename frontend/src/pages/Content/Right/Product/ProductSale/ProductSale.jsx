@@ -10,7 +10,10 @@ export default function ProductSale() {
     const page = useSelector(state => state.products.page)
     const totalPage = useSelector(state => state.products.totalPage)
     const totalProduct = useSelector(state => state.products.totalProduct)
+    const { isAuthenticated, userData } = useSelector(state => state.auth)
+    const idUser = isAuthenticated && userData?.dataLogin?.idUser
     const limit = 5;
+
     // get all product
     useEffect(() => {
         const fetchDatasProduct = async () => {
@@ -36,6 +39,8 @@ export default function ProductSale() {
             dispatch(switchPage(page - 1))
         }
     }
+
+   
 
 
     return (
@@ -63,13 +68,13 @@ export default function ProductSale() {
                             name={product.name}
                             priceNotDiscount={
                                 product?.discount && product?.discount?.length > 0 ?
-                                    (product?.productAttributes[0]?.priceBought ).toLocaleString('vi-VN') + "đ"
+                                    (product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN') + "đ"
                                     :
                                     ""
                             }
                             percentDiscount={
                                 product?.discount && product?.discount?.length > 0 ?
-                                     ((1- product.discount[0].discountValue) * 100).toFixed(0) + "%"
+                                    ((1 - product.discount[0].discountValue) * 100).toFixed(0) + "%"
                                     :
                                     ""
                             }
@@ -82,6 +87,13 @@ export default function ProductSale() {
                             }
                             widthImage="100px"
                             heightImage="200px"
+                            totalReview = {
+                                product?.reviews?.length > 0
+                                ? 
+                                (product?.reviews?.reduce((sum, review) => sum + review.rating, 0) / product?.reviews).toFixed(2)
+                                :
+                                0
+                            }
                         />
                     ))) :
                     <div className="loading">

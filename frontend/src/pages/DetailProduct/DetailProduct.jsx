@@ -89,13 +89,7 @@ export default function Detail() {
                                     src={details.detailProduct.image}
                                 />
                             </div>
-                            {/* <div className="nav ms-2 benefit">
-                                <h6>Đặc điểm nổi bật</h6>
-                                <div className='d-flex '>
-                                    <i style={{ width: '10px' }} className="bi bi-check-circle me-2"></i>
-                                    {details.detailProduct.description}
-                                </div>
-                            </div> */}
+        
                         </div>
                     </div>
 

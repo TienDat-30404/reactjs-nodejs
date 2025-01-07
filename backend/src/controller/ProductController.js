@@ -57,6 +57,7 @@ const getAllProduct = async (req, res, next) => {
                 .limit(limit)
                 .populate('idCategory')
                 .populate('discount')
+                .populate('reviews')
                 .populate({
                     path: 'productAttributes',
                     populate: {

@@ -5,7 +5,7 @@ const getFavoriteOfUser = async (req, res, next) => {
         const idUser = req.query.idUser
         // const { idUser } = req.body
         const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 2
+        const limit = parseInt(req.query.limit) || 4
         const startPage = (page - 1) * limit
         let [favorites, totalFavorite] = await Promise.all([
             Favorite.find({ idUser })
@@ -79,7 +79,7 @@ const addFavorite = async (req, res, next) => {
             favorite.product = favorite.idProduct
             delete favorite.idProduct
         }
-        return res.status(201).json({ favorite })
+        return res.status(201).json({ favorite, status : 201 })
     }
     catch (err) {
         return res.status(500).json({ message: `Fail when add favorite : ${err}` })

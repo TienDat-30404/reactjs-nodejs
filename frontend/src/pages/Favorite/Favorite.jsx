@@ -38,6 +38,7 @@ export default function Favorite() {
     return pages
   }
   useEffect(() => {
+
     const query = `idUser=${idUser}&page=${page}&limit=${limit}`
     const fetchData = async () => {
       const response = await getFavoriteOfUserService(query)
@@ -56,13 +57,15 @@ export default function Favorite() {
 
   const handleDeleteFavorite = async (id) => {
     try {
-      console.log("id", id)
 
       const response = await deleteFavoriteService(id)
       console.log(response)
 
       if (response && response.status === 200) {
         dispatch(deleteFavoriteReudx(id))
+        if (favorites?.length === 1 && page > 1) {
+          dispatch(switchPage(page - 1))
+        }
       }
     }
     catch (error) {
@@ -84,7 +87,7 @@ export default function Favorite() {
           </div>
         )) :
         <div className='text-center'>
-          <img style = {{ width : '300px' }} src="https://www.freeiconspng.com/uploads/favorites-icon-png-30.png" alt="" />
+          <img style={{ width: '300px' }} src="https://www.freeiconspng.com/uploads/favorites-icon-png-30.png" alt="" />
           <p className='fs-4'>Bạn chưa thêm vào danh sách yêu thích sản phẩm nào</p>
         </div>
       }
