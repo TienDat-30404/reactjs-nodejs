@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema
 const VoucherSchema = Schema(
     {
@@ -13,4 +13,4 @@ const VoucherSchema = Schema(
     }
 )
 const Voucher = mongoose.model('Voucher', VoucherSchema)
-module.exports = Voucher
+export default Voucher

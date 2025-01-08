@@ -9,13 +9,15 @@ export default function Favorite() {
   const navigate = useNavigate()
   const { isAuthenticated, userData } = useSelector(state => state.auth)
   const idUser = isAuthenticated && userData?.dataLogin?.idUser
-  let limit = useSelector(state => state?.favorites?.limit)
+  let limit = 4
   let page = useSelector(state => state?.favorites?.page)
   const totalPage = useSelector(state => state?.favorites.totalPage)
   const favorites = useSelector(state => state?.favorites?.data)
-
+  const totalFavorite = useSelector(state => state?.favorites?.totalFavorite)
   const visiblePagination = () => {
     const pages = []
+
+  
     if (page == 1 && totalPage >= 3) {
       pages.push(page)
       pages.push(page + 1)
@@ -26,6 +28,7 @@ export default function Favorite() {
       pages.push(page - 1)
       pages.push(page)
     }
+  
     else {
       if (page > 1) {
         pages.push(page - 1)
@@ -66,6 +69,11 @@ export default function Favorite() {
         if (favorites?.length === 1 && page > 1) {
           dispatch(switchPage(page - 1))
         }
+        else if(favorites?.length === 1)
+        {
+          console.log("123")
+          dispatch(switchPage(page - 1))
+        }
       }
     }
     catch (error) {
@@ -74,7 +82,7 @@ export default function Favorite() {
   }
   return (
     <div className='col-9 row bg-white'>
-      {favorites.length > 0 ?
+      {favorites.length > 0 && totalFavorite > 0 ?
         favorites?.map((favorite, index) => (
           <div key={index} class=" col-3 mt-2">
             <img style={{ width: '220px', height: '200px' }} src={favorite?.product?.image} class="card-img-top" alt="..." />

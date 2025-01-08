@@ -1,8 +1,9 @@
-const Product = require('../model/ProductModel')
-const Category = require('../model/CategoryModel')
-const bcrypt = require('bcrypt')
-const multer = require('multer');
-const path = require('path');
+import Product from '../model/ProductModel.js';
+import Category from '../model/CategoryModel.js';
+import bcrypt from 'bcrypt';
+import multer from 'multer';
+import path from 'path';
+
 // Check email 
 const validateEmail = (email) => {
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -73,7 +74,7 @@ const isCheckExistCategory = async (name) => {
   return !existNameCategory
 }
 
-module.exports = {
+export  {
   validateEmail, hashPassword, validateNameProduct,
   validateNameProductWhenUpdate, isCheckExistNameCategory, conditionLoginMiddleware, shouldUseValidation,
   conditionChagePasswordMiddleware, shouldUseChangePassword, isCheckExistCategory

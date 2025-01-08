@@ -1,8 +1,15 @@
-const Product = require('../model/ProductModel')
-const Size = require('../model/SizeModel')
-const ProductAttribute = require('../model/ProductAttribute')
+// const Product = require('../model/ProductModel')
+// const Size = require('../model/SizeModel')
+// const ProductAttribute = require('../model/ProductAttribute')
 
-const { validateNameProduct } = require('../utils/validate')
+// const { validateNameProduct } = require('../utils/validate')
+
+import Product from '../model/ProductModel.js';
+import Size from '../model/SizeModel.js';
+import ProductAttribute from '../model/ProductAttribute.js';
+
+import { validateNameProduct } from '../utils/validate.js';
+
 const validateAddProduct = async (req, res, next) => {
     const { name, idCategory, description, sizes } = req.body
     
@@ -137,4 +144,4 @@ const validateDeleteProduct = async (req, res, next) => {
     next()
 
 }
-module.exports = { validateAddProduct, validateUpdateProduct, validateDeleteProduct }
+export { validateAddProduct, validateUpdateProduct, validateDeleteProduct }

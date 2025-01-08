@@ -34,9 +34,13 @@ export const favoritesSlice = createSlice({
 
         addFavoriteRedux : (state, action) => {
             state.data.push(action.payload)
+        }, 
+
+        removeFavoriteWhenLogout : (state, action) => {
+            state.data = []
         }
     }
 })
 
-export const {initDataFavorite, switchPage, deleteFavoriteReudx, addFavoriteRedux} = favoritesSlice.actions
+export const {initDataFavorite, switchPage, deleteFavoriteReudx, addFavoriteRedux, removeFavoriteWhenLogout} = favoritesSlice.actions
 export default favoritesSlice.reducer

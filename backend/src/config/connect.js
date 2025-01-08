@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
+import mongoose from "mongoose";
 async function connectDB() {
     try {
         console.log("Connect successfully")
@@ -7,4 +8,4 @@ async function connectDB() {
         console.log(error)
     }
 }
-module.exports = { connectDB };
+export default connectDB;

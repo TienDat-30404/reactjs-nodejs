@@ -1,6 +1,9 @@
 
-const multer = require('multer');
-const path = require('path');
+// const multer = require('multer');
+// const path = require('path');
+
+import multer from 'multer';
+import path from 'path'
 
 const storageAvatar= multer.diskStorage({
     destination: function (req, file, cb) {
@@ -22,4 +25,4 @@ const storageProductImage = multer.diskStorage({
 });
 const uploadImageProduct = multer({ storage: storageProductImage });
 
-module.exports = {uploadAvatar, uploadImageProduct}
+export {uploadAvatar, uploadImageProduct}

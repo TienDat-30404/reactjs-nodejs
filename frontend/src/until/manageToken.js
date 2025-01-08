@@ -12,8 +12,10 @@ export const useAuthHandler = () => {
     const accessToken = Cookies.get('accessToken');
     const checkAndUpdateToken = async () => {
         if (accessToken) {
+            console.log("123")
             dispatch(loginSuccess({ dataLogin: jwtDecode(accessToken) }));
         } else {
+            console.log("123456")
             await handleRefreshToken();
         }
     };

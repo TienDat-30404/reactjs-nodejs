@@ -1,180 +1,189 @@
-const User = require('../model/UserModel')
-const cloudinary = require('../config/cloudinary');
-const refreshTokenJWT = require('../utils/jwt')
-const mongoose = require('mongoose')
+// const User = require('../model/UserModel')
+// const cloudinary = require('../config/cloudinary');
+// const refreshTokenJWT = require('../utils/jwt')
+// const mongoose = require('mongoose')
 
+
+import User from '../model/UserModel.js';
+import cloudinary from '../config/cloudinary.js';
+import mongoose from 'mongoose';
+import refreshTokenJWT from '../utils/jwt.js';
 // [PUT] : /update-user/:id
-const updateUser = async (req, res, next) => {
-    try {
-        const idUser = req.params.idUser
-        if (!mongoose.Types.ObjectId.isValid(idUser)) {
-            return res.status(400).json({ message: "Invalid User ID" });
-        }
-        const { name, address, phone, date_of_birth, sex } = req.body
-        const user = await User.findOne({ _id: idUser })
-                               
-        const newData = {
-            name: name,
-            address: address,
-            phone: phone,
-            date_of_birth: date_of_birth,
-            sex: sex,
-            avatar: user.avatar,
-        };
-        if (req.file) {
-            const fielAvatar = await cloudinary.uploader.upload(req.file.path);
-            newData.avatar = fielAvatar.secure_url
-        }
-        const dataUpdate = await User.findByIdAndUpdate(idUser, newData, {
-            new: true, 
-            runValidators: true, 
-        })
-        return res.status(200).json({
-            message: "Update Successfully",
-            newData,
-            dataUpdate,
-            status : 200
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-};
 
-const deleteUser = async (req, res, next) => {
-    try {
-        const idUser = req.params.idUser
-        const delUser = await User.deleteOne({ _id: idUser })
-        if (delUser.deletedCount > 0) {
+export default class UserController {
+
+    static async updateUser(req, res, next) {
+        try {
+            const idUser = req.params.idUser
+            if (!mongoose.Types.ObjectId.isValid(idUser)) {
+                return res.status(400).json({ message: "Invalid User ID" });
+            }
+            const { name, address, phone, date_of_birth, sex } = req.body
+            const user = await User.findOne({ _id: idUser })
+
+            const newData = {
+                name: name,
+                address: address,
+                phone: phone,
+                date_of_birth: date_of_birth,
+                sex: sex,
+                avatar: user.avatar,
+            };
+            if (req.file) {
+                const fielAvatar = await cloudinary.uploader.upload(req.file.path);
+                newData.avatar = fielAvatar.secure_url
+            }
+            const dataUpdate = await User.findByIdAndUpdate(idUser, newData, {
+                new: true,
+                runValidators: true,
+            })
             return res.status(200).json({
-                message: "Delete Successfully",
+                message: "Update Successfully",
+                newData,
+                dataUpdate,
+                status: 200
             })
         }
-        else {
-            return res.status(400).json({
-                message: "Delete Fail",
+        catch (error) {
+            next(error)
+        }
+    };
+
+    static async deleteUser(req, res, next)  {
+        try {
+            const idUser = req.params.idUser
+            const delUser = await User.deleteOne({ _id: idUser })
+            if (delUser.deletedCount > 0) {
+                return res.status(200).json({
+                    message: "Delete Successfully",
+                })
+            }
+            else {
+                return res.status(400).json({
+                    message: "Delete Fail",
+                })
+            }
+            /* 
+            - deleteMany : xóa nhiều trường dựa theo 1 điều kiện cụ thể( ở đây là các trường có id > 1)
+                await User.deleteMany({id: {$gt: 1}})   
+            -  Tìm nhiều tài liệu dựa trên điều kiện nhất định.
+                await User.find({id : {$gt : 56}})
+            - Tìm một tài liệu theo ID.(ở đây là _id trong database - là 1 chuỗi string)
+                await User.findById(idUser)  Tìm một tài liệu theo ID.(ở đây là _id trong database - là 1 chuỗi string)
+            - Tìm một tài liệu theo ID và xóa nó(tìm dựa vào _id trong db)
+                await User.findByIdAndDelete(idUser)    
+            - Tìm một tài liệu theo ID và cập nhật nó.(_id)
+                await User.findByIdAndUpdate(idUser, {name : "123"}) 
+            - Tìm một tài liệu dựa trên điều kiện nhất định.
+                await User.findOne({id : idUser})  
+            Tìm một tài liệu dựa trên điều kiện nhất định và xóa nó.(giống deleteOne nhưng khác nhau kiểu trả về)
+                await User.findOneAndDelete({id : idUser})  
+            - Tìm một tài liệu dựa trên điều kiện nhất định và thay thế nó bằng một tài liệu mới.(kết quả là trong các trường của id đấy đc thay thể
+              và chỉ có 2 thuộc tính là name, password còn các thuộc tính còn lại sẽ bị xóa)
+                await User.findOneAndReplace({id : idUser}, {name : "Jame", password : "1234567"})  
+            - Tìm một tài liệu dựa trên điều kiện nhất định và cập nhật nó.
+                await User.findOneAndUpdate({id : idUser}, {name : "Thomas"}, {new : true})
+            - Thay thế một tài liệu dựa trên điều kiện nhất định.(giống findOneAndReplcae nhưng khác nhau kiểu trả về)
+                await User.replaceOne({id : idUser}, {name : "123"}) 
+            - Cập nhật nhiều tài liệu dựa trên điều kiện nhất định.
+                await User.updateMany({id : {$lt : 62}}, {password : "11223344"})
+            - Cập nhật một tài liệu dựa trên điều kiện nhất định.
+                await User.updateOne({id : idUser}, {name : "Muller"})
+            */
+        }
+        catch (error) {
+            next(error)
+        }
+    }
+
+
+
+    static async detailUser(req, res, next)  {
+        try {
+            const detailUser = await User.findOne({ _id: req.params.idUser })
+            if (detailUser == null) {
+                return res.status(400).json({
+                    mesage: "Fail Detail User"
+                })
+            }
+            return res.status(200).json({
+                detailUser
             })
         }
-        /* 
-        - deleteMany : xóa nhiều trường dựa theo 1 điều kiện cụ thể( ở đây là các trường có id > 1)
-            await User.deleteMany({id: {$gt: 1}})   
-        -  Tìm nhiều tài liệu dựa trên điều kiện nhất định.
-            await User.find({id : {$gt : 56}})
-        - Tìm một tài liệu theo ID.(ở đây là _id trong database - là 1 chuỗi string)
-            await User.findById(idUser)  Tìm một tài liệu theo ID.(ở đây là _id trong database - là 1 chuỗi string)
-        - Tìm một tài liệu theo ID và xóa nó(tìm dựa vào _id trong db)
-            await User.findByIdAndDelete(idUser)    
-        - Tìm một tài liệu theo ID và cập nhật nó.(_id)
-            await User.findByIdAndUpdate(idUser, {name : "123"}) 
-        - Tìm một tài liệu dựa trên điều kiện nhất định.
-            await User.findOne({id : idUser})  
-        Tìm một tài liệu dựa trên điều kiện nhất định và xóa nó.(giống deleteOne nhưng khác nhau kiểu trả về)
-            await User.findOneAndDelete({id : idUser})  
-        - Tìm một tài liệu dựa trên điều kiện nhất định và thay thế nó bằng một tài liệu mới.(kết quả là trong các trường của id đấy đc thay thể
-          và chỉ có 2 thuộc tính là name, password còn các thuộc tính còn lại sẽ bị xóa)
-            await User.findOneAndReplace({id : idUser}, {name : "Jame", password : "1234567"})  
-        - Tìm một tài liệu dựa trên điều kiện nhất định và cập nhật nó.
-            await User.findOneAndUpdate({id : idUser}, {name : "Thomas"}, {new : true})
-        - Thay thế một tài liệu dựa trên điều kiện nhất định.(giống findOneAndReplcae nhưng khác nhau kiểu trả về)
-            await User.replaceOne({id : idUser}, {name : "123"}) 
-        - Cập nhật nhiều tài liệu dựa trên điều kiện nhất định.
-            await User.updateMany({id : {$lt : 62}}, {password : "11223344"})
-        - Cập nhật một tài liệu dựa trên điều kiện nhất định.
-            await User.updateOne({id : idUser}, {name : "Muller"})
-        */
+        catch (error) {
+            next(error)
+        }
     }
-    catch (error) {
-        next(error)
-    }
-}
 
-
-
-const detailUser = async (req, res, next) => {
-    try {
-        const detailUser = await User.findOne({ _id: req.params.idUser })
-        if (detailUser == null) {
-            return res.status(400).json({
-                mesage: "Fail Detail User"
+    static async refreshToken(req, res, next)  {
+        try {
+            const token = req.cookies.refreshToken
+            if (!token) {
+                return res.status(401)
+            }
+            const tokenNew = await refreshTokenJWT.refreshToken(token)
+            return res.status(200).json({
+                refreshToken: token,
+                success: "Success",
+                tokenNew
             })
         }
-        return res.status(200).json({
-            detailUser
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-}
-
-const refreshToken = async (req, res, next) => {
-    try {
-        const token = req.cookies.refreshToken
-        if (!token) {
-            return res.status(401)
-        }
-        const tokenNew = await refreshTokenJWT.refreshToken(token)
-        return res.status(200).json({
-            refreshToken: token,
-            success: "Success",
-            tokenNew
-        })
-    }
-    catch (error) {
-        if (error.name === 'TokenExpiredError') {
-            res.status(401).json({ message: "Token has expired" });
-        } else {
-            res.status(400).json({ message: "Error Refresh Token" });
+        catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                res.status(401).json({ message: "Token has expired" });
+            } else {
+                res.status(500).json({ message: `Error Refresh Token : ${error}`})
+            }
         }
     }
+
+
+    static async logoutRefreshToken (req, res, next)  {
+        try {
+            res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
+            return res.status(200).json({
+                message: "Success"
+            })
+        }
+        catch (error) {
+            next(error)
+        }
+
+    }
+
+
+
+
+
+    static async searchUser(req, res, next)  {
+        const { idUser, name, email, phone, idRole } = req.query
+        const searchParams = {}
+        if (idUser) {
+            searchParams.idUser = idUser
+        }
+        if (name) {
+            searchParams.name = { $regex: name, $options: 'i' }; // 'i' để tìm không phân biệt chữ hoa chữ thường
+        }
+        if (email) {
+            searchParams.email = { $regex: email };
+        }
+        if (phone) {
+            searchParams.phone = { $regex: phone }
+        }
+        if (idRole) {
+            searchParams.idRole = idRole
+        }
+
+        try {
+            const users = await User.find(searchParams)
+            return res.status(200).json({ users })
+        }
+        catch (error) {
+            return res.status(400).json({ message: error.message })
+        }
+    }
+
 }
 
 
-const logoutRefreshToken = (req, res, next) => {
-    try {
-        res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
-        return res.status(200).json({
-            message: "Success"
-        })
-    }
-    catch (error) {
-        next(error)
-    }
-
-}
-
-
-
-
-
-const searchUser = async (req, res, next) => {
-    const { idUser, name, email, phone, idRole } = req.query
-    const searchParams = {}
-    if (idUser) {
-        searchParams.idUser = idUser
-    }
-    if (name) {
-        searchParams.name = { $regex: name, $options: 'i' }; // 'i' để tìm không phân biệt chữ hoa chữ thường
-    }
-    if (email) {
-        searchParams.email = { $regex: email };
-    }
-    if (phone) {
-        searchParams.phone = { $regex: phone }
-    }
-    if (idRole) {
-        searchParams.idRole = idRole
-    }
-
-    try {
-        const users = await User.find(searchParams)
-        return res.status(200).json({ users })
-    }
-    catch (error) {
-        return res.status(400).json({ message: error.message })
-    }
-}
-
-
-
-module.exports = { updateUser, deleteUser, refreshToken, detailUser, logoutRefreshToken, searchUser }
+// export { updateUser, deleteUser, refreshToken, detailUser, logoutRefreshToken, searchUser }

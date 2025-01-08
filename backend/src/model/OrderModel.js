@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 const OrderSchema = new Schema(
     {
@@ -23,4 +23,4 @@ OrderSchema.virtual('orderDetails', {
 })
 
 const Order = mongoose.model('Order', OrderSchema);
-module.exports = Order;
+export default Order

@@ -1,7 +1,9 @@
-const express = require('express')
-const router = express.Router()
-const NotificationController = require('../controller/NotificationController')
-const { authenticateToken } = require('../middlewares/authencationMiddleWare')
+import express from 'express';
+import NotificationController from '../controller/NotificationController.js';
+import { authenticateToken } from '../middlewares/authencationMiddleWare.js';
+
+const router = express.Router();
+
 router.get('/get-notification-user', NotificationController.getNotificationOfUser)
 router.patch('/read-notification', NotificationController.readNotification)
-module.exports = router
+export default router

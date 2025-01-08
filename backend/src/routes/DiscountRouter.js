@@ -1,5 +1,7 @@
-const express = require('express')
-const router = express.Router()
-const DiscountController = require('../controller/DiscountController')
+import express from 'express';
+import DiscountController from '../controller/DiscountController.js';
+
+const router = express.Router();
+
 router.post('/add-discount', DiscountController.addDiscount)
-module.exports = router
+export default router

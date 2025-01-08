@@ -22,7 +22,7 @@ export default function CartProduct({ id, image, name, priceNotDiscount, percent
     // const flyingHeartRef = useRef(null);
 
     useEffect(() => {
-        const query = `idUser=${idUser}`
+        const query = `idUser=${idUser}&limit=100`
         const fetchData = async () => {
             const response = await getFavoriteOfUserService(query)
             console.log(response)
@@ -92,7 +92,7 @@ export default function CartProduct({ id, image, name, priceNotDiscount, percent
                     <p style={{ fontSize: "16px" }} className="text-danger fw-bold">{price}đ</p>
                     
                     {Array.from({ length: 5 }, (_, index) => {
-                        if (index + 1 < totalReview) {
+                        if (index + 1 <= totalReview) {
                             return <i key={index} style={{ fontSize: "12px", color: "orange" }} className="bi bi-star-fill"></i>;
                         }
                         else if (totalReview >= Math.floor(totalReview) + 0.5 && totalReview > index) {

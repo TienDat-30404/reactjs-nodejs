@@ -22,4 +22,5 @@ const validateAddOrder = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = validateAddOrder
+// module.exports = validateAddOrder
+export default validateAddOrder

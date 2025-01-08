@@ -106,7 +106,7 @@ export default function Detail() {
                                 <p style={{ marginTop: '2px' }} className='mb-0 me-2'>{totalReview}</p>
 
                                 {Array.from({ length: 5 }, (_, index) => {
-                                    if (index + 1 < totalReview) {
+                                    if (index + 1 <= totalReview) {
                                         return <i key={index} style={{ fontSize: "12px", color: "orange" }} className="bi bi-star-fill"></i>;
                                     }
                                     else if (totalReview >= Math.floor(totalReview) + 0.5 && totalReview > index) {

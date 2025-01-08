@@ -62,7 +62,6 @@ export default function InformationBasicProfile() {
             setDataUpdate(null);
         }
     }, [isAuthenticated, userData, dataUser]);
-
     const fetchApiUpdateUser = async (id, data) => {
         try {
             const resultUpdate = await updateUser(id, data)
@@ -90,15 +89,16 @@ export default function InformationBasicProfile() {
     };
 
     const handleSaveChanges = async () => {
-        if (dataUpdate && userData.dataLogin.idUser) {
+        console.log(dataUpdate)
+        if (dataUpdate && userData?.dataLogin?.idUser) {
             var formData = new FormData()
-            formData.append('name', dataUpdate.name)
-            formData.append('address', dataUpdate.address)
-            formData.append('phone', dataUpdate.phone)
-            formData.append('date_of_birth', dataUpdate.date_of_birth)
-            formData.append('sex', dataUpdate.sex)
+            formData.append('name', dataUpdate?.name)
+            formData.append('address', dataUpdate?.address)
+            formData.append('phone', dataUpdate?.phone)
+            formData.append('date_of_birth', dataUpdate?.date_of_birth)
+            formData.append('sex', dataUpdate?.sex)
             formData.append('avatar', avatar)
-            fetchApiUpdateUser(userData.dataLogin.idUser, formData);
+            fetchApiUpdateUser(userData?.dataLogin?.idUser, formData);
         }
     };
 
@@ -110,21 +110,7 @@ export default function InformationBasicProfile() {
         }));
     };
 
-    // const handleImageChange = (e) => {
-    //     const file = e.target.files[0];
-    //     if (file) {
-    //         const reader = new FileReader();
-    //         reader.onloadend = () => {
-    //             const base64Image = reader.result;
-    //             setDataUser(prevInfor => ({
-    //                 ...prevInfor,
-    //                 avatar: reader.result
-    //             }));
-    //             localStorage.setItem('avatar', base64Image); // Lưu ảnh mới vào localStorage
-    //         };
-    //         reader.readAsDataURL(file);
-    //     }
-    // };
+  
 
     const handleChangeFile = (e) => {
         const selectedFileImage = e.target.files[0]

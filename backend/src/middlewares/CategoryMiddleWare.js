@@ -1,5 +1,9 @@
-const Category = require('../model/CartModel')
-const { isCheckExistNameCategory, isCheckExistCategory} = require('../utils/validate')
+// const Category = require('../model/CartModel')
+// const { isCheckExistNameCategory, isCheckExistCategory} = require('../utils/validate')
+
+import Category from '../model/CartModel.js';
+import { isCheckExistNameCategory, isCheckExistCategory } from '../utils/validate.js';
+
 const validateAddCategory = async (req, res, next) => {
     const {name} = req.body
     const existNameCategory = await isCheckExistNameCategory(name)
@@ -52,6 +56,6 @@ const middlewareUpdateCategory = async(req, res, next) => {
     next()
 }
 
-module.exports = {
+export {
     validateAddCategory, middlewareUpdateCategory
 }

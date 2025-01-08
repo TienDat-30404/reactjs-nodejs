@@ -1,4 +1,5 @@
-const Favorite = require('../model/FavoriteModel')
+// const Favorite = require('../model/FavoriteModel')
+import Favorite from '../model/FavoriteModel.js'
 const addFavoriteMiddleWare = async (req, res, next) => {
     try {
         const { idUser, idProduct } = req.body
@@ -18,4 +19,4 @@ const addFavoriteMiddleWare = async (req, res, next) => {
     }
 }
 
-module.exports = { addFavoriteMiddleWare }
+export { addFavoriteMiddleWare }

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema
 const SizeSchema = new Schema(
     {
@@ -29,4 +29,4 @@ const createDefaultSize = async () => {
 
 createDefaultSize();
 
-module.exports = Size
+export default Size

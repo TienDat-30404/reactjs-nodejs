@@ -17,6 +17,7 @@ import LoginModal from "../../../pages/Login/Login";
 import Notification1 from "./Notification";
 import { ToastContainer } from "react-toastify";
 import SignUpModal from "../../../pages/SignUp/SignUp";
+import { removeFavoriteWhenLogout } from "../../../redux/Favorite/favoritesSlice";
 const Header = () => {
 
     const [showModal, setShowModal] = useState(false);
@@ -40,6 +41,7 @@ const Header = () => {
         toast.success("Đăng xuất thành công")
         await logoutUser()
         dispatch(logoutSuccess());
+        dispatch(removeFavoriteWhenLogout())
         navigate('/')
     };
 

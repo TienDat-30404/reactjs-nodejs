@@ -1,9 +1,11 @@
-const express = require('express')
-const router = express.Router()
-const {uploadImageProduct} = require('../utils/multerConfig')
-const authencationMiddleWare = require('../middlewares/authencationMiddleWare')
-const ProductController = require('../controller/ProductController')
-const {validateAddProduct, validateUpdateProduct, validateDeleteProduct} = require('../middlewares/ProductMiddleWare')
+import express from 'express';
+import { uploadImageProduct } from '../utils/multerConfig.js';
+// import {authencationMiddleWare} from '../middlewares/authencationMiddleWare.js';
+import ProductController from '../controller/ProductController.js';
+import { validateAddProduct, validateUpdateProduct, validateDeleteProduct } from '../middlewares/ProductMiddleWare.js';
+
+const router = express.Router();
+
 router.post('/add-product', uploadImageProduct.single('image'), validateAddProduct, ProductController.addProduct)
 router.put('/update-product/:_id', uploadImageProduct.single('image'), validateUpdateProduct, ProductController.updateProduct)
 router.delete('/delete-product/:idProduct', 
@@ -14,4 +16,4 @@ router.delete('/delete-product/:idProduct',
 router.get('/get-all-product', ProductController.getAllProduct)
 router.get('/detail-product/:_id', ProductController.getDetailProduct)
 router.get('/price', ProductController.getPrice)
-module.exports = router
+export default router

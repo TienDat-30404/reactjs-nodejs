@@ -1,5 +1,8 @@
-const jwt = require('jsonwebtoken')
-const refreshTokenJWT = require('../utils/jwt')
+// const jwt = require('jsonwebtoken')
+// const refreshTokenJWT = require('../utils/jwt')
+
+import jwt from 'jsonwebtoken';
+import refreshTokenJWT from '../utils/jwt.js';
 
 const authencationMiddleWare = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -79,4 +82,4 @@ const authenticateToken = async (req, res, next) => {
     }
 };
 
-module.exports = {authencationMiddleWare, authenticateToken}
+export {authencationMiddleWare, authenticateToken}

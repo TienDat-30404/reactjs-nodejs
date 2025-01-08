@@ -1,5 +1,7 @@
-const express = require('express')
-const router = express.Router()
-const SizeController = require('../controller/SizeController')
+import express from 'express';
+import SizeController from '../controller/SizeController.js';
+
+const router = express.Router();
+
 router.get('/add-size', SizeController.addSize)
-module.exports = router
+export default router

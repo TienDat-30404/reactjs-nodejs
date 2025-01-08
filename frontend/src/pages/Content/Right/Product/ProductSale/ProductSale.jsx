@@ -90,7 +90,7 @@ export default function ProductSale() {
                             totalReview = {
                                 product?.reviews?.length > 0
                                 ? 
-                                (product?.reviews?.reduce((sum, review) => sum + review.rating, 0) / product?.reviews).toFixed(2)
+                                (product?.reviews?.reduce((sum, review) => sum + review?.rating, 0) / product?.reviews?.length).toFixed(2)
                                 :
                                 0
                             }

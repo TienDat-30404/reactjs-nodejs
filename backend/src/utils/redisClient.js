@@ -1,5 +1,5 @@
-const redis = require('redis');
-
+// const redis = require('redis');
+import redis from 'redis'
 // Cấu hình kết nối Redis
 const client = redis.createClient({
     host: 'host.docker.internal', // Địa chỉ Redis server (sử dụng mặc định localhost)
@@ -17,4 +17,4 @@ const client = redis.createClient({
 })();
 
 
-module.exports = client;
+export default client;

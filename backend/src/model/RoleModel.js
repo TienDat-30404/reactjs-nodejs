@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
-const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const RoleSchema = new Schema(
     {
@@ -37,4 +36,4 @@ const createDefaultRoles = async () => {
 // Gọi hàm khởi tạo khi ứng dụng khởi động
 createDefaultRoles();
 
-module.exports = Role;
+export default Role

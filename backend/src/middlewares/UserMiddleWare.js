@@ -1,8 +1,14 @@
-const { validateEmail } = require('../utils/validate')
-const User = require('../model/UserModel')
-const Account = require('../model/AccountModel')
-const bcrypt = require('bcrypt')
-const { generateToken, generateRefreshToken } = require('../utils/jwt')
+// const { validateEmail } = require('../utils/validate')
+// const User = require('../model/UserModel')
+// const Account = require('../model/AccountModel')
+// const bcrypt = require('bcrypt')
+// const { generateToken, generateRefreshToken } = require('../utils/jwt')
+
+import { validateEmail } from '../utils/validate.js';
+import User from '../model/UserModel.js';
+import Account from '../model/AccountModel.js';
+import bcrypt from 'bcrypt';
+
 // validate for sign in
 const validateSignIn = async (req, res, next) => {
     try {
@@ -201,4 +207,4 @@ const authLoginGoogle = async (req, res, next) => {
         next(error)
     }
 }
-module.exports = { validateSignIn, validateLogin, validateUpdateUser, validateChangePassword, authLoginGoogle }
+export { validateSignIn, validateLogin, validateUpdateUser, validateChangePassword, authLoginGoogle }

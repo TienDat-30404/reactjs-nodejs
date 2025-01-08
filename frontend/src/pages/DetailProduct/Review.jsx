@@ -110,7 +110,7 @@ export default function Review({ idProduct }) {
           <button class="btn btn-outline-secondary" type="button">Bình luận</button>
         </div>
       </div>
-      {reviews && reviews?.length > 0 && reviews.map((review, index) => (
+      {reviews && reviews?.length > 0 && reviews?.map((review, index) => (
         <div key={index} className='py-3 border-bottom'>
           <div className='d-flex'>
             <img style={{ width: '40px', height: '40px' }} src="https://tse2.mm.bing.net/th?id=OIP.7MddAHCT3e7T8Z_gLwVffwHaE8&pid=Api&P=0&h=180" class="card-img-top" alt="..." />

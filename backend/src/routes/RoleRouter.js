@@ -1,7 +1,9 @@
-const express = require('express')
-const router = express.Router()
-const RoleController = require('../controller/RoleController')
+import express from 'express';
+import RoleController from '../controller/RoleController.js';
+
+const router = express.Router();
+
 router.post('/add-role', RoleController.addRole)
 router.get('/get-all-role', RoleController.getAllRole)
 router.get('/detail-role/:_id', RoleController.detailRole )
-module.exports = router
+export default router

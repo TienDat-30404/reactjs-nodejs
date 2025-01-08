@@ -1,17 +1,19 @@
-const UserRouter = require('./UserRouter')
-const ProductRouter = require('./ProductRouter')
-const CategoryRouter = require('./CategoryRouter')
-const CartRouter = require('./CartRouter')
-const OrderRouter = require('./OrderRouter')
-const RoleRouter = require('./RoleRouter')
-const MessageRouter = require('./MessageRouter')
-const AccountRouter = require('./AccountRouter')
-const SizeRouter = require('./SizeRouter')
-const DiscountRouter = require('./DiscountRouter')
-const ReviewRouter = require('./ReviewRouter')
-const VoucherRouter = require('./VoucherRouter')
-const Notification = require('./NotificationRouter')
-const FavoriteRouter = require('./FavoriteRouter')
+import UserRouter from './UserRouter.js';
+import ProductRouter from './ProductRouter.js';
+import CategoryRouter from './CategoryRouter.js';
+import CartRouter from './CartRouter.js';
+import OrderRouter from './OrderRouter.js';
+import RoleRouter from './RoleRouter.js';
+import MessageRouter from './MessageRouter.js';
+import AccountRouter from './AccountRouter.js';
+import SizeRouter from './SizeRouter.js';
+import DiscountRouter from './DiscountRouter.js';
+import ReviewRouter from './ReviewRouter.js';
+import VoucherRouter from './VoucherRouter.js';
+import NotificationRouter from './NotificationRouter.js';
+import FavoriteRouter from './FavoriteRouter.js';
+import PaymentRouter from './PaymentRouter.js';
+
 const routes = (app) => {
     app.use('/', UserRouter)
     app.use('/', ProductRouter)
@@ -25,7 +27,8 @@ const routes = (app) => {
     app.use('/', DiscountRouter)
     app.use('/', ReviewRouter)
     app.use('/', VoucherRouter)
-    app.use('/', Notification)
+    app.use('/', NotificationRouter)
     app.use('/', FavoriteRouter)
+    app.use('/', PaymentRouter)
 }
-module.exports = routes
+export default routes
