@@ -46,15 +46,13 @@ export const debounce = (func, delay) => {
 
 export const useLoadMoreData = () => {
     const loadMoreData = useCallback((limit, total, func, dispatch, element) => {
-        let scrollPosition; 
+        let scrollPosition;
         let bottomPosition
-        if(element)
-        {
+        if (element) {
             scrollPosition = element.scrollTop + element.clientHeight;
             bottomPosition = element.scrollHeight;
         }
-        else 
-        {
+        else {
             scrollPosition = window.scrollY + window.innerHeight;
             bottomPosition = document.documentElement.scrollHeight;
         }
@@ -63,4 +61,20 @@ export const useLoadMoreData = () => {
         }
     }, []);
     return loadMoreData
+}
+
+
+export const validateInformationPayment = (data) => {
+    const errors = {}
+    const phoneRegex = /^09\d{8,9}$/;
+    if (data.phone == "") {
+        errors.phone = "Số điện thoại không được để trống";
+    }
+    if (data.address == "") {
+        errors.address = "Địa chỉ không được để trống"
+    }
+    if (!phoneRegex.test(data.phone) && data.phone != "") {
+        errors.phone = "Số điện thoại không hợp lệ";
+    }
+    return errors
 }

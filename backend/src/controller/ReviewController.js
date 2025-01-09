@@ -7,7 +7,7 @@ class ReviewController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 3;
             const startPage = (page - 1) * limit;
-            const  idProduct  = req.params; // Sử dụng destructuring để lấy idProduct từ params
+            const  idProduct  = req.params; 
             const listReview = await Review.find({ idProduct: idProduct })
                 .skip(startPage)
                 .limit(limit)

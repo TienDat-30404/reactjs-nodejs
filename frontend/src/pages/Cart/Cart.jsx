@@ -98,7 +98,7 @@ export default function Cart() {
             )
         )
         , 0)
-    // * cart?.attribute?.product?.discount?.discountValue
+        
     const totalPriceDiscountProduct = cartsCheck.reduce((sum, cart) =>
         sum +
         (

@@ -1,14 +1,20 @@
-// backend/utils/vnpayUtils.js
-import crypto from 'crypto';
-import { VNPAY_HASH_SECRET } from '../config/vnpayConfig';
 
+function sortObjectVnpay(obj) {
+  let sorted = {};
+  let str = [];
+  let key;
 
-// Hàm tạo chữ ký cho VNPAY
-function createSecureHash(params) {
-  const sortedKeys = Object.keys(params).sort();
-  const queryString = sortedKeys.map(key => `${key}=${params[key]}`).join('&');
-  const hashData = queryString + '&' + `vnp_SecureHashType=SHA256&vnp_SecureHash=${crypto.createHmac('sha256', VNPAY_HASH_SECRET).update(queryString).digest('hex')}`;
-  return hashData;
+  for (key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      str.push(encodeURIComponent(key));
+    }
+  }
+
+  str.sort();
+
+  for (key = 0; key < str.length; key++) {
+    sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+  }
+  return sorted;
 }
-
-export{ createSecureHash };
+export { sortObjectVnpay };

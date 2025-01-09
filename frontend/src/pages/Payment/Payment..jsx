@@ -8,14 +8,19 @@ import { addOrder } from '../../services/OrderService';
 import { toast, ToastContainer } from 'react-toastify';
 import { addVoucher, deleteVoucher } from '../../redux/Voucher/vouchersSlice';
 import { removeUseVoucher } from '../../redux/Voucher/vouchersSlice';
+import { paymentByVnpService } from '../../services/PaymentService';
+import { validateInformationPayment } from '../../until/function';
 export default function Payment() {
     const dispatch = useDispatch()
-    const nagigate = useNavigate()
+    const navigate = useNavigate()
     const useVoucher = useSelector(state => state?.vouchers?.useVoucher)
-    let { isAuthenticated, userData, dataCart } = useSelector(state => state.auth)
-    const idUser = isAuthenticated && userData.dataLogin.idUser
     const location = useLocation();
     let { cartsCheck } = location.state || {};
+
+    let { isAuthenticated, userData, dataCart } = useSelector(state => state.auth)
+    const idUser = isAuthenticated && userData?.dataLogin?.idUser
+    const phone = isAuthenticated && userData?.dataLogin?.phone
+
     // total Price
     const totalPrice = cartsCheck.reduce((sum, cart) =>
         sum +
@@ -36,50 +41,52 @@ export default function Payment() {
     const [provinces, setProvinces] = useState([])
     const [districts, setDistricts] = useState([])
     const [wards, setWards] = useState([])
-    const [banks, setBanks] = useState([])
-
-    const [informations, setInformations] = useState({
-        nameUser: '',
-        phone: '',
+    const [chooseAddress, setChooseAddress] = useState({
         province: '',
         district: '',
-        ward: '',
+        ward: ''
+    })
+    const [showPayment, setShowPayment] = useState('payLater')
+    // const [banks, setBanks] = useState([])
+
+    const [informations, setInformations] = useState({
+        idUser: isAuthenticated && userData?.dataLogin?.idUser ? userData.dataLogin.idUser : "",
+        phone: '',
         address: '',
         paymentMethod: '',
-        bankAccount: ''
+        bankAccount: '',
+        products: [],
+        totalPrice: '',
+        paymentMethod: '',
+        bankAccount: '',
+        useVoucher: []
     })
 
-    const [showPayment, setShowPayment] = useState('payLater')
-    const displayDefaultInformation = useCallback(() => {
-        if (isAuthenticated && userData?.dataLogin) {
-            const { name, phone } = userData.dataLogin
-            setInformations({
-                nameUser: name,
-                phone,
-                province: '',
-                district: '',
-                ward: '',
-                address: '',
-                paymentMethod: '',
-                bankAccount: ''
-            })
-        } else {
-            setInformations({
-                nameUser: '',
-                phone: '',
-                province: '',
-                district: '',
-                ward: '',
-                address: '',
-                paymentMethod: '',
-                bankAccount: ''
-            })
-        }
-    }, [isAuthenticated, userData])
-
     useEffect(() => {
-        displayDefaultInformation()
-    }, [displayDefaultInformation]);
+        if (idUser) {
+            const provinceName = provinces.find(province => province?.id === chooseAddress?.province)?.name || "";
+            const districtName = districts.find(district => district?.id === chooseAddress?.district)?.name || "";
+            const wardName = wards.find(ward => ward?.id === chooseAddress?.ward)?.name || "";
+            let fullAddress = ""
+            if(provinceName && districtName && wardName)
+            {
+                fullAddress = provinceName + ", " + districtName + ", " + wardName
+            }
+            setInformations(prev => ({
+                ...prev,
+                idUser,
+                phone,
+                totalPrice,
+                products: cartsCheck,
+                address: fullAddress,
+                useVoucher,
+                paymentMethod : showPayment === 'payLater' ? "Thanh toán khi đã nhận hàng" : "VNPAY",
+
+
+            }))
+        }
+    }, [idUser, phone, cartsCheck, chooseAddress.province, chooseAddress.district, chooseAddress.ward, showPayment])
+
     // fetch data province
     useEffect(() => {
         const fetchDataProvince = async () => {
@@ -93,31 +100,31 @@ export default function Payment() {
     // fetch data district 
     useEffect(() => {
         const fetchDatasDistrict = async () => {
-            const response = await fetch(`https://esgoo.net/api-tinhthanh/2/${informations.province}.htm`)
+            const response = await fetch(`https://esgoo.net/api-tinhthanh/2/${chooseAddress.province}.htm`)
             const result = await response.json()
             setDistricts(result.data)
         }
         fetchDatasDistrict()
-    }, [informations.province])
+    }, [chooseAddress.province])
     // fetch data ward
     useEffect(() => {
         const fetchDatasWard = async () => {
-            const response = await fetch(`https://esgoo.net/api-tinhthanh/3/${informations.district}.htm`)
+            const response = await fetch(`https://esgoo.net/api-tinhthanh/3/${chooseAddress.district}.htm`)
             const result = await response.json()
             setWards(result.data)
         }
         fetchDatasWard()
-    }, [informations.district])
+    }, [chooseAddress.district])
 
     // fetch data Bank
-    useEffect(() => {
-        const fetchDatasBank = async () => {
-            const response = await fetch('https://api.vietqr.io/v2/banks')
-            const result = await response.json()
-            setBanks(result.data)
-        }
-        fetchDatasBank()
-    }, [])
+    // useEffect(() => {
+    //     const fetchDatasBank = async () => {
+    //         const response = await fetch('https://api.vietqr.io/v2/banks')
+    //         const result = await response.json()
+    //         setBanks(result.data)
+    //     }
+    //     fetchDatasBank()
+    // }, [])
     // set value Input
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
@@ -126,28 +133,38 @@ export default function Payment() {
             [name]: value
         }));
     };
-    // handle button buy Product
+
+    const handleChangeInputChooseAddress = (e) => {
+        const { name, value } = e.target;
+        setChooseAddress(prevInfor => ({
+            ...prevInfor,
+            [name]: value
+        }));
+    }
+
+    // handle pay
     const handleBuy = async () => {
+       
+        if (showPayment === 'vnpay') {
+            const validateInputErrors = validateInformationPayment(informations)
+            if(Object.keys(validateInputErrors).length > 0)
+            {
+                console.log(validateInputErrors)
+                setErrors(validateInputErrors)
+                return
+            }
+            const response = await paymentByVnpService({
+                amount: totalPrice,
+                content: informations?.address
+                // content : ` ${provinces?.find(province => province?.id === informations?.province)?.name}, ${districts?.find(district => district?.id === informations?.district)?.name}, ${wards?.find(ward => ward?.id === informations?.ward)?.name}, ${informations?.address}`
+            })
+            window.location.href = response.vnpUrl
+            
+            localStorage.setItem('informationPayment', JSON.stringify(informations))
+            return
+        }
 
-        const response = await addOrder({
-            idUser,
-            totalPrice,
-            phone: informations?.phone,
-            address:
-                informations?.province && informations?.district && informations?.ward && informations?.address
-                    ? ` ${provinces.find(province => province?.id === informations?.province)?.name}, ${districts.find(district => district?.id === informations?.district)?.name}, ${wards.find(ward => ward?.id === informations?.ward)?.name}, ${informations?.address}`
-                    :
-                    "",
-            paymentMethod: informations?.paymentMethod ?
-                banks.find(bank => bank?.id === parseInt(informations?.paymentMethod))?.name : 'Thanh toán sau khi nhận hàng',
-
-            bankAccount: informations?.bankAccount,
-            products: cartsCheck,
-            totalPrice: totalPrice,
-            useVoucher: useVoucher
-
-        })
-        console.log(response)
+        const response = await addOrder(informations)
         if (response.errors) {
             setErrors(response.errors)
             return
@@ -156,8 +173,7 @@ export default function Payment() {
             alert("Lỗi khi thanh toán")
             return
         }
-        if(response && response.status === 201)
-        {
+        if (response && response.status === 201) {
             const idProductCartCheck = new Set(cartsCheck.map(item => item.idProduct));
             dataCart = dataCart?.carts?.filter(item => !idProductCartCheck.has(item.idProduct));
             dispatch(deleteVoucher(useVoucher[0]?._id))
@@ -167,10 +183,12 @@ export default function Payment() {
             })
             toast("Đặt hàng thành công")
             setTimeout(() => {
-                nagigate('/')
+                navigate('/')
             }, 2500)
         }
     }
+
+
     return (
         <div>
             <div className='w-100 bg-white'>
@@ -209,17 +227,7 @@ export default function Payment() {
                     <p style={{ fontSize: '15px', color: 'rgb(51, 51, 51', fontFamily: 'Inter,Helvetica,Arial,sans-serif' }} className='py-3 fw-bold'>Địa chỉ giao hàng</p>
                     <div style={{ backgroundColor: 'rgb(247, 247, 247)', border: '1px solid rgb(221, 221, 221)' }} className='col-12 '>
                         <div className='py-4 '>
-                            <div className='col-auto mb-3 d-flex col-12 justify-content-center'>
-                                <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Họ và tên</label>
-                                <InputComponent
-                                    name="nameUser"
-                                    value={informations.nameUser}
-                                    onChange={handleChangeInput}
-                                    type="text"
-                                    className='form-control'
-                                    style={{ width: '350px', height: '35px', border: '1px solid #ccc' }}
-                                />
-                            </div>
+
                             <div className='col-auto mb-3 d-flex justify-content-center'>
                                 <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Số điện thoại</label>
                                 <div>
@@ -238,11 +246,10 @@ export default function Payment() {
                             <div className='col-auto mb-3 d-flex justify-content-center'>
                                 <label style={{ fontSize: '14px', color: 'rgb(51, 51, 51)', fontWeight: '600', width: '200px' }} className='col-form-label'>Tỉnh/Thành phố</label>
                                 <div>
-
                                     <select
                                         name="province"
-                                        value={informations.province}
-                                        onChange={handleChangeInput}
+                                        value={chooseAddress.province}
+                                        onChange={handleChangeInputChooseAddress}
                                         className={`form-control ${errors.address ? 'is-invalid' : ''} `}
                                         style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
                                     >
@@ -256,7 +263,7 @@ export default function Payment() {
                                             <option></option>
                                         }
                                     </select>
-                                    {informations.province === "" && <ErrorMessageInput errors={errors} field="address" />}
+                                    {chooseAddress.province === "" && <ErrorMessageInput errors={errors} field="address" />}
                                 </div>
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
@@ -264,8 +271,8 @@ export default function Payment() {
                                 <div>
                                     <select
                                         name="district"
-                                        value={informations.district}
-                                        onChange={handleChangeInput}
+                                        value={chooseAddress.district}
+                                        onChange={handleChangeInputChooseAddress}
                                         className={`form-control ${errors.address ? 'is-invalid' : ''} `}
                                         style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
                                     >
@@ -279,7 +286,7 @@ export default function Payment() {
                                             <option disabled>Not Found</option>
                                         }
                                     </select>
-                                    {informations.district === "" && <ErrorMessageInput errors={errors} field="address" />}
+                                    {chooseAddress.district === "" && <ErrorMessageInput errors={errors} field="address" />}
                                 </div>
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
@@ -287,8 +294,8 @@ export default function Payment() {
                                 <div>
                                     <select
                                         name="ward"
-                                        value={informations.ward}
-                                        onChange={handleChangeInput}
+                                        value={chooseAddress.ward}
+                                        onChange={handleChangeInputChooseAddress}
                                         className={`form-control ${errors.address ? 'is-invalid' : ''} `}
                                         style={{ width: '350px', height: '35px', border: '1px solid #cccc' }}
                                     >
@@ -302,7 +309,7 @@ export default function Payment() {
                                             <option disabled>Not Found</option>
                                         }
                                     </select>
-                                    {informations.ward === "" && <ErrorMessageInput errors={errors} field="address" />}
+                                    {chooseAddress.ward === "" && <ErrorMessageInput errors={errors} field="address" />}
                                 </div>
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-center'>
@@ -322,6 +329,19 @@ export default function Payment() {
                             <div className='col-auto mb-3 d-flex justify-content-center align-items-center'>
                                 <div class="form-check me-5">
                                     <InputComponent
+                                        value="vnpay"
+                                        onChange={(e) => setShowPayment(e.target.value)}
+                                        checked={showPayment === 'vnpay'}
+                                        style={{ border: '1px solid #ccc' }} class="form-check-input"
+                                        type="radio"
+                                        name="flexRadioDefault"
+                                    />
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Thanh toán bằng vnpay
+                                    </label>
+                                </div>
+                                {/* <div class="form-check me-5">
+                                    <InputComponent
                                         value="payNow"
                                         onChange={(e) => setShowPayment(e.target.value)}
                                         checked={showPayment === 'payNow'}
@@ -332,7 +352,7 @@ export default function Payment() {
                                     <label class="form-check-label" for="flexRadioDefault1">
                                         Thanh toán ngay
                                     </label>
-                                </div>
+                                </div> */}
                                 <div class="form-check">
                                     <InputComponent
                                         value="payLater"
@@ -347,7 +367,7 @@ export default function Payment() {
                                     </label>
                                 </div>
                             </div>
-                            {showPayment === 'payNow' ? (
+                            {/* {showPayment === 'payNow' ? (
 
                                 <div>
                                     <div className='col-auto mb-3 d-flex justify-content-center'>
@@ -384,7 +404,7 @@ export default function Payment() {
                                 </div>
                             ) :
                                 <></>
-                            }
+                            } */}
                             <div className='d-flex justify-content-center'>
                                 <button
                                     style={{ border: '1px solid #ccc', marginLeft: '200px', width: '163px', boxShadow: '1px 1px 0px 0px' }}
