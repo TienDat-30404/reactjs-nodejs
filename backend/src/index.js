@@ -1,10 +1,8 @@
 import express from 'express';
 import http from 'http';
 // import * as socketIo from 'socket.io';  // Thêm socket.io
-
 import dotenv from 'dotenv';
 dotenv.config();
-
 import connectDB from './config/connect.js';
 connectDB();
 
@@ -21,14 +19,12 @@ app.use(express.json());
 
 import cors from 'cors';
 const corsOptions = {
-  origin: 'http://localhost:3000',
+  origin: process.env.PORT_CLIENT,
   credentials: true,
 };
 app.use(cors(corsOptions));
-
 // Tạo server HTTP
 const server = http.createServer(app);
-
 // Tích hợp socket.io với server
 // const io = socketIo(server, {
 //   cors: {
@@ -59,6 +55,13 @@ app.use(errorMiddleware);
 
 app.use(errorHandler);
 
-server.listen(port, () => {
+
+server.listen(port, async() => {
   console.log(`Server is running on port ${port}`);
+  // try {
+  //   const url = await ngrok.connect(5000);  
+  //   console.log(`Ngrok tunnel established at ${url}`);
+  // } catch (error) {
+  //   console.error('Error starting ngrok tunnel:', error);
+  // }
 });

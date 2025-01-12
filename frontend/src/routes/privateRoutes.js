@@ -12,13 +12,17 @@ import SearchLayout from "../Layouts/SearchLayout/SearchLayout";
 import InformationGeneralProfile from "../pages/ProfileUser/InformationGeneralProfile";
 import ProfileLayout from "../Layouts/ProfileLayout/ProfileLayout";
 import Favorite from "../pages/Favorite/Favorite";
-import PaymentReturn from "../pages/Payment/PaymentReturn";
+import PaymentVnpayReturn from "../pages/Payment/PaymentVnpayReturn";
+import PaymentMomoReturn from "../pages/Payment/PaymentMomoReturn";
+import PaymentZalopayReturn from "../pages/Payment/PaymentZaloPayReturn";
 export const privateRoutes = [
     {path : '/', page : Body, layout : DefaultLayout},
     {path : '/detail/:_id', page : Detail, layout : DetailProductLayout},
     // {path : '/profile', page : ProfileUser, layout : DefaultLayout},
     {path : '/payment', page : Payment, layout : null},
-    {path : 'payment-return', page : PaymentReturn, layout : null},
+    {path : '/payment-vnpay-return', page : PaymentVnpayReturn, layout : null},
+    {path : '/payment-momo-return', page : PaymentMomoReturn, layout : null},
+    {path : '/payment-zalopay-return', page : PaymentZalopayReturn, layout : null},
     {path : '/cart/:idUser', page : Cart, layout : CartLayout},
     {path : '/category/:_id', page : Category, layout : CategoryLayout} ,
     { path : '/search', page : Search, layout : SearchLayout },

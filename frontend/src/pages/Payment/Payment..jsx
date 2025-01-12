@@ -8,7 +8,7 @@ import { addOrder } from '../../services/OrderService';
 import { toast, ToastContainer } from 'react-toastify';
 import { addVoucher, deleteVoucher } from '../../redux/Voucher/vouchersSlice';
 import { removeUseVoucher } from '../../redux/Voucher/vouchersSlice';
-import { paymentByVnpService } from '../../services/PaymentService';
+import { paymentByMomo, paymentByVnpService, paymentByZaloPay } from '../../services/PaymentService';
 import { validateInformationPayment } from '../../until/function';
 export default function Payment() {
     const dispatch = useDispatch()
@@ -68,8 +68,7 @@ export default function Payment() {
             const districtName = districts.find(district => district?.id === chooseAddress?.district)?.name || "";
             const wardName = wards.find(ward => ward?.id === chooseAddress?.ward)?.name || "";
             let fullAddress = ""
-            if(provinceName && districtName && wardName)
-            {
+            if (provinceName && districtName && wardName) {
                 fullAddress = provinceName + ", " + districtName + ", " + wardName
             }
             setInformations(prev => ({
@@ -80,9 +79,7 @@ export default function Payment() {
                 products: cartsCheck,
                 address: fullAddress,
                 useVoucher,
-                paymentMethod : showPayment === 'payLater' ? "Thanh toán khi đã nhận hàng" : "VNPAY",
-
-
+                paymentMethod: showPayment
             }))
         }
     }, [idUser, phone, cartsCheck, chooseAddress.province, chooseAddress.district, chooseAddress.ward, showPayment])
@@ -144,47 +141,78 @@ export default function Payment() {
 
     // handle pay
     const handleBuy = async () => {
-       
-        if (showPayment === 'vnpay') {
+
+        if (showPayment === 'payLater') {
+            const response = await addOrder(informations)
+            if (response.errors) {
+                setErrors(response.errors)
+                return
+            }
+            if (response.error) {
+                alert("Lỗi khi thanh toán")
+                return
+            }
+            if (response && response.status === 201) {
+                const idProductCartCheck = new Set(cartsCheck.map(item => item.idProduct));
+                dataCart = dataCart?.carts?.filter(item => !idProductCartCheck.has(item.idProduct));
+                dispatch(deleteVoucher(useVoucher[0]?._id))
+                dispatch(removeUseVoucher())
+                response.voucherAdded.map((voucher) => {
+                    dispatch(addVoucher(voucher))
+                })
+                toast("Đặt hàng thành công")
+                setTimeout(() => {
+                    navigate('/')
+                }, 2500)
+            }
+        }
+        else if(showPayment === 'vnpay') {
             const validateInputErrors = validateInformationPayment(informations)
-            if(Object.keys(validateInputErrors).length > 0)
-            {
-                console.log(validateInputErrors)
+            if (Object.keys(validateInputErrors).length > 0) {
                 setErrors(validateInputErrors)
                 return
             }
             const response = await paymentByVnpService({
                 amount: totalPrice,
                 content: informations?.address
-                // content : ` ${provinces?.find(province => province?.id === informations?.province)?.name}, ${districts?.find(district => district?.id === informations?.district)?.name}, ${wards?.find(ward => ward?.id === informations?.ward)?.name}, ${informations?.address}`
             })
             window.location.href = response.vnpUrl
-            
-            localStorage.setItem('informationPayment', JSON.stringify(informations))
-            return
-        }
 
-        const response = await addOrder(informations)
-        if (response.errors) {
-            setErrors(response.errors)
-            return
+            localStorage.setItem('informationPayment', JSON.stringify(informations))
+            return;
         }
-        if (response.error) {
-            alert("Lỗi khi thanh toán")
-            return
-        }
-        if (response && response.status === 201) {
-            const idProductCartCheck = new Set(cartsCheck.map(item => item.idProduct));
-            dataCart = dataCart?.carts?.filter(item => !idProductCartCheck.has(item.idProduct));
-            dispatch(deleteVoucher(useVoucher[0]?._id))
-            dispatch(removeUseVoucher())
-            response.voucherAdded.map((voucher) => {
-                dispatch(addVoucher(voucher))
+        else if (showPayment === 'momo') {
+            const validateInputErrors = validateInformationPayment(informations)
+            if (Object.keys(validateInputErrors).length > 0) {
+                setErrors(validateInputErrors)
+                return
+            }
+            const response = await paymentByMomo({
+                amount: totalPrice,
+                orderInfo: informations?.address
             })
-            toast("Đặt hàng thành công")
-            setTimeout(() => {
-                navigate('/')
-            }, 2500)
+            window.location.href = response.result.payUrl
+
+            localStorage.setItem('informationPayment', JSON.stringify(informations))
+            return;
+        }
+        else if(showPayment === 'zalopay')
+        {
+            const validateInputErrors = validateInformationPayment(informations)
+            if(Object.keys(validateInputErrors).length > 0)
+            {
+                setErrors(validateInputErrors)
+                return
+            }
+            const response = await paymentByZaloPay(
+                {
+                    amount : totalPrice
+
+                }
+            )
+            localStorage.setItem('informationPayment', JSON.stringify(informations))
+            window.location.href = response?.result?.order_url
+            return;
         }
     }
 
@@ -326,8 +354,21 @@ export default function Payment() {
                                     {informations.address === "" && <ErrorMessageInput errors={errors} field="address" />}
                                 </div>
                             </div>
-                            <div className='col-auto mb-3 d-flex justify-content-center align-items-center'>
-                                <div class="form-check me-5">
+                            <div className='col-auto mb-3 d-flex justify-content-evenly align-items-center'>
+                                <div class="form-check">
+                                    <InputComponent
+                                        value="payLater"
+                                        onChange={(e) => setShowPayment(e.target.value)}
+                                        checked={showPayment === 'payLater'}
+                                        style={{ border: '1px solid #ccc' }}
+                                        class="form-check-input" type="radio"
+                                        name="flexRadioDefault"
+                                    />
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Thanh toán khi đã nhận hàng
+                                    </label>
+                                </div>
+                                <div class="form-check">
                                     <InputComponent
                                         value="vnpay"
                                         onChange={(e) => setShowPayment(e.target.value)}
@@ -338,6 +379,32 @@ export default function Payment() {
                                     />
                                     <label class="form-check-label" for="flexRadioDefault1">
                                         Thanh toán bằng vnpay
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <InputComponent
+                                        value="momo"
+                                        onChange={(e) => setShowPayment(e.target.value)}
+                                        checked={showPayment === 'momo'}
+                                        style={{ border: '1px solid #ccc' }}
+                                        class="form-check-input" type="radio"
+                                        name="flexRadioDefault"
+                                    />
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Thanh toán bằng momo
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <InputComponent
+                                        value="zalopay"
+                                        onChange={(e) => setShowPayment(e.target.value)}
+                                        checked={showPayment === 'zalopay'}
+                                        style={{ border: '1px solid #ccc' }}
+                                        class="form-check-input" type="radio"
+                                        name="flexRadioDefault"
+                                    />
+                                    <label class="form-check-label" for="flexRadioDefault2">
+                                        Thanh toán bằng zalopay
                                     </label>
                                 </div>
                                 {/* <div class="form-check me-5">
@@ -353,19 +420,7 @@ export default function Payment() {
                                         Thanh toán ngay
                                     </label>
                                 </div> */}
-                                <div class="form-check">
-                                    <InputComponent
-                                        value="payLater"
-                                        onChange={(e) => setShowPayment(e.target.value)}
-                                        checked={showPayment === 'payLater'}
-                                        style={{ border: '1px solid #ccc' }}
-                                        class="form-check-input" type="radio"
-                                        name="flexRadioDefault"
-                                    />
-                                    <label class="form-check-label" for="flexRadioDefault2">
-                                        Thanh toán khi đã nhận hàng
-                                    </label>
-                                </div>
+
                             </div>
                             {/* {showPayment === 'payNow' ? (
 

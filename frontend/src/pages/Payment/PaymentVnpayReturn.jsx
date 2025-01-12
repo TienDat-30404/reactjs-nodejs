@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from 'react'
 import { paymentVpnReturnService } from '../../services/PaymentService';
-
+import Loading from '../../components/Loading';
 import moment from 'moment'
 import { addOrder } from '../../services/OrderService';
-export default function PaymentReturn() {
+export default function PaymentVnpayReturn() {
   const [result, setResult] = useState({})
+  const [isLoading, setIsLoading] = useState(true);
+
   let params
-  let secureHash;
   if (window.location.search) {
     params = new URLSearchParams(window.location.search);
-    secureHash = params.get('vnp_SecureHash');
   }
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await paymentVpnReturnService(params)
-      if (response && response?.status === 200 && response?.statusTransaction === "00") {
-        const informations = JSON.parse(localStorage.getItem('informationPayment'))
-        await addOrder(informations)
+      try {
+        const response = await paymentVpnReturnService(params)
+        const informations = localStorage.getItem('informationPayment');
+        const parsedInfo = informations ? JSON.parse(informations) : null;
+
+        if (response && response?.status === 200 && informations && response?.statusTransaction === "00") {
+          await addOrder(parsedInfo)
+          localStorage.removeItem('informationPayment')
+        }
+        setResult(response)
       }
-      setResult(response)
-      localStorage.removeItem('informationPayment')
-      
+      catch (err) {
+        console.log("Lỗi giao dịch ", err)
+      }
+      finally {
+        setIsLoading(false)
+      }
     }
     fetchData()
   }, [])
 
+  if (isLoading) {
+    return <Loading />
+  }
   return (
     <div style={{ height: '100vh' }} className='bg-white d-flex justify-content-center align-items-center'>
       {result?.statusTransaction === "00" ? (
