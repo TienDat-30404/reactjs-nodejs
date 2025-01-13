@@ -7,9 +7,12 @@ import { detailCategory } from '../../../../services/CategoryService'
 import { InputComponent } from '../../../../components/InputComponent'
 import { getAllCategory } from '../../../../services/CategoryService'
 import { handleChangeInput } from '../../../../until/function'
+import { useSelector, useDispatch } from 'react-redux'
+import { initDataProduct } from '../../../../redux/Products/productsSlice'
 export default function Product() {
-  const [products, setProducts] = useState([])
-  const [showAdd, setShowAdd] = useState(false)
+  const dispatch = useDispatch()
+  const products = useSelector(state => state?.products?.products)
+  const [showAddModal, setShowAddModal] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
   const [idProduct, setIdProduct] = useState(null)
   const [categories, setCategories] = useState([])
@@ -23,81 +26,57 @@ export default function Product() {
 
   })
   // get ALl Product 
-  const fetchDatasProduct = async () => {
-    const [allProduct] = await Promise.all([
-      getAllProduct(null, 'idProduct', 'asc', null)
-    ]);
 
-    const productsWithCategoryNames = await Promise.all(
-      allProduct.products.map(async (product) => {
-        const category = await detailCategory(product.idCategory);
-        return { ...product, category };
-      })
-    );
 
-    setProducts(productsWithCategoryNames);
-  };
-
-  // get all category
   useEffect(() => {
-    const fetchDatasRole = async () => {
-      const response = await getAllCategory();
-      setCategories(response.categories)
+    const fetchData = async () => {
+      try {
+        const response = await getAllProduct()
+        if (response && response?.status === 200) {
+          dispatch(initDataProduct(response))
+        }
+      }
+      catch (error) {
+        console.log("Lỗi khi lấy danh sách sản phẩm")
+      }
     }
-    fetchDatasRole()
-  }, [])
-
+    fetchData()
+  })
 
   const handleSwitchPageEdit = (id) => {
-    setShowEdit(true)
-    setIdProduct(id)
+    // setShowEdit(true)
+    // setIdProduct(id)
   }
 
-  // handle display product immediately after add product
-  const handleAddProductSuccess = () => {
-    fetchDatasProduct();
-  };
 
   // handle delete product
   const handleDeleteProduct = async (id) => {
-    const response = await deleteProduct(id)
-    if (response) {
-      setProducts(products.filter(product => product._id != id))
-    }
+    // const response = await deleteProduct(id)
+    // if (response) {
+    //   setProducts(products.filter(product => product._id != id))
+    // }
   }
 
 
 
 
   const handleSearchProduct = async (e) => {
-    e.preventDefault()
-    const [listSearchProduct] = await Promise.all([
-      getAllProduct(null, 'idProduct', 'asc', null, wordSearch.idProduct, wordSearch.idCategory,
-        wordSearch.name, wordSearch.priceFrom, wordSearch.priceTo, wordSearch.quantity)
-    ]);
-
-    const productsWithCategoryNames = await Promise.all(
-      listSearchProduct.products.map(async (product) => {
-        const category = await detailCategory(product.idCategory);
-        return { ...product, category };
-      })
-    );
-    if (productsWithCategoryNames) {
-      setProducts(productsWithCategoryNames);
-    }
+    // e.preventDefault()
+    // const [listSearchProduct] = await Promise.all([
+    //   getAllProduct(null, 'idProduct', 'asc', null, wordSearch.idProduct, wordSearch.idCategory,
+    //     wordSearch.name, wordSearch.priceFrom, wordSearch.priceTo, wordSearch.quantity)
+    // ])
   }
 
-  useEffect(() => {
-    fetchDatasProduct();
-  }, []);
-  console.log(products)
+
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
         <div className='d-flex align-items-center'>
           <h3>Product</h3>
+
           <h6 className='ms-3'>({products.length} product found)</h6>
-          <button onClick={() => setShowAdd(true)} type="button" className="btn btn-outline-success ms-3">Tạo sản phẩm</button>
+          <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo sản phẩm</button>
         </div>
         <div className='d-flex align-items-center'>
           <i className="bi bi-bell me-3"></i>
@@ -202,40 +181,37 @@ export default function Product() {
       </form>
 
 
-      <table style={{ width: '100%', backgroundColor: 'white', marginTop: '30px' }} cellspacing="0" cellpading="10">
+      <table class="table">
         <thead>
-
           <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th className='text-center'>Image</th>
-            <th className='text-center'>Price</th>
-            <th className='text-center'>Quantity</th>
-            <th className='text-center'>Category</th>
-            <th className='text-center'>Description</th>
-            <th className='text-center' colSpan='2'>Action</th>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Category</th>
+            <th scope="col">Description</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Updated At</th>
+            <th scope="col">Action</th>
           </tr>
         </thead>
         <tbody>
-          {products.length > 0 ? (
-            products.map((product, index) => (
-              <tr key={index}>
-                <td style={{ width: '4%' }}>{product._id}</td>
-                <td style={{ width: '20%' }}>{product.name}</td>
-                <td style={{ width: '10%' }} className='text-center'>
+          {products && products?.length > 0 ? (
+            products?.map((product, index) => (
+              <tr>
+                <th scope="row">{(product?._id).slice(0, 10)}...</th>
+                <td>
                   <ImageComponent
-                    src={product.image} alt=""
+                    src={product?.image} alt=""
                     width="70px"
                     height="50px"
                     borderRadius="5px"
+                    className="me-2"
                   />
+                  {product?.name}
                 </td>
-                <td className='text-center'>{product.price}</td>
-                <td className='text-center'>{product.quantity}</td>
-                {product.category.category.map((category, index) => (
-                  <td style={{ width: '15%' }} key={index} className='text-center'>{category.name}</td>
-                ))}
-                <td style={{ maxWidth: '15%', overflowWrap: 'break-word', wordBreak: 'break-word', whiteSpace: 'normal' }}>{product.description}</td>
+                <td>{product?.category?.name}</td>
+                <td>{product?.description}</td>
+                <td>{product?.createdAt}</td>
+                <td>{product?.updatedAt}</td>
                 <td style={{ width: '6%' }} className='text-center'>
                   <button
                     onClick={() => handleSwitchPageEdit(product._id)}
@@ -249,16 +225,13 @@ export default function Product() {
                 </td>
               </tr>
             ))
-          ) :
-            <div className="loading">
-              <div className="spinner"></div>
-            </div>
-          }
+          ) : "123"}
 
         </tbody>
       </table>
-      <AddProduct show={showAdd} close={() => setShowAdd(false)} onSuccess={handleAddProductSuccess} />
-      <EditProduct show={showEdit} close={() => setShowEdit(false)} idProduct={idProduct} onSuccess={fetchDatasProduct} />
+      
+      <AddProduct show={showAddModal} close={() => setShowAddModal(false)} />
+      {/* <EditProduct show={showEdit} close={() => setShowEdit(false)} idProduct={idProduct} onSuccess={fetchDatasProduct} /> */}
     </div>
   )
 }

@@ -31,7 +31,7 @@ const Category = () => {
 
                     categories?.map((category, index) => (
                         <li onClick={() => switchCategory(category?._id)} key={index} className="nav-item d-flex align-items-center px-4 py-1">
-                            <img width="35px" src={category?.image} alt="" />
+                            <img width="50px" src={category?.image} alt="" />
                             <h5 className="nav-link text-dark">{category?.name}</h5>
                         </li>
                     ))

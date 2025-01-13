@@ -29,9 +29,13 @@ export default class UserController {
                 sex: sex,
                 avatar: user.avatar,
             };
+
             if (req.file) {
+                console.log("confid", cloudinary.config())
+                
                 const fielAvatar = await cloudinary.uploader.upload(req.file.path);
                 newData.avatar = fielAvatar.secure_url
+                console.log("123")
             }
             const dataUpdate = await User.findByIdAndUpdate(idUser, newData, {
                 new: true,
@@ -63,33 +67,6 @@ export default class UserController {
                     message: "Delete Fail",
                 })
             }
-            /* 
-            - deleteMany : xóa nhiều trường dựa theo 1 điều kiện cụ thể( ở đây là các trường có id > 1)
-                await User.deleteMany({id: {$gt: 1}})   
-            -  Tìm nhiều tài liệu dựa trên điều kiện nhất định.
-                await User.find({id : {$gt : 56}})
-            - Tìm một tài liệu theo ID.(ở đây là _id trong database - là 1 chuỗi string)
-                await User.findById(idUser)  Tìm một tài liệu theo ID.(ở đây là _id trong database - là 1 chuỗi string)
-            - Tìm một tài liệu theo ID và xóa nó(tìm dựa vào _id trong db)
-                await User.findByIdAndDelete(idUser)    
-            - Tìm một tài liệu theo ID và cập nhật nó.(_id)
-                await User.findByIdAndUpdate(idUser, {name : "123"}) 
-            - Tìm một tài liệu dựa trên điều kiện nhất định.
-                await User.findOne({id : idUser})  
-            Tìm một tài liệu dựa trên điều kiện nhất định và xóa nó.(giống deleteOne nhưng khác nhau kiểu trả về)
-                await User.findOneAndDelete({id : idUser})  
-            - Tìm một tài liệu dựa trên điều kiện nhất định và thay thế nó bằng một tài liệu mới.(kết quả là trong các trường của id đấy đc thay thể
-              và chỉ có 2 thuộc tính là name, password còn các thuộc tính còn lại sẽ bị xóa)
-                await User.findOneAndReplace({id : idUser}, {name : "Jame", password : "1234567"})  
-            - Tìm một tài liệu dựa trên điều kiện nhất định và cập nhật nó.
-                await User.findOneAndUpdate({id : idUser}, {name : "Thomas"}, {new : true})
-            - Thay thế một tài liệu dựa trên điều kiện nhất định.(giống findOneAndReplcae nhưng khác nhau kiểu trả về)
-                await User.replaceOne({id : idUser}, {name : "123"}) 
-            - Cập nhật nhiều tài liệu dựa trên điều kiện nhất định.
-                await User.updateMany({id : {$lt : 62}}, {password : "11223344"})
-            - Cập nhật một tài liệu dựa trên điều kiện nhất định.
-                await User.updateOne({id : idUser}, {name : "Muller"})
-            */
         }
         catch (error) {
             next(error)

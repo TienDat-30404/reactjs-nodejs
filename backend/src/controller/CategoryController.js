@@ -10,7 +10,12 @@ export default class CategoryController {
             const {name, image} = req.body
             const category = new Category({name, image})
             await category.save()
-            return res.status(200).json({category})
+            return res.status(200).json(
+                {
+                    category,
+                    status : 201
+                }
+            )
         }
         catch(error)
         {
@@ -32,7 +37,8 @@ export default class CategoryController {
             page,
             limit,
             totalPage,
-            totalCategory
+            totalCategory,
+            status : 200
     
         })
     }

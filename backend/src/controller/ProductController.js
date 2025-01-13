@@ -15,7 +15,7 @@ export default class ProductController {
     static async getAllProduct(req, res, next) {
         try {
             const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 5;
+            const limit = parseInt(req.query.limit) || 100
             const startPage = (page - 1) * limit;
 
             const sortBy = req.query.sortBy || 'idProduct';
@@ -105,7 +105,8 @@ export default class ProductController {
                 totalPage,
                 objectSort,
                 limit,
-                objectFilter
+                objectFilter,
+                status : 200
             });
         } catch (error) {
             return res.status(500).json({ message: "Internal Server Error", error: error.message });
@@ -117,28 +118,29 @@ export default class ProductController {
         const session = await mongoose.startSession();
         session.startTransaction()
         try {
-            const { name, idCategory, description, sizes } = req.body
-            // const result = await cloudinary.uploader.upload(req.file.path);
-            // // console.log(result)
-            // if (!req.file) {
-            //     return res.status(400).json({ error: "File image is required." });
-            // }
+            let { name, idCategory, description, sizes } = req.body
+         
+            const result = await cloudinary.uploader.upload(req.file.path);
+            console.log(result)
+            if (!req.file) {
+                return res.status(400).json({ error: "File image is required." });
+            }
             const dataProduct = new Product(
                 {
                     name,
-                    // image: result.secure_url, 
+                    image: result.secure_url, 
                     idCategory,
                     description,
                 }
             )
             const savedProduct = await dataProduct.save()
             const size = await Size.findOne({ name: 'L' })
-            const selectedSize = sizes ? sizes : size._id;
+            // const selectedSize = sizes ? sizes : size._id;
 
-            if (!selectedSize || !Array.isArray(selectedSize) || selectedSize.length === 0) {
-                return res.status(400).json({ message: "Vui lòng chọn thuộc tính sản phẩm" });
-            }
-            const productAttributesPromises = selectedSize.map(async (idSize) => {
+            // if (!selectedSize || !Array.isArray(selectedSize) || selectedSize.length === 0) {
+            //     return res.status(400).json({ message: "Vui lòng chọn thuộc tính sản phẩm" });
+            // }
+            const productAttributesPromises = sizes.map(async (idSize) => {
                 const productAttribute = new ProductAttribute({
                     idProduct: savedProduct._id,
                     idSize: idSize,
@@ -189,7 +191,6 @@ export default class ProductController {
         const idProduct = req.params._id
 
         const { name, idCategory, description, sizes } = req.body
-
         await Product.updateOne({ _id: idProduct }, {
             name,
             // image : product.image,  
@@ -210,7 +211,7 @@ export default class ProductController {
                 catch (error) {
                     return res.status(400).json(
                         {
-                            message: "Lỗi khi lưu productAttribute"
+                            message: `Lỗi khi lưu productAttribute : ${error}`
                         }
                     )
                 }

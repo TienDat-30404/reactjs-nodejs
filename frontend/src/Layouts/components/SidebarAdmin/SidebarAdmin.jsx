@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-export default function Left() {
+export default function SidebarAdmin() {
     const navigate = useNavigate()
     return (
         <div className='admin_left'>

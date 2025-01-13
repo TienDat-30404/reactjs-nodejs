@@ -11,7 +11,7 @@ import ProductAttribute from '../model/ProductAttribute.js';
 import { validateNameProduct } from '../utils/validate.js';
 
 const validateAddProduct = async (req, res, next) => {
-    const { name, idCategory, description, sizes } = req.body
+    let { name, idCategory, description, sizes } = req.body
     
     const isCheckExistNameProduct = await validateNameProduct(name)
     const errors = {}
@@ -37,13 +37,13 @@ const validateAddProduct = async (req, res, next) => {
     const allSize = await Size.find({})
     if(sizes.length == 0)
     {
+        console.log("length === 0")
         errors.size = "Vui lòng chọn thuộc tính sản phẩm"
     }
     else 
     {
-        
+        console.log("size", sizes)
         const isCheckSize = sizes.every(size => !allSize.some(item => item._id.toString() === size))
-        console.log(isCheckSize)
         if(isCheckSize)
         {
             errors.size = "Thuộc tính không hợp lệ"

@@ -18,7 +18,7 @@ export const productsSlice = createSlice({
             state.totalProduct = action.payload?.totalProduct
             state.limit = action.payload?.limit
             state.products = action.payload?.products
-            state.isLoading = action.payload?.isLoading
+            state.isLoading = false
         },
         switchPage : (state, action) => {
             state.page = action.payload

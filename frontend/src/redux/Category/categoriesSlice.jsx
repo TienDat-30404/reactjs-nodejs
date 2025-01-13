@@ -18,7 +18,7 @@ export const categoriesSlice = createSlice({
             state.totalCategory = action.payload?.totalCategory
             state.limit = action.payload?.limit
             state.categories = action.payload?.categories
-            state.isLoading = action.payload?.isLoading
+            state.isLoading = false
         },
         switchPage : (state, action) => {
             state.page = action.payload

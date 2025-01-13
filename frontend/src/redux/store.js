@@ -9,6 +9,7 @@ import reviewsReducer from './Review/reviewsSlice'
 import vouchersReducer from './Voucher/vouchersSlice'
 import notificationsReducer from './Notification/notificationsSlice'
 import favoritesReducer from './Favorite/favoritesSlice'
+import sizesReducer from './Size/sizesSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -20,6 +21,7 @@ export default configureStore({
     reviews : reviewsReducer,
     vouchers : vouchersReducer,
     notifications : notificationsReducer,
-    favorites : favoritesReducer
+    favorites : favoritesReducer,
+    sizes : sizesReducer
   }
 })

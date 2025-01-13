@@ -3,5 +3,6 @@ import SizeController from '../controller/SizeController.js';
 
 const router = express.Router();
 
-router.get('/add-size', SizeController.addSize)
+router.post('/add-size', SizeController.addSize)
+router.get('/sizes', SizeController.getAllSize)
 export default router

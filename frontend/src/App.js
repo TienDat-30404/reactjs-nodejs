@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { routes } from './routes';
 import { Fragment } from 'react';
 import './public/css/main.css'
 import './public/css/left.css'
@@ -11,6 +10,7 @@ import { useEffect } from 'react';
 import { useAuthHandler } from './until/manageToken';
 import "react-toastify/dist/ReactToastify.css";
 import { privateRoutes } from './routes/privateRoutes';
+import { adminRoutes } from './routes/adminRoutes';
 function App() {
   const { checkAndUpdateToken } = useAuthHandler();
 
@@ -22,17 +22,13 @@ function App() {
     <div className='div_biggest'>
       <Router>
         <Routes>
-          
-
-          {privateRoutes.map((route, i) => {
-            const Page = route.page
+          {adminRoutes.map((route, i) => {
+            let Page = route.page
             let Layout = route.layout
-            if(route.layout)
-            {
+            if (route.layout) {
               Layout = route.layout
             }
-            else if(route.layout == null)
-            {
+            else if (route.layout === null) {
               Layout = Fragment
             }
             return (
@@ -40,9 +36,30 @@ function App() {
                 key={i}
                 path={route.path}
                 element={
-                    <Layout>
-                      <Page />
-                    </Layout>
+                  <Layout>
+                    <Page />
+                  </Layout>
+                }
+              />
+            )
+          })}
+          {privateRoutes.map((route, i) => {
+            let Page = route.page
+            let Layout = route.layout
+            if (route.layout) {
+              Layout = route.layout
+            }
+            else if (route.layout == null) {
+              Layout = Fragment
+            }
+            return (
+              <Route
+                key={i}
+                path={route.path}
+                element={
+                  <Layout>
+                    <Page />
+                  </Layout>
                 }
               />
             );
