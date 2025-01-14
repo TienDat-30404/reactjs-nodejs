@@ -20,29 +20,12 @@ export default function AddProduct({ show, close }) {
     })
     const [selectedOptions, setSelectedOptions] = useState([]);
 
-
     const categories = useSelector(state => state.categories.categories)
     const sizes = useSelector(state => state.sizes.data)
     const [image, setImage] = useState(null);
     const [fileInputKey, setFileInputKey] = useState(Date.now());
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
-    useEffect(() => {
-        const fetchData = async () => {
-            let [responseCategory, responseAttribute] = await Promise.all([
-                getAllCategory(),
-                getAllSizeService()
-            ])
-            if (responseCategory && responseCategory?.status === 200) {
-                dispatch(initDataCategory(responseCategory))
-            }
-            if (responseAttribute && responseAttribute?.status === 200) {
-                dispatch(initDataSize(responseAttribute))
-            }
-        }
-        fetchData()
-    }, [])
-
     const options = sizes.map((size) => ({
         value: size._id, label: size.name
     }))
@@ -55,9 +38,11 @@ export default function AddProduct({ show, close }) {
         formData.append('image', image)
         formData.append('idCategory', product.idCategory)
         formData.append('description', product.description)
-        selectedOptions.forEach(size => {
-            formData.append('sizes[]', size.value);
-        });
+
+        selectedOptions?.length > 0 ? selectedOptions?.forEach(size => {
+            formData.append('sizes[]', size?.value);
+        }) : formData.append('sizes[]', [])
+
         const response = await addProduct(formData)
         console.log(response)
         if (response.errors) {
@@ -105,7 +90,7 @@ export default function AddProduct({ show, close }) {
     const handleChangeAttribute = (selected) => {
         setSelectedOptions(selected);
     };
-    
+
 
     const closeModal = () => {
         close()
@@ -115,6 +100,7 @@ export default function AddProduct({ show, close }) {
             description: '',
             sizes: 0
         })
+        setSelectedOptions([])
         setFileInputKey(Date.now());
         setErrors({})
     }
@@ -170,7 +156,6 @@ export default function AddProduct({ show, close }) {
                         <label style={{ fontSize: '14px' }} className="form-label">Thuộc tính</label>
                         <div style={{ width: '100%' }}>
                             <Select
-                                onClick={() => console.log(options)}
                                 isMulti
                                 value={selectedOptions}
                                 options={options}
@@ -178,12 +163,17 @@ export default function AddProduct({ show, close }) {
                                 styles={{
                                     menu: (provided) => ({
                                         ...provided,
-                                        maxHeight: 150, /* Chiều cao tối đa */
-                                        overflowY: 'auto', /* Hiển thị thanh cuộn */
+                                        maxHeight: 150,
+                                        overflowY: 'auto',
+                                        borderColor: 'red'
+                                    }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        borderColor: errors.size ? 'red' : ""
                                     }),
                                 }}
                             />
-                            {errors.idCategory && <ErrorMessageInput errors={errors} field="idCategory" />}
+                            {errors.size && <ErrorMessageInput errors={errors} field="size" />}
                         </div>
                     </div>
                     <div className='px-4 py-2 d-flex align-items-center'>

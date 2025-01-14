@@ -1,81 +1,57 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
-import { updateProduct, getDetailProduct } from '../../../../services/ProductService'
-import { getAllCategory } from '../../../../services/CategoryService'
+import { updateProduct } from '../../../../services/ProductService'
+import Select from 'react-select'
+import { useSelector, useDispatch } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify';
+import { updateProductRedux } from '../../../../redux/Products/productsSlice'
 
-export default function EditProduct({ show, close, idProduct, onSuccess }) {
+export default function EditProduct({ data, show, close }) {
+    const dispatch = useDispatch()
+    const categories = useSelector(state => state.categories.categories)
+    const sizes = useSelector(state => state.sizes.data)
     const [product, setProduct] = useState({
         name: '',
-        image : '',
-        price: '',
-        quantity: '',
         idCategory: '',
         description: ''
     })
+    const [selectedOptions, setSelectedOptions] = useState([]);
+
+
+    useEffect(() => {
+        if (data) {
+            setProduct({
+                name: data?.name || '',
+                idCategory: data?.category?._id || '',
+                description: data?.description || ''
+            });
+            const attributeOfProduct = data?.productAttributes?.map(attr => ({
+                value: attr?.size?._id, label: attr?.size.name
+            }))
+            setSelectedOptions(attributeOfProduct)
+        }
+
+    }, [data]);
+
+
+    const options = sizes.map((size) => ({
+        value: size._id, label: size.name
+    }))
+
     const [image, setImage] = useState(null);
     const [fileInputKey, setFileInputKey] = useState(Date.now());
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
-    const [category, setCategory] = useState([])
-    useEffect(() => {
-        const fetchData = async () => {
-            if(idProduct)
-            {     
-                const response = await getAllCategory();
-                setCategory(response.categories)
-                const responseDetailProduct = await getDetailProduct(idProduct);
-                if(show)
-                {
-                    setProduct({
-                        name : responseDetailProduct.detailProduct.name,
-                        image : responseDetailProduct.detailProduct.image,
-                        price : responseDetailProduct.detailProduct.price,
-                        quantity : responseDetailProduct.detailProduct.quantity,
-                        idCategory : responseDetailProduct.detailProduct.idCategory,
-                        description : responseDetailProduct.detailProduct.description
-                    })
-                }
-            }
-        }
-        if(show)
-        {
-            fetchData()
-        }
-    }, [show, idProduct])
 
-    // handle click add product
-    const handleClickUpdateProduct = async () => {
-        if(idProduct)
-        {
-            inputFocusRef.current.focus()
-            var formData = new FormData()
-            formData.append('name', product.name)
-            formData.append('image', image)
-            formData.append('price', product.price)
-            formData.append('quantity', product.quantity)
-            formData.append('idCategory', product.idCategory)
-            formData.append('description', product.description)
-            const response = await updateProduct(idProduct, formData)
-            console.log(response)
-            if (response.errors) {
-                setErrors(response.errors)
-                return
-            }
-            else {
-                alert("Chỉnh sửa sản phẩm thành công")
-                onSuccess()
-            }
-        }
-    }
 
+   
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
         setProduct(prevInfo => ({
             ...prevInfo,
             [name]: value
         }));
-
         const isValid = validateInput(name, value);
         setErrors(prevErrors => {
             const newErrors = { ...prevErrors };
@@ -102,18 +78,51 @@ export default function EditProduct({ show, close, idProduct, onSuccess }) {
         })
     };
 
+    const handleChangeAttribute = (selected) => {
+        setSelectedOptions(selected)
+    }
+
     const closeModal = () => {
         close()
         setProduct({
             name: '',
-            price: '',
-            quantity: '',
             idCategory: 0,
             description: ''
         })
         setFileInputKey(Date.now());
         setErrors({})
     }
+
+    const handleClickUpdateProduct = async () => {
+        inputFocusRef.current.focus()
+        var formData = new FormData()
+        formData.append('name', product.name)
+        formData.append('image', image)
+        formData.append('description', product.description)
+        formData.append('idCategory', product.idCategory)
+        selectedOptions?.length > 0 ? selectedOptions?.map((size) => {
+            formData.append('sizes[]', size.value)
+        }) : formData.append('sizes[]', [])
+
+        const response = await updateProduct(data?._id, formData)
+        if(response && response?.status === 200)
+        {
+            console.log(response.product)
+            dispatch(updateProductRedux({
+                id : data?._id ,
+                newData : response?.product
+            }))
+        }
+        console.log("response107", response)
+        if (response.errors) {
+            setErrors(response.errors)
+            return
+        }
+        else {
+            toast.success("Chỉnh sửa thành công")
+        }
+    }
+
     const validateInput = (name, value) => {
         switch (name) {
             default:
@@ -123,7 +132,7 @@ export default function EditProduct({ show, close, idProduct, onSuccess }) {
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="modal-dialog add_product">
-                {product ? (
+                {show && data ? (
                     <div className=" modal-content">
                         <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Chỉnh sửa sản phẩm</p>
                         <div className='px-4 py-2 d-flex align-items-center'>
@@ -141,7 +150,7 @@ export default function EditProduct({ show, close, idProduct, onSuccess }) {
                             </div>
 
                         </div>
-
+                     
                         <div className='px-4 py-2 d-flex align-items-center'>
                             <label style={{ fontSize: '14px' }} className="form-label">Ảnh sản phẩm</label>
                             <div style={{ width: '100%' }}>
@@ -152,55 +161,48 @@ export default function EditProduct({ show, close, idProduct, onSuccess }) {
                                         name="image"
                                         onChange={handleChangeFile}
                                         className={`form-control ${errors.image ? 'is-invalid' : ''} `}
-                                        placeholder={errors.image ? errors.image : ""}
+                                        placeholder={errors?.image ? errors?.image : ""}
                                     />
-                                    <img width = "60px" height = "40px" src={product.image} alt="" />
+                                    <img width="60px" height="40px" src={data?.image} alt="" />
                                 </div>
                                 {errors.image && <ErrorMessageInput className errors={errors} field="image" />}
                             </div>
                         </div>
 
                         <div className='px-4 py-2 d-flex align-items-center'>
-                            <label style={{ fontSize: '14px' }} className="form-label">Giá sản phẩm</label>
+                            <label style={{ fontSize: '14px' }} className="form-label">Thuộc tính</label>
                             <div style={{ width: '100%' }}>
-                                <InputComponent
-                                    name="price"
-                                    value={product.price}
-                                    onChange={handleChangeInput}
-                                    className={`form-control ${errors.price ? 'is-invalid' : ''} `}
-                                    placeholder={errors.price ? errors.price : ""}
+                                <Select
+                                    isMulti
+                                    value={selectedOptions}
+                                    options={options}
+                                    onChange={handleChangeAttribute}
+                                    styles={{
+                                        menu: (provided) => ({
+                                            ...provided,
+                                            maxHeight: 150,
+                                            overflowY: 'auto',
+                                        }),
+                                    }}
                                 />
-                                {product.price != "" && !Number(product.price) && <p style={{ color: 'red', fontSize: '13px' }}>Giá sản phẩm không hợp lệ</p>}
-
+                                {errors.size && <ErrorMessageInput errors={errors} field="size" />}
+                                {errors.idCategory && <ErrorMessageInput errors={errors} field="idCategory" />}
                             </div>
                         </div>
-                        <div className='px-4 py-2 d-flex align-items-center'>
-                            <label style={{ fontSize: '14px' }} className="form-label">Số lượng</label>
-                            <div style={{ width: '100%' }}>
-                                <InputComponent
-                                    name="quantity"
-                                    value={product.quantity}
-                                    onChange={handleChangeInput}
-                                    className={`form-control ${errors.quantity ? 'is-invalid' : ''} `}
-                                    placeholder={errors.quantity ? errors.quantity : ""}
-                                />
-                                {product.quantity != "" && !Number(product.quantity) && <p style={{ color: 'red', fontSize: '13px' }}>Số lượng sản phẩm không hợp lệ</p>}
 
-                            </div>
-                        </div>
                         <div className='px-4 py-2 d-flex align-items-center'>
                             <label style={{ fontSize: '14px' }} className="form-label">Thể loại</label>
                             <div style={{ width: '100%' }}>
                                 <select
-                                    value = {product.idCategory}
+                                    value={product?.idCategory}
                                     name="idCategory"
-                                    className={`form-control ${errors.idCategory ? 'is-invalid' : ''} `}
+                                    className={`form-control ${errors?.idCategory ? 'is-invalid' : ''} `}
                                     onChange={handleChangeInput}
                                 >
                                     <option value="0">Chọn thể loại</option>
-                                    {category.length > 0 ? (
-                                        category.map((category, index) => (
-                                            <option key ={index} value={category._id}>{category.name}</option>
+                                    {categories.length > 0 ? (
+                                        categories.map((category, index) => (
+                                            <option key={index} value={category._id}>{category.name}</option>
                                         ))
                                     ) : <option>Hiện không có thể loại sản phẩm nào</option>}
                                 </select>

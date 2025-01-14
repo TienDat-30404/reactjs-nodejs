@@ -22,8 +22,28 @@ export const productsSlice = createSlice({
         },
         switchPage : (state, action) => {
             state.page = action.payload
+        },
+
+        deleteProductRedux : (state, action) => {
+            const id = action.payload 
+            const isExistProduct = state.products.find(product => product._id ===id)
+            if(isExistProduct)
+            {
+                state.products = state.products.filter(product => product._id !== id)
+            }
+        },
+
+        updateProductRedux : (state, action) => {
+            const {id, newData} = action.payload 
+            console.log("id", id)
+            console.log("newData", newData)
+            const productIndex = state.products.findIndex(product => product._id === id)
+            if(productIndex != -1)
+            {
+                state.products[productIndex] = newData
+            }
         }
     }
 })
-export const {initDataProduct, switchPage} = productsSlice.actions
+export const {initDataProduct, switchPage, deleteProductRedux, updateProductRedux} = productsSlice.actions
 export default productsSlice.reducer

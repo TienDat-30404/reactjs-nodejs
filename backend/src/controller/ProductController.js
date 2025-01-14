@@ -15,7 +15,7 @@ export default class ProductController {
     static async getAllProduct(req, res, next) {
         try {
             const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 100
+            const limit = parseInt(req.query.limit) || 5
             const startPage = (page - 1) * limit;
 
             const sortBy = req.query.sortBy || 'idProduct';
@@ -56,10 +56,10 @@ export default class ProductController {
 
             }
 
-            if (productIds) {
-                objectFilter._id = { $in: productIds };
-            }
-            
+            // if (productIds) {
+            //     objectFilter._id = { $in: productIds };
+            // }
+            console.log("objectFilter", objectFilter)
             let [products, totalProduct] = await Promise.all([
                 Product.find(objectFilter)
                     .skip(startPage)
@@ -106,7 +106,7 @@ export default class ProductController {
                 objectSort,
                 limit,
                 objectFilter,
-                status : 200
+                status: 200
             });
         } catch (error) {
             return res.status(500).json({ message: "Internal Server Error", error: error.message });
@@ -119,27 +119,20 @@ export default class ProductController {
         session.startTransaction()
         try {
             let { name, idCategory, description, sizes } = req.body
-         
-            const result = await cloudinary.uploader.upload(req.file.path);
-            console.log(result)
-            if (!req.file) {
-                return res.status(400).json({ error: "File image is required." });
-            }
+
+            // const result = await cloudinary.uploader.upload(req.file.path);
+            // if (!req.file) {
+            //     return res.status(400).json({ error: "File image is required." });
+            // }
             const dataProduct = new Product(
                 {
                     name,
-                    image: result.secure_url, 
+                    // image: result.secure_url, 
                     idCategory,
                     description,
                 }
             )
             const savedProduct = await dataProduct.save()
-            const size = await Size.findOne({ name: 'L' })
-            // const selectedSize = sizes ? sizes : size._id;
-
-            // if (!selectedSize || !Array.isArray(selectedSize) || selectedSize.length === 0) {
-            //     return res.status(400).json({ message: "Vui lòng chọn thuộc tính sản phẩm" });
-            // }
             const productAttributesPromises = sizes.map(async (idSize) => {
                 const productAttribute = new ProductAttribute({
                     idProduct: savedProduct._id,
@@ -188,64 +181,79 @@ export default class ProductController {
 
     // [PUT] /update-product/:_id
     static async updateProduct(req, res, next) {
-        const idProduct = req.params._id
+        try 
+        {
 
-        const { name, idCategory, description, sizes } = req.body
-        await Product.updateOne({ _id: idProduct }, {
-            name,
-            // image : product.image,  
-            idCategory,
-            description
-        })
-
-        if (sizes && sizes.length > 0) {
-            for (let i = 0; i < sizes.length; i++) {
-                try {
-                    const productAttribute = new ProductAttribute({
-                        idProduct,
-                        idSize: sizes[i],
-                        quantity: 0,
+            const idProduct = req.params._id
+    
+            let { name, idCategory, description, sizes, image } = req.body
+            const productImage = await Product.findOne({_id : idProduct})
+            
+            if (req.file) {
+                const fileImage = await cloudinary.uploader.upload(req.file.path);
+                image = fileImage.secure_url
+            }
+            else 
+            {
+                image = productImage?.image
+            }
+            await Product.updateOne({ _id: idProduct }, {
+                name,
+                image,  
+                idCategory,
+                description
+            })
+    
+            if (sizes && sizes.length > 0) {
+                const productAttributes = sizes.map((size) => ({
+                    idProduct,
+                    idSize : size ,
+                    quantity : 0
+                }))
+                await Promise.all(
+                    productAttributes.map(attr => {
+                        new ProductAttribute(attr).save()
                     })
-                    await productAttribute.save()
-                }
-                catch (error) {
-                    return res.status(400).json(
-                        {
-                            message: `Lỗi khi lưu productAttribute : ${error}`
+                )
+            }
+    
+            let product = await Product.findOne({ _id: idProduct })
+                .populate('idCategory')
+                .populate(
+                    {
+                        path: 'productAttributes',
+                        populate: {
+                            path: 'idSize',
+                            model: 'Size'
                         }
-                    )
-                }
-            }
-        }
-
-        let product = await Product.findOne({ _id: idProduct })
-            .populate('idCategory')
-            .populate(
-                {
-                    path: 'productAttributes',
-                    populate: {
-                        path: 'idSize',
-                        model: 'Size'
                     }
+                )
+            product = product.toObject()
+            product.productAttributes.map(item => {
+                if (item.idSize) {
+                    item.size = item.idSize
+                    delete item.idSize
                 }
-            )
-        product = product.toObject()
-        product.productAttributes.map(item => {
-            if (item.idSize) {
-                item.size = item.idSize
-                delete item.idSize
+                return item
+            })
+            if (product.idCategory) {
+                product.category = product.idCategory;
+                delete product.idCategory;
             }
-            return item
-        })
-        if (product.idCategory) {
-            product.category = product.idCategory;
-            delete product.idCategory;
+    
+            return res.status(200).json({
+                product,
+                message: "Update Successfully",
+                status : 200
+            })
         }
-
-        return res.status(200).json({
-            product,
-            message: "Update Successfully"
-        })
+        catch(err)
+        {
+            return res.status(500).json({
+                message : `Lỗi khi cập nhật sản phẩm : ${err}`,
+                status : 500
+            })
+        }
 
     }
 
@@ -255,16 +263,16 @@ export default class ProductController {
         session.startTransaction()
         try {
             const idProduct = req.params.idProduct
-            const result = await Product.updateOne({ _id: idProduct }, {
+            const result = await Product.deleteOne({ _id: idProduct }, {
                 deletedAt: new Date()
             })
 
-            await ProductAttribute.updateMany({ idProduct: idProduct }, {
+            await ProductAttribute.deleteMany({ idProduct: idProduct }, {
                 deletedAt: new Date()
             })
             await session.commitTransaction()
             session.endSession()
-            return res.status(200).json({ message: "Xóa thành công" })
+            return res.status(200).json({ message: "Xóa thành công", status: 200 })
         }
         catch (error) {
             await session.abortTransaction();

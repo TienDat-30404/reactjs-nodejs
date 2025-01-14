@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Fragment } from 'react';
-import './public/css/main.css'
-import './public/css/left.css'
-import './public/css/right.css'
-import './public/css/detail.css'
-import './public/css/profile.css'
-import './public/css/admin.css'
+  import './public/css/main.css'
+  import './public/css/left.css'
+  import './public/css/right.css'
+  import './public/css/detail.css'
+  import './public/css/profile.css'
+  import './public/css/admin.css'
 import { useEffect } from 'react';
 import { useAuthHandler } from './until/manageToken';
 import "react-toastify/dist/ReactToastify.css";

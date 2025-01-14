@@ -9,17 +9,12 @@
     font-size : 14px;
     color : black;
 }
-.product li 
-{
-    padding : 10px;
-}
-.product li:not(:first-child)
-{
-    margin-left : 10px;
-}
+
+
 .product li:hover 
 {
     background-color: #efefef;
+    cursor : pointer;
 }
 .image_demo-video
 {

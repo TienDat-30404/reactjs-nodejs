@@ -12,7 +12,7 @@ import { validateNameProduct } from '../utils/validate.js';
 
 const validateAddProduct = async (req, res, next) => {
     let { name, idCategory, description, sizes } = req.body
-    
+
     const isCheckExistNameProduct = await validateNameProduct(name)
     const errors = {}
     if (name.trim() == "") {
@@ -33,19 +33,13 @@ const validateAddProduct = async (req, res, next) => {
     if (description == "") {
         errors.description = "Vui lòng nhập mô tả sản phẩm"
     }
-
     const allSize = await Size.find({})
-    if(sizes.length == 0)
-    {
-        console.log("length === 0")
+    if (sizes.length == 0) {
         errors.size = "Vui lòng chọn thuộc tính sản phẩm"
     }
-    else 
-    {
-        console.log("size", sizes)
+    else {
         const isCheckSize = sizes.every(size => !allSize.some(item => item._id.toString() === size))
-        if(isCheckSize)
-        {
+        if (isCheckSize) {
             errors.size = "Thuộc tính không hợp lệ"
         }
     }
@@ -62,11 +56,12 @@ const validateAddProduct = async (req, res, next) => {
 // validate update product
 const validateUpdateProduct = async (req, res, next) => {
     const idProduct = req.params._id
-    if(!idProduct)
-    {
-        return res.status(404).json({message : "Id không tìm thấy"})
+    if (!idProduct) {
+        return res.status(404).json({ message: "Id không tìm thấy" })
     }
     const { name, idCategory, description, sizes } = req.body
+
+
     const product = await Product.findOne({ _id: idProduct })
         .populate('idCategory')
         .populate({
@@ -89,6 +84,7 @@ const validateUpdateProduct = async (req, res, next) => {
             }
         }
     }
+ 
     if (idCategory == 0) {
         errors.idCategory = "Vui lòng chọn thể loại sản phẩm"
     }
@@ -100,14 +96,9 @@ const validateUpdateProduct = async (req, res, next) => {
             errors.sizes = "Dữ liệu thuộc tính không hợp lệ"
         }
 
-        const isCheckExistSizeOfProduct = product.productAttributes.some(product => {
-            return sizes.some(size => size === product.idSize._id.toString())
-        })
-        console.log(isCheckExistSizeOfProduct)
-        if (isCheckExistSizeOfProduct) {
-            errors.sizes = "Thuộc tính đã có trong sản phẩm"
-        }
-
+        const isExistAttribute = product.productAttributes.map(attr => attr.idSize._id.toString())
+        const newSizes = sizes.filter(size => !isExistAttribute.includes(size))
+        req.body.sizes = newSizes
     }
 
     if (Object.keys(errors).length > 0) {

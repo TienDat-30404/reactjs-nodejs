@@ -3,70 +3,91 @@ import ImageComponent from '../../../../components/ImageComponent'
 import { getAllProduct, deleteProduct } from '../../../../services/ProductService'
 import AddProduct from './AddProduct'
 import EditProduct from './EditProduct'
-import { detailCategory } from '../../../../services/CategoryService'
 import { InputComponent } from '../../../../components/InputComponent'
 import { getAllCategory } from '../../../../services/CategoryService'
 import { handleChangeInput } from '../../../../until/function'
 import { useSelector, useDispatch } from 'react-redux'
-import { initDataProduct } from '../../../../redux/Products/productsSlice'
+import { deleteProductRedux, initDataProduct, switchPage } from '../../../../redux/Products/productsSlice'
+import { getAllSizeService } from '../../../../services/SizeService'
+import { initDataCategory } from '../../../../redux/Category/categoriesSlice'
+import { initDataSize } from '../../../../redux/Size/sizesSlice'
+import { visiblePagination } from '../../../../until/function'
 export default function Product() {
   const dispatch = useDispatch()
   const products = useSelector(state => state?.products?.products)
+  const page = useSelector(state => state?.products?.page)
+  const totalPage = useSelector(state => state?.products?.totalPage)
+  const limit = useSelector(state => state?.product?.limit)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [showEdit, setShowEdit] = useState(false)
-  const [idProduct, setIdProduct] = useState(null)
-  const [categories, setCategories] = useState([])
   const [wordSearch, setWordSearch] = useState({
     idProduct: '',
     name: '',
-    priceFrom: '',
-    priceTo: '',
-    quantity: '',
     idCategory: ''
-
   })
-  // get ALl Product 
+
+  const handleSearchProduct = async (e) => {
+    
+  }
 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getAllProduct()
-        if (response && response?.status === 200) {
-          dispatch(initDataProduct(response))
+        let queryProduct = `page=${page}&limit=${limit}`
+        let [responseProduct, responseCategory, responseAttribute] = await Promise.all([
+          getAllProduct(queryProduct),
+          getAllCategory(),
+          getAllSizeService()
+        ])
+        if (responseProduct && responseProduct?.status === 200) {
+          dispatch(initDataProduct(responseProduct))
         }
+        if (responseCategory && responseCategory?.status === 200) {
+          dispatch(initDataCategory(responseCategory))
+        }
+        if (responseAttribute && responseAttribute?.status === 200) {
+          dispatch(initDataSize(responseAttribute))
+        }
+
       }
       catch (error) {
-        console.log("Lỗi khi lấy danh sách sản phẩm")
+        console.log("Fail when get products to display")
       }
     }
     fetchData()
-  })
+  }, [page, limit])
 
-  const handleSwitchPageEdit = (id) => {
-    // setShowEdit(true)
-    // setIdProduct(id)
+  const handleSwitchPageEdit = (data) => {
+    setShowEdit(true)
+    setSelectedProduct(data)
+  }
+
+  const handlePagination = (page) => {
+    dispatch(switchPage(page))
   }
 
 
   // handle delete product
   const handleDeleteProduct = async (id) => {
-    // const response = await deleteProduct(id)
-    // if (response) {
-    //   setProducts(products.filter(product => product._id != id))
-    // }
+    const response = await deleteProduct(id)
+    console.log(response)
+    if (response && response?.status === 200) {
+      dispatch(deleteProductRedux(id))
+      if (products?.length === 1 && page > 1) {
+        dispatch(switchPage(page - 1))
+      }
+      else if (products?.length === 1) {
+        dispatch(switchPage(page - 1))
+      }
+    }
   }
 
+  
 
 
 
-  const handleSearchProduct = async (e) => {
-    // e.preventDefault()
-    // const [listSearchProduct] = await Promise.all([
-    //   getAllProduct(null, 'idProduct', 'asc', null, wordSearch.idProduct, wordSearch.idCategory,
-    //     wordSearch.name, wordSearch.priceFrom, wordSearch.priceTo, wordSearch.quantity)
-    // ])
-  }
 
 
   return (
@@ -90,11 +111,9 @@ export default function Product() {
         </div>
       </div>
 
-      <form onSubmit={handleSearchProduct} className='mt-3 w-100 align-items-center justify-content-between shadow p-3 mb-5 bg-white rounded '>
-        {/* Các trường input */}
+      {/* <form onSubmit={handleSearchProduct} className='mt-3 w-100 align-items-center justify-content-between shadow p-3 mb-5 bg-white rounded '>
         <div style={{ width: '100%' }} className='d-flex'>
           <div style={{ width: '70%' }}>
-            {/* Id */}
             <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
               <label style={{ width: '80px' }} htmlFor="inputId" className="me-2 col-form-label">Id</label>
               <InputComponent
@@ -106,7 +125,6 @@ export default function Product() {
               />
             </div>
 
-            {/* Name */}
             <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
               <label style={{ width: '80px' }} htmlFor="inputName" className="me-2 col-form-label">Name</label>
               <InputComponent
@@ -118,7 +136,6 @@ export default function Product() {
               />
             </div>
 
-            {/* Email */}
             <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
               <div style={{ width: '50%' }} className='d-flex align-items-center me-3'>
                 <label style={{ width: '100px' }} htmlFor="inputEmail" className="me-2 col-form-label">Price</label>
@@ -145,7 +162,6 @@ export default function Product() {
               </div>
             </div>
 
-            {/* Phone */}
             <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
               <label style={{ width: '80px' }} htmlFor="inputPhone" className="me-2 col-form-label">Quantity</label>
               <InputComponent
@@ -158,7 +174,6 @@ export default function Product() {
               />
             </div>
 
-            {/* Role */}
             <div className="d-flex align-items-center" style={{ width: '100%' }}>
               <label style={{ width: '80px' }} className="me-2 col-form-label">Category</label>
               <select className='form-control' name="idCategory" onChange={(e) => handleChangeInput(e, setWordSearch)}
@@ -173,12 +188,11 @@ export default function Product() {
             </div>
           </div>
 
-          {/* Nút Submit */}
           <div style={{ width: '30%' }} className="d-flex justify-content-center align-items-center">
             <button type="submit" className="btn btn-primary">Tìm kiếm</button>
           </div>
         </div>
-      </form>
+      </form> */}
 
 
       <table class="table">
@@ -196,7 +210,7 @@ export default function Product() {
         <tbody>
           {products && products?.length > 0 ? (
             products?.map((product, index) => (
-              <tr>
+              <tr key={index}>
                 <th scope="row">{(product?._id).slice(0, 10)}...</th>
                 <td>
                   <ImageComponent
@@ -214,7 +228,7 @@ export default function Product() {
                 <td>{product?.updatedAt}</td>
                 <td style={{ width: '6%' }} className='text-center'>
                   <button
-                    onClick={() => handleSwitchPageEdit(product._id)}
+                    onClick={() => handleSwitchPageEdit(product)}
                     type="button"
                     className="btn btn-outline-primary">
                     Edit
@@ -225,13 +239,36 @@ export default function Product() {
                 </td>
               </tr>
             ))
-          ) : "123"}
+          ) : <p>Không có sản phẩm tồn tại</p>}
 
         </tbody>
       </table>
-      
+
+      {totalPage > 1 && (
+        <ul class="pagination d-flex justify-content-center">
+          <li style={{ cursor: 'pointer' }} onClick={() => handlePagination(page - 1)} class={`page-item ${page === 1 ? "disabled" : ""}`}>
+            <a class="page-link">Previous</a>
+          </li>
+
+          {visiblePagination(page, totalPage).map((pageNumber) => (
+            <li
+              key={pageNumber}
+              className={`page-item ${page === pageNumber ? "active" : ""}`}
+              onClick={() => handlePagination(pageNumber)}
+            >
+              <button className="page-link">{pageNumber}</button>
+            </li>
+          ))}
+
+          <li style={{ cursor: 'pointer' }} class={`page-item ${page === totalPage ? "disabled" : ""}`}>
+            <button onClick={() => handlePagination(page + 1)}
+              class="page-link">Next</button>
+          </li>
+        </ul>
+      )}
+
       <AddProduct show={showAddModal} close={() => setShowAddModal(false)} />
-      {/* <EditProduct show={showEdit} close={() => setShowEdit(false)} idProduct={idProduct} onSuccess={fetchDatasProduct} /> */}
+      <EditProduct show={showEdit} close={() => setShowEdit(false)} data={selectedProduct} />
     </div>
   )
 }

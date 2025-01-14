@@ -78,3 +78,30 @@ export const validateInformationPayment = (data) => {
     }
     return errors
 }
+
+export const visiblePagination = (page, totalPage) => {
+    const pages = []
+
+
+    if (page == 1 && totalPage >= 3) {
+        pages.push(page)
+        pages.push(page + 1)
+        pages.push(page + 2)
+    }
+    else if (page == totalPage && totalPage > 3) {
+        pages.push(page - 2)
+        pages.push(page - 1)
+        pages.push(page)
+    }
+
+    else {
+        if (page > 1) {
+            pages.push(page - 1)
+        }
+        pages.push(page)
+        if (page < totalPage) {
+            pages.push(page + 1)
+        }
+    }
+    return pages
+}

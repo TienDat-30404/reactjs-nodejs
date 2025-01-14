@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { deleteFavoriteService, getFavoriteOfUserService } from '../../services/FavoriteService'
 import { deleteFavoriteReudx, initDataFavorite } from '../../redux/Favorite/favoritesSlice'
 import { switchPage } from '../../redux/Favorite/favoritesSlice'
+import { visiblePagination } from '../../until/function'
 export default function Favorite() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -14,32 +15,7 @@ export default function Favorite() {
   const totalPage = useSelector(state => state?.favorites.totalPage)
   const favorites = useSelector(state => state?.favorites?.data)
   const totalFavorite = useSelector(state => state?.favorites?.totalFavorite)
-  const visiblePagination = () => {
-    const pages = []
-
-  
-    if (page == 1 && totalPage >= 3) {
-      pages.push(page)
-      pages.push(page + 1)
-      pages.push(page + 2)
-    }
-    else if (page == totalPage && totalPage > 3) {
-      pages.push(page - 2)
-      pages.push(page - 1)
-      pages.push(page)
-    }
-  
-    else {
-      if (page > 1) {
-        pages.push(page - 1)
-      }
-      pages.push(page)
-      if (page < totalPage) {
-        pages.push(page + 1)
-      }
-    }
-    return pages
-  }
+ 
   useEffect(() => {
 
     const query = `idUser=${idUser}&page=${page}&limit=${limit}`
@@ -105,7 +81,7 @@ export default function Favorite() {
             <a class="page-link">Previous</a>
           </li>
 
-          {visiblePagination().map((pageNumber) => (
+          {visiblePagination(page, totalPage).map((pageNumber) => (
             <li
               key={pageNumber}
               className={`page-item ${page === pageNumber ? "active" : ""}`}
