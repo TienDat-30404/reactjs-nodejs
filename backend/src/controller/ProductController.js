@@ -25,10 +25,21 @@ export default class ProductController {
             objectSort[sortBy] = type;
 
             const objectFilter = {};
-
             if (req.query.idProduct) {
-               
-                objectFilter._id = req.query.idProduct;
+                if (mongoose.Types.ObjectId.isValid(req.query.idProduct)) {
+                    objectFilter._id = req.query.idProduct
+                } else {
+                    return res.json({
+                        products: [],
+                        page : 1,
+                        totalProduct : 0,
+                        totalPage : 0,
+                        objectSort : {},
+                        limit : 0,
+                        objectFilter : {},
+                        status: 200
+                    });
+                }
             }
             if (req.query.idCategory) {
                 objectFilter.idCategory = req.query.idCategory;
@@ -77,7 +88,7 @@ export default class ProductController {
                     .lean(),
                 Product.countDocuments(objectFilter)
             ])
-            
+
 
 
 
