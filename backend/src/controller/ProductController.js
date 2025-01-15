@@ -2,13 +2,14 @@
 // const Size = require('../model/SizeModel')
 // const ProductAttribute = require('../model/ProductAttribute')
 // const cloudinary = require('../config/cloudinary');
-// const mongoose = require('mongoose')
 
+import mongoose from 'mongoose';
 import Product from '../model/ProductModel.js';
 import Size from '../model/SizeModel.js';
 import ProductAttribute from '../model/ProductAttribute.js';
 import cloudinary from '../config/cloudinary.js';
-import mongoose from 'mongoose';
+import { isValidObjectId } from 'mongoose'
+
 
 export default class ProductController {
 
@@ -26,6 +27,7 @@ export default class ProductController {
             const objectFilter = {};
 
             if (req.query.idProduct) {
+               
                 objectFilter._id = req.query.idProduct;
             }
             if (req.query.idCategory) {
@@ -46,7 +48,6 @@ export default class ProductController {
                 else {
                     query = ProductAttribute.find(query)
                 }
-
                 const attributes = await query.select('idProduct');
                 productIds = attributes.map(attr => attr.idProduct);
             }
@@ -56,10 +57,9 @@ export default class ProductController {
 
             }
 
-            // if (productIds) {
-            //     objectFilter._id = { $in: productIds };
-            // }
-            console.log("objectFilter", objectFilter)
+            if (productIds && req.query.priceFrom && req.query.priceTo) {
+                objectFilter._id = { $in: productIds };
+            }
             let [products, totalProduct] = await Promise.all([
                 Product.find(objectFilter)
                     .skip(startPage)
@@ -77,6 +77,9 @@ export default class ProductController {
                     .lean(),
                 Product.countDocuments(objectFilter)
             ])
+            
+
+
 
             if (productIds) {
                 const productIdsString = productIds.map(id => id.toString());
@@ -181,34 +184,32 @@ export default class ProductController {
 
     // [PUT] /update-product/:_id
     static async updateProduct(req, res, next) {
-        try 
-        {
+        try {
 
             const idProduct = req.params._id
-    
+
             let { name, idCategory, description, sizes, image } = req.body
-            const productImage = await Product.findOne({_id : idProduct})
-            
+            const productImage = await Product.findOne({ _id: idProduct })
+
             if (req.file) {
                 const fileImage = await cloudinary.uploader.upload(req.file.path);
                 image = fileImage.secure_url
             }
-            else 
-            {
+            else {
                 image = productImage?.image
             }
             await Product.updateOne({ _id: idProduct }, {
                 name,
-                image,  
+                image,
                 idCategory,
                 description
             })
-    
+
             if (sizes && sizes.length > 0) {
                 const productAttributes = sizes.map((size) => ({
                     idProduct,
-                    idSize : size ,
-                    quantity : 0
+                    idSize: size,
+                    quantity: 0
                 }))
                 await Promise.all(
                     productAttributes.map(attr => {
@@ -216,7 +217,7 @@ export default class ProductController {
                     })
                 )
             }
-    
+
             let product = await Product.findOne({ _id: idProduct })
                 .populate('idCategory')
                 .populate(
@@ -240,18 +241,17 @@ export default class ProductController {
                 product.category = product.idCategory;
                 delete product.idCategory;
             }
-    
+
             return res.status(200).json({
                 product,
                 message: "Update Successfully",
-                status : 200
+                status: 200
             })
         }
-        catch(err)
-        {
+        catch (err) {
             return res.status(500).json({
-                message : `Lỗi khi cập nhật sản phẩm : ${err}`,
-                status : 500
+                message: `Lỗi khi cập nhật sản phẩm : ${err}`,
+                status: 500
             })
         }
 

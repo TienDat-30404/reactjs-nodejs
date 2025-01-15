@@ -31,12 +31,11 @@ export const productsSlice = createSlice({
             {
                 state.products = state.products.filter(product => product._id !== id)
             }
+            state.totalProduct = state.totalProduct - 1
         },
 
         updateProductRedux : (state, action) => {
             const {id, newData} = action.payload 
-            console.log("id", id)
-            console.log("newData", newData)
             const productIndex = state.products.findIndex(product => product._id === id)
             if(productIndex != -1)
             {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
 import { getAllProduct, deleteProduct } from '../../../../services/ProductService'
 import AddProduct from './AddProduct'
@@ -12,35 +12,58 @@ import { getAllSizeService } from '../../../../services/SizeService'
 import { initDataCategory } from '../../../../redux/Category/categoriesSlice'
 import { initDataSize } from '../../../../redux/Size/sizesSlice'
 import { visiblePagination } from '../../../../until/function'
+import { toast } from 'react-toastify'
 export default function Product() {
   const dispatch = useDispatch()
   const products = useSelector(state => state?.products?.products)
   const page = useSelector(state => state?.products?.page)
   const totalPage = useSelector(state => state?.products?.totalPage)
-  const limit = useSelector(state => state?.product?.limit)
+  const totalProduct = useSelector(state => state?.products?.totalProduct)
+  const limit = useSelector(state => state?.products?.limit)
+  const categories = useSelector(state => state.categories.categories)
   const [showAddModal, setShowAddModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showEdit, setShowEdit] = useState(false)
-  const [wordSearch, setWordSearch] = useState({
+  const [displayTextSearch, setDisplayTextSearch] = useState('idProduct')
+  const [searchCriteria, setSearchCriteria] = useState({
     idProduct: '',
     name: '',
-    idCategory: ''
+    idCategory: '',
+    priceFrom: '',
+    priceTo: ''
   })
-
-  const handleSearchProduct = async (e) => {
-    
-  }
 
 
   useEffect(() => {
     const fetchData = async () => {
+
       try {
         let queryProduct = `page=${page}&limit=${limit}`
+        if (searchCriteria.name != "") {
+          queryProduct += `&search=${searchCriteria.name}`
+        }
+        if (searchCriteria.idProduct != "") {
+          queryProduct += `&idProduct=${searchCriteria.idProduct}`
+        }
+        if (searchCriteria.idCategory != "") {
+          queryProduct += `&idCategory=${searchCriteria.idCategory}`
+        }
+        if (displayTextSearch === 'price') {
+
+          // if(!Number(searchCriteria.priceFrom))
+          // {
+          //   return
+          // }
+          queryProduct += `&priceFrom=${searchCriteria.priceFrom}&priceTo=${searchCriteria.priceTo}`
+        }
+
+
         let [responseProduct, responseCategory, responseAttribute] = await Promise.all([
           getAllProduct(queryProduct),
           getAllCategory(),
           getAllSizeService()
         ])
+        console.log("responseProduct", responseProduct)
         if (responseProduct && responseProduct?.status === 200) {
           dispatch(initDataProduct(responseProduct))
         }
@@ -57,7 +80,7 @@ export default function Product() {
       }
     }
     fetchData()
-  }, [page, limit])
+  }, [page, limit, searchCriteria, displayTextSearch])
 
   const handleSwitchPageEdit = (data) => {
     setShowEdit(true)
@@ -84,19 +107,26 @@ export default function Product() {
     }
   }
 
-  
+  const handleChangeSearchSelect = (e) => {
+    setSearchCriteria({
+      idProduct: '',
+      name: '',
+      idCategory: '',
+      priceFrom: '',
+      priceTo: ''
+    })
+    setDisplayTextSearch("")
+    setDisplayTextSearch(e.target.value)
+  }
+  console.log(searchCriteria.priceFrom)
 
-
-
-
-
+  console.log("searchCriteria", searchCriteria)
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
         <div className='d-flex align-items-center'>
           <h3>Product</h3>
-
-          <h6 className='ms-3'>({products.length} product found)</h6>
+          <h6 className='ms-3'>({totalProduct} product found)</h6>
           <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo sản phẩm</button>
         </div>
         <div className='d-flex align-items-center'>
@@ -111,88 +141,87 @@ export default function Product() {
         </div>
       </div>
 
-      {/* <form onSubmit={handleSearchProduct} className='mt-3 w-100 align-items-center justify-content-between shadow p-3 mb-5 bg-white rounded '>
-        <div style={{ width: '100%' }} className='d-flex'>
-          <div style={{ width: '70%' }}>
-            <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
-              <label style={{ width: '80px' }} htmlFor="inputId" className="me-2 col-form-label">Id</label>
-              <InputComponent
-                onChange={(e) => handleChangeInput(e, setWordSearch)}
-                name="idProduct"
-                type="text"
-                className="form-control"
-                id="inputId"
-              />
-            </div>
+      <select
+        onChange={handleChangeSearchSelect}
+        class="form-select mt-2"
+      >
+        <option value="idProduct" selected>Tìm kiếm theo Id</option>
+        <option value="name">Tìm kiếm theo tên</option>
+        <option value="idCategory">Tìm kiếm theo thể loại</option>
+        <option value="price">Tìm kiếm theo giá</option>
+      </select>
 
-            <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
-              <label style={{ width: '80px' }} htmlFor="inputName" className="me-2 col-form-label">Name</label>
-              <InputComponent
-                onChange={(e) => handleChangeInput(e, setWordSearch)}
-                name="name"
-                type="text"
-                className="form-control"
-                id="inputName"
-              />
-            </div>
+      {displayTextSearch == 'price' && (
+        <div className='d-flex align-items-center justify-content-between'>
+          <div class="input-group mb-3 mt-1 w-40 me-2">
+            <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Giá bắt đầu</button>
+            <input
+              type="text"
+              class="form-control"
+              name="priceFrom"
+              value={searchCriteria[`${displayTextSearch}From`]}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || Number(value)) {
+                  handleChangeInput(e, setSearchCriteria);
+                }
 
-            <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
-              <div style={{ width: '50%' }} className='d-flex align-items-center me-3'>
-                <label style={{ width: '100px' }} htmlFor="inputEmail" className="me-2 col-form-label">Price</label>
-                <InputComponent
-                  onChange={(e) => handleChangeInput(e, setWordSearch)}
-                  name="priceFrom"
-                  type="text"
-                  className="form-control"
-                  id="inputEmail"
-                />
-              </div>
-
-              <i style={{ fontSize: '25px' }} class="bi bi-arrow-right"></i>
-
-              <div style={{ width: '50%' }} className='d-flex align-items-center ms-3'>
-                <InputComponent
-                  onChange={(e) => handleChangeInput(e, setWordSearch)}
-
-                  name="priceTo"
-                  type="text"
-                  className="form-control"
-                  id="inputEmail"
-                />
-              </div>
-            </div>
-
-            <div className="d-flex align-items-center mb-2" style={{ width: '100%' }}>
-              <label style={{ width: '80px' }} htmlFor="inputPhone" className="me-2 col-form-label">Quantity</label>
-              <InputComponent
-                onChange={(e) => handleChangeInput(e, setWordSearch)}
-
-                name="quantity"
-                type="text"
-                className="form-control"
-                id="inputPhone"
-              />
-            </div>
-
-            <div className="d-flex align-items-center" style={{ width: '100%' }}>
-              <label style={{ width: '80px' }} className="me-2 col-form-label">Category</label>
-              <select className='form-control' name="idCategory" onChange={(e) => handleChangeInput(e, setWordSearch)}
-              >
-                <option value="-1">Chọn thể loại</option>
-                {categories.length > 0 ? (
-                  categories.map((category, index) => (
-                    <option key={index} value={category._id}>{category.name}</option>
-                  ))
-                ) : <option>Hiện tại chưa có quyền</option>}
-              </select>
-            </div>
+              }}
+            />
           </div>
 
-          <div style={{ width: '30%' }} className="d-flex justify-content-center align-items-center">
-            <button type="submit" className="btn btn-primary">Tìm kiếm</button>
+          <div class="input-group mb-3 mt-1 w-40">
+            <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Giá kết thúc</button>
+            <input
+              type="text"
+              class="form-control"
+              name="priceTo"
+              value={searchCriteria[`${displayTextSearch}To`]}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || Number(value)) {
+                  handleChangeInput(e, setSearchCriteria);
+                }
+              }}
+            />
           </div>
         </div>
-      </form> */}
+      )}
+
+      {displayTextSearch != 'idCategory' && displayTextSearch != 'price' && (
+        <div class="input-group mb-3 mt-1">
+          <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
+          <input
+            type="text"
+            class="form-control"
+            name={displayTextSearch}
+            value={searchCriteria[`${displayTextSearch}`]}
+            onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+          />
+        </div>
+      )}
+
+      {displayTextSearch == 'idCategory' && (
+
+        <div>
+          <select
+            name={displayTextSearch}
+            value={searchCriteria[`${displayTextSearch}`]}
+            class="form-select"
+            onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+          >
+            <option>Chọn thể loại</option>
+            {categories && categories?.length > 0 ? (
+              categories?.map((category, index) => (
+                <option key={index} value={category._id}>{category.name}</option>
+              )
+              )) :
+              <option value="" selected>Không tồn tại thể loại</option>
+            }
+          </select>
+        </div>
+      )}
+
 
 
       <table class="table">
