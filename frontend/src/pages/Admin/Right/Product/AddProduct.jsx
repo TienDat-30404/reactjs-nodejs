@@ -8,6 +8,8 @@ import Select from "react-select";
 import { initDataCategory } from '../../../../redux/Category/categoriesSlice'
 import { getAllSizeService } from '../../../../services/SizeService'
 import { initDataSize } from '../../../../redux/Size/sizesSlice'
+import { toast } from 'react-toastify'
+import { addProductRedux } from '../../../../redux/Products/productsSlice'
 
 export default function AddProduct({ show, close }) {
 
@@ -49,8 +51,9 @@ export default function AddProduct({ show, close }) {
             setErrors(response.errors)
             return
         }
-        else {
-            alert("Thêm sản phẩm thành công")
+        if(response && response.status === 201) {
+            toast.success("Thêm sản phẩm thành công")
+            dispatch(addProductRedux(response.product))
         }
     }
 

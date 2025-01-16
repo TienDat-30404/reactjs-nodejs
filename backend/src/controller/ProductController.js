@@ -31,12 +31,12 @@ export default class ProductController {
                 } else {
                     return res.json({
                         products: [],
-                        page : 1,
-                        totalProduct : 0,
-                        totalPage : 0,
-                        objectSort : {},
-                        limit : 0,
-                        objectFilter : {},
+                        page: 1,
+                        totalProduct: 0,
+                        totalPage: 0,
+                        objectSort: {},
+                        limit: 0,
+                        objectFilter: {},
                         status: 200
                     });
                 }
@@ -184,7 +184,12 @@ export default class ProductController {
             await session.commitTransaction()
             session.endSession()
 
-            return res.status(200).json({ product })
+            return res.status(201).json(
+                {
+                    product,
+                    status : 201
+                }
+            )
         }
         catch (error) {
             await session.abortTransaction();

@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { deleteCategory, updateCategory } from "../../services/CategoryService";
 const initialState = {
     page : 0,
     totalPage : 0,
@@ -22,8 +23,33 @@ export const categoriesSlice = createSlice({
         },
         switchPage : (state, action) => {
             state.page = action.payload
+        }, 
+
+        addCategoryRedux : (state, action) => {
+            state.categories.push(action.payload) 
+            state.totalCategory += 1
+        },
+        deleteCategoryRedux  : (state, action) => {   
+            const idCategory = action.payload
+            const index = state.categories.findIndex(category => category._id === idCategory)
+            state.categories.splice(index, 1)
+            state.totalCategory -= 1
+        },
+
+        addCategoryRedux : (state, action) => {
+            state.categories.push(action.payload) 
+            state.totalCategory += 1
+        },
+
+        updateCategoryRedux : (state, action) => {   
+            const {id, newData} = action.payload
+            const index = state.categories.findIndex(category => category._id === id)
+            if(index != -1)
+            {
+                state.categories[index] = newData
+            }
         }
     }
 })
-export const {initDataCategory, switchPage} = categoriesSlice.actions
+export const {initDataCategory, switchPage, deleteCategoryRedux, addCategoryRedux, updateCategoryRedux} = categoriesSlice.actions
 export default categoriesSlice.reducer

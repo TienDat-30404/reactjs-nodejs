@@ -25,4 +25,14 @@ const storageProductImage = multer.diskStorage({
 });
 const uploadImageProduct = multer({ storage: storageProductImage });
 
-export {uploadAvatar, uploadImageProduct}
+const storageCategoryImage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        return cb(null, './src/utils/uploads/category');
+    },
+    filename: function (req, file, cb) {
+        return cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const uploadImageCategory = multer({ storage: storageCategoryImage });
+
+export {uploadAvatar, uploadImageProduct, uploadImageCategory}

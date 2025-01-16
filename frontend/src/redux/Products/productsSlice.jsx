@@ -41,8 +41,13 @@ export const productsSlice = createSlice({
             {
                 state.products[productIndex] = newData
             }
+        },
+
+        addProductRedux : (state, action) => {
+            state.products.push(action.payload) 
+            state.totalProduct += 1
         }
     }
 })
-export const {initDataProduct, switchPage, deleteProductRedux, updateProductRedux} = productsSlice.actions
+export const {initDataProduct, switchPage, deleteProductRedux, updateProductRedux, addProductRedux} = productsSlice.actions
 export default productsSlice.reducer

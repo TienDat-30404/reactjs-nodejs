@@ -20,6 +20,10 @@ export default function SidebarAdmin() {
                     <i class="bi bi-p-square"></i>
                     <p class="nav-link">Product</p>
                 </li>
+                <li onClick={() => navigate('/admin/category')} class="nav-item">
+                    <i class="bi bi-p-square"></i>
+                    <p class="nav-link">Category</p>
+                </li>
                 <li onClick={() => navigate('/admin/order')} class="nav-item">
                     <i class="bi bi-p-square"></i>
                     <p class="nav-link">Order</p>
