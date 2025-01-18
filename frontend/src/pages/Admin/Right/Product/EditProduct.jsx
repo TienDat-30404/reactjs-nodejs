@@ -18,9 +18,8 @@ export default function EditProduct({ data, show, close }) {
     })
     const [selectedOptions, setSelectedOptions] = useState([]);
 
-
     useEffect(() => {
-        if (data) {
+            console.log(data)
             setProduct({
                 name: data?.name || '',
                 idCategory: data?.category?._id || '',
@@ -30,9 +29,8 @@ export default function EditProduct({ data, show, close }) {
                 value: attr?.size?._id, label: attr?.size.name
             }))
             setSelectedOptions(attributeOfProduct)
-        }
 
-    }, [data]);
+    }, [show]);
 
 
     const options = sizes.map((size) => ({
@@ -140,7 +138,7 @@ export default function EditProduct({ data, show, close }) {
                             <div style={{ width: '100%' }}>
                                 <InputComponent
                                     name="name"
-                                    value={product.name}
+                                    value={product?.name}
                                     onChange={handleChangeInput}
                                     className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
@@ -186,7 +184,7 @@ export default function EditProduct({ data, show, close }) {
                                     }}
                                 />
                                 {errors.size && <ErrorMessageInput errors={errors} field="size" />}
-                                {errors.idCategory && <ErrorMessageInput errors={errors} field="idCategory" />}
+                                {errors.size && <ErrorMessageInput errors={errors} field="size" />}
                             </div>
                         </div>
 
@@ -200,9 +198,9 @@ export default function EditProduct({ data, show, close }) {
                                     onChange={handleChangeInput}
                                 >
                                     <option value="0">Chọn thể loại</option>
-                                    {categories.length > 0 ? (
-                                        categories.map((category, index) => (
-                                            <option key={index} value={category._id}>{category.name}</option>
+                                    {categories?.length > 0 ? (
+                                        categories?.map((category, index) => (
+                                            <option key={index} value={category?._id}>{category?.name}</option>
                                         ))
                                     ) : <option>Hiện không có thể loại sản phẩm nào</option>}
                                 </select>
@@ -214,7 +212,7 @@ export default function EditProduct({ data, show, close }) {
                             <textarea
                                 className={`form-control ${errors.description ? 'is-invalid' : ''} `}
                                 name="description"
-                                value={product.description}
+                                value={product?.description}
                                 onChange={handleChangeInput}
                                 placeholder={errors.description ? errors.description : ""}
                             >

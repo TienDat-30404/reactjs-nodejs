@@ -1,61 +1,65 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
-import { getAllRole, addRole } from '../../../../services/RoleService'
-import { sendOtpForCreateAccount } from '../../../../services/UserService'
-import { useSelector, useDispatch } from 'react-redux'
-import { initDataRole } from '../../../../redux/Role/rolesSlice'
-import { addUser } from '../../../../redux/User/usersSlice'
-export default function AddUser({ show, close }) {
-    const [informations, setInformations] = useState({
-        name: '',
-        email: '',
-        password: '',
-        idRole: '',
-    })
-    
+import { addProduct } from '../../../../services/ProductService'
+import { getAllCategory } from '../../../../services/CategoryService'
+import { useDispatch, useSelector } from 'react-redux'
+import Select from "react-select";
+import { initDataCategory } from '../../../../redux/Category/categoriesSlice'
+import { getAllSizeService } from '../../../../services/SizeService'
+import { initDataSize } from '../../../../redux/Size/sizesSlice'
+import { toast } from 'react-toastify'
+import { addProductRedux } from '../../../../redux/Products/productsSlice'
+
+export default function AddProduct({ show, close }) {
+
+
     const dispatch = useDispatch()
+    const [product, setProduct] = useState({
+        name: '',
+        idCategory: '',
+        description: ''
+    })
+    const [selectedOptions, setSelectedOptions] = useState([]);
+
+    const categories = useSelector(state => state.categories.categories)
+    const sizes = useSelector(state => state.sizes.data)
+    const [image, setImage] = useState(null);
+    const [fileInputKey, setFileInputKey] = useState(Date.now());
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
-    const roles = useSelector(state => state.roles.roles)
-    useEffect(() => {
-        const fetchDatasRole = async () => {
-            const response = await getAllRole();
-            if(response)
-            {
-                dispatch(initDataRole(response))
-            }
-        }
-        fetchDatasRole()
-    }, [])
+    const options = sizes.map((size) => ({
+        value: size._id, label: size.name
+    }))
 
- 
-
-    // handle click add account
-    const handleClickAddAccount = async () => {
+    // handle click add product
+    const handleClickAddProduct = async () => {
         inputFocusRef.current.focus()
-        const response = await sendOtpForCreateAccount(
-            {
-                name : informations.name,
-                email : informations.email,
-                password : informations.password,
-                confirm_password : informations.password,
-                idRole : informations.idRole
-            }
-        )
+        var formData = new FormData()
+        formData.append('name', product.name)
+        formData.append('image', image)
+        formData.append('idCategory', product.idCategory)
+        formData.append('description', product.description)
+
+        selectedOptions?.length > 0 ? selectedOptions?.forEach(size => {
+            formData.append('sizes[]', size?.value);
+        }) : formData.append('sizes[]', [])
+
+        const response = await addProduct(formData)
+        console.log(response)
         if (response.errors) {
             setErrors(response.errors)
             return
         }
-        else {
-            alert("Thêm tài khoản thành công")
-            dispatch(addUser(response.user))
+        if(response && response.status === 201) {
+            toast.success("Thêm sản phẩm thành công")
+            dispatch(addProductRedux(response.product))
         }
     }
 
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
-        setInformations(prevInfo => ({
+        setProduct(prevInfo => ({
             ...prevInfo,
             [name]: value
         }));
@@ -74,22 +78,47 @@ export default function AddUser({ show, close }) {
         });
     };
 
+    const handleChangeFile = (e) => {
+        const selectedFileImage = e.target.files[0]
+        setImage(selectedFileImage);
+        setErrors(prevError => {
+            const newError = { ...prevError }
+            if (selectedFileImage) {
+                delete newError.image
+            }
+            return newError
+        })
+    };
+
+    const handleChangeAttribute = (selected) => {
+        setSelectedOptions(selected);
+    };
+
+
     const closeModal = () => {
         close()
-        setInformations({
+        setProduct({
             name: '',
-            email: '',
-            password: '',
-            idRole: 0,
+            idCategory: '',
+            description: '',
+            sizes: 0
         })
+        setSelectedOptions([])
+        setFileInputKey(Date.now());
         setErrors({})
     }
     const validateInput = (name, value) => {
         switch (name) {
+            // case 'price':
+            //     return !isNaN(value) && value > 0;
+            // case 'quantity':
+            //     return !isNaN(value) && value > 0;
             default:
                 return value.trim() !== '';
         }
     };
+
+
 
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
@@ -97,75 +126,99 @@ export default function AddUser({ show, close }) {
                 <div className=" modal-content">
                     <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Tạo sản phẩm</p>
                     <div className='px-4 py-2 d-flex align-items-center'>
-                        <label style={{ fontSize: '14px' }} className="form-label">Tên người dùng</label>
+                        <label style={{ fontSize: '14px' }} className="form-label">Tên sản phẩm</label>
                         <div style={{ width: '100%' }}>
                             <InputComponent
                                 name="name"
-                                value={informations.name}
+                                value={product.name}
                                 onChange={handleChangeInput}
                                 className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                 ref={inputFocusRef}
                                 placeholder={errors.name ? errors.name : ""}
                             />
-                            {informations.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />}
+                            {product.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />}
                         </div>
 
                     </div>
 
                     <div className='px-4 py-2 d-flex align-items-center'>
-                        <label style={{ fontSize: '14px' }} className="form-label">Email</label>
+                        <label style={{ fontSize: '14px' }} className="form-label">Ảnh sản phẩm</label>
                         <div style={{ width: '100%' }}>
                             <InputComponent
-                                name="email"
-                                value={informations.email}
-                                onChange={handleChangeInput}
-                                className={`form-control ${errors.email ? 'is-invalid' : ''} `}
-                                placeholder={errors.email ? errors.email : ""}
+                                key={fileInputKey}
+                                type="file"
+                                name="image"
+                                onChange={handleChangeFile}
+                                className={`form-control ${errors.image ? 'is-invalid' : ''} `}
+                                placeholder={errors.image ? errors.image : ""}
                             />
-                            {informations.email != "" && errors.email && <ErrorMessageInput errors={errors} field="email" />}
+                            {errors.image && <ErrorMessageInput className errors={errors} field="image" />}
                         </div>
                     </div>
-
                     <div className='px-4 py-2 d-flex align-items-center'>
-                        <label style={{ fontSize: '14px' }} className="form-label">Mật khẩu</label>
+                        <label style={{ fontSize: '14px' }} className="form-label">Thuộc tính</label>
                         <div style={{ width: '100%' }}>
-                            <InputComponent
-                                name="password"
-                                value={informations.password}
-                                onChange={handleChangeInput}
-                                className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                                ref={inputFocusRef}
-                                placeholder={errors.password ? errors.password : ""}
+                            <Select
+                                isMulti
+                                value={selectedOptions}
+                                options={options}
+                                onChange={handleChangeAttribute}
+                                styles={{
+                                    menu: (provided) => ({
+                                        ...provided,
+                                        maxHeight: 150,
+                                        overflowY: 'auto',
+                                        borderColor: 'red'
+                                    }),
+                                    control: (provided) => ({
+                                        ...provided,
+                                        borderColor: errors.size ? 'red' : ""
+                                    }),
+                                }}
                             />
-                            {informations.password != "" && errors.password && <ErrorMessageInput errors={errors} field="password" />}
+                            {errors.size && <ErrorMessageInput errors={errors} field="size" />}
                         </div>
                     </div>
                     <div className='px-4 py-2 d-flex align-items-center'>
-                        <label style={{ fontSize: '14px' }} className="form-label">Loại tài khoản</label>
-                        <div style = {{ width : '100%' }}>
-                            <select 
-                                value = {roles.idRole}
-                                name="idRole" 
-                                className={`form-control  ${errors.idRole ? 'is-invalid' : ''}  `} 
+                        <label style={{ fontSize: '14px' }} className="form-label">Thể loại</label>
+                        <div style={{ width: '100%' }}>
+                            <select
+                                value={product.idCategory}
+                                name="idCategory"
+                                className={`form-control ${errors.idCategory ? 'is-invalid' : ''} `}
                                 onChange={handleChangeInput}
                             >
-                                <option value="0" checked>Chọn loại tài khoản</option>
-                                {roles.length > 0 ? (
-                                    roles.map((role, index) => (
-                                        <option key = {index} value={role._id}>{role.name}</option>
+                                <option value="0" checked>Chọn thể loại</option>
+                                {categories && categories.length > 0 ? (
+                                    categories.map((category, index) => (
+                                        <option key={index} value={category._id}>{category.name}</option>
                                     ))
-                                ) : <option>Hiện không có loại tài khoản nào. Vui lòng thêm vào loại tài khoản để sử dụng chức năng này.</option>}
+                                ) : <option>Hiện không có thể loại sản phẩm nào</option>}
                             </select>
-                            {errors.idRole && <ErrorMessageInput errors={errors} field="idRole" />}
+                            {errors.idCategory && <ErrorMessageInput errors={errors} field="idCategory" />}
                         </div>
                     </div>
+
+                    <div className='px-4 py-2 d-flex align-items-center'>
+                        <label style={{ fontSize: '14px' }} className="form-label">Mô tả sản phẩm</label>
+                        <textarea
+                            className={`form-control ${errors.description ? 'is-invalid' : ''} `}
+                            name="description"
+                            value={product.description}
+                            onChange={handleChangeInput}
+                            placeholder={errors.description ? errors.description : ""}
+                        >
+                        </textarea>
+                    </div>
+
 
                     <div className="modal-footer d-flex justify-content-between ">
                         <button onClick={() => closeModal()} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button onClick={handleClickAddAccount} type="button" className="btn btn-primary">Add</button>
+                        <button onClick={handleClickAddProduct} type="button" className="btn btn-primary">Add</button>
                     </div>
                 </div>
             </div>
         </div>
     )
 }
+

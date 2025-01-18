@@ -19,8 +19,7 @@ export default function EditCategory({ data, show, close }) {
         if (data) {
             setName(data.name)
         }
-
-    }, [data]);
+    }, [show]);
 
 
    

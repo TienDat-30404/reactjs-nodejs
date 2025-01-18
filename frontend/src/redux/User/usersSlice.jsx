@@ -18,7 +18,7 @@ export const usersSlice = createSlice({
             state.totalUser = action.payload?.totalUser
             state.limit = action.payload?.limit
             state.users = action.payload?.users
-            state.isLoading = action.payload?.isLoading
+            state.isLoading = false
         },
         switchPage : (state, action) => {
             state.page = action.payload

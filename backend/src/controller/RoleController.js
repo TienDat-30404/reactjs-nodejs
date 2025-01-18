@@ -17,7 +17,7 @@ export default class RoleController {
         try 
         {
             const roles = await Role.find({})
-            return res.status(200).json({roles})
+            return res.status(200).json({roles, status : 200})
         }
         catch (error)
         {

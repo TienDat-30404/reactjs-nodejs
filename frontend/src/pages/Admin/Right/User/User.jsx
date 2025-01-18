@@ -1,119 +1,110 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
-import { getAllUser, searchUser } from '../../../../services/UserService'
+import { getAllProduct, deleteProduct } from '../../../../services/ProductService'
 import AddUser from './AddUser'
-import ChangePassword from './ChangePassword'
-import { deleteUser } from '../../../../services/UserService'
 import EditUser from './EditUser'
 import { InputComponent } from '../../../../components/InputComponent'
-import { getAllRole } from '../../../../services/RoleService'
+import { getAllCategory } from '../../../../services/CategoryService'
 import { handleChangeInput } from '../../../../until/function'
 import { useSelector, useDispatch } from 'react-redux'
-import { deleteUserRedux, initDataUser, switchPage } from '../../../../redux/User/usersSlice'
+import { deleteProductRedux, initDataProduct, switchPage } from '../../../../redux/Products/productsSlice'
+import { getAllSizeService } from '../../../../services/SizeService'
+import { initDataCategory } from '../../../../redux/Category/categoriesSlice'
+import { initDataSize } from '../../../../redux/Size/sizesSlice'
+import { visiblePagination } from '../../../../until/function'
+import { getAllUser } from '../../../../services/UserService'
+import { initDataUser } from '../../../../redux/User/usersSlice'
+import { getAllRole } from '../../../../services/RoleService'
 import { initDataRole } from '../../../../redux/Role/rolesSlice'
-export default function User() {
+export default function Product() {
   const dispatch = useDispatch()
-  const [showAdd, setShowAdd] = useState(false)
+  const users = useSelector(state => state?.users?.users)
+  const page = useSelector(state => state?.users?.page)
+  const totalPage = useSelector(state => state?.users?.totalPage)
+  const totalUser = useSelector(state => state?.users?.totalUser)
+  const limit = useSelector(state => state?.users?.limit)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null);
   const [showEdit, setShowEdit] = useState(false)
-  const [showChangePassword, setShowChangePassword] = useState(false)
-  const [idUser, setIdUser] = useState(null)
-  const [selectedId, setSelectedId] = useState(null); // State để lưu idUser được chọn
-  const [wordSearch, setWordSearch] = useState({
-    idUser: '',
+  const [displayTextSearch, setDisplayTextSearch] = useState('idProduct')
+  const [searchCriteria, setSearchCriteria] = useState({
+    idProduct: '',
     name: '',
-    email: '',
-    phone: '',
-    idRole: ''
+    idCategory: '',
+    priceFrom: '',
+    priceTo: ''
   })
 
-  const users = useSelector(state => state.users.users)
-  const page = useSelector(state => state.users.page)
-  const totalPage = useSelector(state => state.users.totalPage)
-  const limit = useSelector(state => state.users.limit)
-  const totalUser = useSelector(state => state.users.totalUser)
-
-  const roles = useSelector(state => state.roles.roles)
-
-  const fetchDataUser = async () => {
-    let query = `page=${page}&limit=1000`
-    const responseUser = await getAllUser(query)
-    const responseRole = await getAllRole()
-    if (responseUser && responseRole) {
-      dispatch(initDataUser(responseUser))
-      dispatch(initDataRole(responseRole))
-    }
-  }
 
   useEffect(() => {
-    fetchDataUser()
-  }, [page, dispatch])
+    const fetchData = async () => {
 
-
-
-  //  handle pagination next page Cart
-  const handleNextPageCart = () => {
-    if (page < totalPage) {
-      dispatch(switchPage(page + 1))
+      try {
+        let query = `page=${page}&limit=${limit}`
+        let [responseUser, responseRole] = await Promise.all(
+          [
+            getAllUser(query),
+            getAllRole()
+          ])
+        if(responseUser && responseUser.status === 200)
+        {
+            dispatch(initDataUser(responseUser))
+        }
+        if(responseRole && responseRole.status === 200)
+        {
+            dispatch(initDataRole(responseRole))
+        }
+      }
+      catch (error) {
+        console.log("Fail when get users to display")
+      }
     }
-  }
+    fetchData()
+  }, [page, limit])
 
-  // handle pagination prev page Cart
-  const handlePrevPageCart = useCallback(() => {
-    if (page > 1) {
-      dispatch(switchPage(page - 1))
-    }
-  }, [page])
-
-  const handleSelectRow = (id) => {
-    setSelectedId(id); // Lưu idUser của dòng được chọn
-  };
-
-
-  const handleSwitchPageEdit = (id) => {
+  const handleSwitchPageEdit = (data) => {
     setShowEdit(true)
-    setIdUser(id)
+    setSelectedUser(data)
+  }
+  const handlePagination = (page) => {
+    dispatch(switchPage(page))
   }
 
-  
 
-  // handle search user
-  const handleSearchUser = async (e) => {
-    // e.preventDefault()
-    // const response = await searchUser(wordSearch.idUser, wordSearch.name, wordSearch.email, wordSearch.phone, wordSearch.idRole)
-    // if (response && response.users) {
-    //   await fetchUsersWithRoles(response.users);  // Lấy chi tiết role của các user trong kết quả tìm kiếm
+  // handle delete product
+  const handleDeleteProduct = async (id) => {
+    // const response = await deleteProduct(id)
+    // console.log(response)
+    // if (response && response?.status === 200) {
+    //   dispatch(deleteProductRedux(id))
+    //   if (products?.length === 1 && page > 1) {
+    //     dispatch(switchPage(page - 1))
+    //   }
+    //   else if (products?.length === 1) {
+    //     dispatch(switchPage(page - 1))
+    //   }
     // }
   }
 
-  // handle delete account
-  const handleDeleteUser = async (id) => {
-    const response = await deleteUser(id)
-    if (response) {
-      dispatch(deleteUserRedux({id}))
-    }
+  const handleChangeSearchSelect = (e) => {
+    // setSearchCriteria({
+    //   idProduct: '',
+    //   name: '',
+    //   idCategory: '',
+    //   priceFrom: '',
+    //   priceTo: ''
+    // })
+    // setDisplayTextSearch("")
+    // setDisplayTextSearch(e.target.value)
   }
-
-  // switch modal change password
-  const switchModalChangePassword = () => {
-    if (selectedId) {
-      setShowChangePassword(true)
-    }
-    else {
-      alert("Vui lòng chọn tài khoản muốn đổi tài khoản")
-    }
-  }
-
-
-
-
+  console.log(users)
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
         <div className='d-flex align-items-center'>
           <h3>User</h3>
-          <h6 className='ms-3'>({users.length} user found)</h6>
-          <button onClick={() => setShowAdd(true)} type="button" className="btn btn-outline-success ms-3">Tạo người dùng</button>
-          <button onClick={() => switchModalChangePassword()} type="button" className="btn btn-outline-success ms-3">Đổi mật khẩu</button>
+          <h6 className='ms-3'>({totalUser} user found)</h6>
+          <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo tài khoản</button>
         </div>
         <div className='d-flex align-items-center'>
           <i className="bi bi-bell me-3"></i>
@@ -127,159 +118,145 @@ export default function User() {
         </div>
       </div>
 
-      <form onSubmit={handleSearchUser} className='mt-3 w-100 align-items-center justify-content-between shadow p-3 mb-5 bg-white rounded '>
-        {/* Các trường input */}
-        <div style={{ width: '100%' }} className='d-flex align-items-center justify-content-between'>
+      <select
+        onChange={handleChangeSearchSelect}
+        class="form-select mt-2"
+      >
+        <option value="idProduct" selected>Tìm kiếm theo Id</option>
+        <option value="name">Tìm kiếm theo tên</option>
+        <option value="idCategory">Tìm kiếm theo thể loại</option>
+        <option value="price">Tìm kiếm theo giá</option>
+      </select>
 
-          {/* Id */}
-          <div className="d-flex align-items-center" style={{ width: '10%', marginRight: '10px' }}>
-            <label className="me-2 col-form-label">Id</label>
-            <InputComponent
-              onChange={(e) => handleChangeInput(e, setWordSearch)}
-              name="idUser"
+      {displayTextSearch == 'price' && (
+        <div className='d-flex align-items-center justify-content-between'>
+          <div class="input-group mb-3 mt-1 w-40 me-2">
+            <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Giá bắt đầu</button>
+            <input
               type="text"
-              className="form-control"
-              id="inputId"
+              class="form-control"
+              name="priceFrom"
+              value={searchCriteria[`${displayTextSearch}From`]}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || Number(value)) {
+                  handleChangeInput(e, setSearchCriteria);
+                }
+
+              }}
             />
           </div>
 
-          {/* Name */}
-          <div className="d-flex align-items-center" style={{ width: '20%', marginRight: '10px' }}>
-            <label htmlFor="inputName" className="me-2 col-form-label">Name</label>
-            <InputComponent
-              onChange={(e) => handleChangeInput(e, setWordSearch)}
-              name="name"
+          <div class="input-group mb-3 mt-1 w-40">
+            <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Giá kết thúc</button>
+            <input
               type="text"
-              className="form-control"
-              id="inputName"
+              class="form-control"
+              name="priceTo"
+              value={searchCriteria[`${displayTextSearch}To`]}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || Number(value)) {
+                  handleChangeInput(e, setSearchCriteria);
+                }
+              }}
             />
           </div>
-
-          {/* Email */}
-          <div className="d-flex align-items-center" style={{ width: '25%', marginRight: '10px' }}>
-            <label htmlFor="inputEmail" className="me-2 col-form-label">Email</label>
-            <InputComponent
-              onChange={(e) => handleChangeInput(e, setWordSearch)}
-              name="email"
-              type="text"
-              className="form-control"
-              id="inputEmail"
-            />
-          </div>
-
-          {/* Phone */}
-          <div className="d-flex align-items-center" style={{ width: '20%', marginRight: '10px' }}>
-            <label htmlFor="inputPhone" className="me-2 col-form-label">Phone</label>
-            <InputComponent
-              onChange={(e) => handleChangeInput(e, setWordSearch)}
-              name="phone"
-              type="text"
-              className="form-control"
-              id="inputPhone"
-            />
-          </div>
-
-          {/* Role */}
-          <div className="d-flex align-items-center" style={{ width: '15%' }}>
-            <label htmlFor="inputRole" className="me-2 col-form-label">Role</label>
-            <select className='form-control' name="idRole" onChange={(e) => handleChangeInput(e, setWordSearch)}
-            >
-              <option value="-1">Chọn quyền</option>
-              {roles.length > 0 ? (
-                roles.map((role, index) => (
-                  <option key={index} value={role.idRole}>{role.name}</option>
-                ))
-              ) : <option>Hiện tại chưa có quyền</option>}
-            </select>
-          </div>
-
         </div>
+      )}
 
-        {/* Nút Submit */}
-        <div className="mt-3 text-center">
-          <button type="submit" className="btn btn-primary">Tìm kiếm</button>
+      {displayTextSearch != 'idCategory' && displayTextSearch != 'price' && (
+        <div class="input-group mb-3 mt-1">
+          <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
+          <input
+            type="text"
+            class="form-control"
+            name={displayTextSearch}
+            value={searchCriteria[`${displayTextSearch}`]}
+            onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+          />
         </div>
-      </form>
+      )}
 
 
 
-      {users.length > 0 ? (
-
-        <table style={{ width: '100%', backgroundColor: 'white', marginTop: '30px' }} cellspacing="0" cellpading="10">
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Name</th>
-              <th className='text-center'>Email</th>
-              {/* <th className='text-center'>Password</th> */}
-              <th className='text-center'>Address</th>
-              <th className='text-center'>Phone</th>
-              <th className='text-center'>Date Of Birth</th>
-              <th className='text-center'>Sex</th>
-              <th className='text-center'>Avatar</th>
-              <th className='text-center'>Role</th>
-              <th className='text-center' colSpan='2'>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, index) => (
-              <tr key={index}
-                style={{
-                  backgroundColor: selectedId === user._id ? 'lightblue' : 'white', // Đổi màu nền khi được chọn
-                  cursor: 'pointer'
-                }}
-                onClick={() => handleSelectRow(user._id)} // Sự kiện click để chọn user
-              >
-
-                <td style={{ width: '4%' }}>{user._id}</td>
-                <td style={{ width: '8%' }}>{user.name}</td>
-
-                <td style={{ width: '15%' }} className='text-center'>{user.email}</td>
-                {/* <td style={{ width: '5%' }} className='text-center'>{user.password}</td> */}
-                <td style={{ width: '15%' }} className='text-center'>{user.address}</td>
-                <td className='text-center' style={{ width: '15%' }}>{user.phone}</td>
-                <td className='text-center' style={{ width: '10%' }}>{user.date_of_birth}</td>
-                <td className='text-center' style={{ width: '5%' }}>{user.sex}</td>
-                <td className='text-center'>
-                  {user.avatar != "" ? (
-                    <ImageComponent
-                      src={user.avatar} alt=""
-                      width="70px"
-                      height="50px"
-                      borderRadius="5px"
-                    />
-                  ) :
-                    <p>null</p>
-                  }
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">UserName</th>
+            <th scope="col">Email</th>
+            <th scope="col">TypeLogin</th>
+            <th scope="col">Role</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Updated At</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users && users?.length > 0 ? (
+            users?.map((user, index) => (
+              <tr key={index}>
+                <th scope="row">{(user?.account?._id)?.slice(0, 10)}...</th>
+                <td>
+                  <ImageComponent
+                    src={user?.avatar} alt=""
+                    width="70px"
+                    height="50px"
+                    borderRadius="5px"
+                    className="me-2"
+                  />
+                  {user?.account?.userName}
                 </td>
+                <td>{user?.account?.email}</td>
+                <td>{user?.account?.typeLogin}</td>
+                <td>{user?.account?.role?.name}</td>
 
-                <td key={index} className='text-center' >{user.role.name}</td>
-
+                <td>{user?.account?.createdAt}</td>
+                <td>{user?.account?.updatedAt}</td>
                 <td style={{ width: '6%' }} className='text-center'>
                   <button
-                    onClick={() => handleSwitchPageEdit(user._id)}
+                    onClick={() => handleSwitchPageEdit(user)}
                     type="button"
                     className="btn btn-outline-primary">
                     Edit
                   </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button onClick={() => handleDeleteUser(user._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                  <button onClick={() => handleDeleteProduct(user._id)} type="button" className="btn btn-outline-danger">Delete</button>
                 </td>
               </tr>
-            ))}
+            ))
+          ) : <p>Không có sản phẩm tồn tại</p>}
 
+        </tbody>
+      </table>
 
-          </tbody>
-        </table>
-      ) :
-        <div className='text-center'>
-          <img src="https://tse3.mm.bing.net/th?id=OIP.-CiVIfCy46VrgitiIjfahwAAAA&pid=Api&P=0&h=180" alt="" />
-          <h2>Không có nhân viên mà bạn muốn tìm kiếm</h2>
-        </div>}
-      <AddUser show={showAdd} close={() => setShowAdd(false)} />
-      <EditUser show={showEdit} close={() => setShowEdit(false)} idUser={idUser}  />
-      <ChangePassword show={showChangePassword} close={() => setShowChangePassword(false)} idUser={selectedId} />
+      {totalPage > 1 && (
+        <ul class="pagination d-flex justify-content-center">
+          <li style={{ cursor: 'pointer' }} onClick={() => handlePagination(page - 1)} class={`page-item ${page === 1 ? "disabled" : ""}`}>
+            <a class="page-link">Previous</a>
+          </li>
+
+          {visiblePagination(page, totalPage).map((pageNumber) => (
+            <li
+              key={pageNumber}
+              className={`page-item ${page === pageNumber ? "active" : ""}`}
+              onClick={() => handlePagination(pageNumber)}
+            >
+              <button className="page-link">{pageNumber}</button>
+            </li>
+          ))}
+
+          <li style={{ cursor: 'pointer' }} class={`page-item ${page === totalPage ? "disabled" : ""}`}>
+            <button onClick={() => handlePagination(page + 1)}
+              class="page-link">Next</button>
+          </li>
+        </ul>
+      )}
+
+      <AddUser show={showAddModal} close={() => setShowAddModal(false)} />
+      <EditUser show={showEdit} close={() => setShowEdit(false)} data={selectedUser} />
     </div>
   )
 }

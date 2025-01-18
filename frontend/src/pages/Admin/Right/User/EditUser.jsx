@@ -1,89 +1,56 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
-import { getAllRole } from '../../../../services/RoleService'
-import { getDetailUser } from '../../../../services/UserService'
-import { updateUser } from '../../../../services/UserService'
-export default function EditUser({ show, close, idUser }) {
-    const [informations, setInformations] = useState({
-        name: '',
+import { updateProduct } from '../../../../services/ProductService'
+import Select from 'react-select'
+import { useSelector, useDispatch } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify';
+import { updateProductRedux } from '../../../../redux/Products/productsSlice'
+
+export default function EditUser({ data, show, close }) {
+    const dispatch = useDispatch()
+    const roles = useSelector(state => state.roles.roles)
+    const [userInformation, setUserInformation] = useState({
+        userName: '',
         email: '',
+        idRole: '',
+        name: '',
         address: '',
         phone: '',
         date_of_birth: '',
-        sex : '',
-        avatar : '',
-        idRole : ''
+        sex: '',
+        avatar: '',
     })
-    const [avatar, setAvatar] = useState(null);
+
+    useEffect(() => {
+        setUserInformation({
+            name: data?.account?.userName || '',
+            email: data?.account?.email || '',
+            idRole: data?.account?.role?._id || '',
+            name: data?.name,
+            address: data?.address,
+            phone: data?.phone,
+            date_of_birth: data?.date_of_birth,
+            sex: data?.sex,
+            avatar: data?.avatar
+        });
+
+    }, [show]);
+
+
+    const [image, setImage] = useState(null);
     const [fileInputKey, setFileInputKey] = useState(Date.now());
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
-    const [roles, setRoles] = useState([])
-    useEffect(() => {
-        const fetchDatasRole = async () => {
-            const response = await getAllRole();
-            setRoles(response.roles)
-        }
-        fetchDatasRole()
-    }, [])
-    useEffect(() => {
-        const fetchData = async () => {
-            if (idUser) {
-                const response = await getDetailUser(idUser);
-                if (show) {
-                    setInformations({
-                        name: response.detailUser.name,
-                        email: response.detailUser.email,
-                        address: response.detailUser.address,
-                        phone: response.detailUser.phone,
-                        date_of_birth: response.detailUser.date_of_birth,
-                        sex: response.detailUser.sex,
-                        avatar: response.detailUser.avatar,
-                        idRole: response.detailUser.idRole
-                        
-                    })
-                }
-            }
-        }
-        if (show) {
-            fetchData()
-        }
-    }, [show, idUser])
-    // handle click add product
-    const handleClickUpdateUser = async () => {
-        // inputFocusRef.current.focus()
-        if(idUser)
-        {
-            console.log("THông tin", informations.name)
-            var formData = new FormData()
-            formData.append('name', informations.name)
-            formData.append('email', informations.email)
-            formData.append('address', informations.address)
-            formData.append('phone', informations.phone)
-            formData.append('date_of_birth', informations.date_of_birth)
-            formData.append('sex', informations.sex)
-            formData.append('avatar', avatar)
-            formData.append('idRole', informations.idRole)
-            const response = await updateUser(idUser, formData)
-            console.log(response)
-            if (response.errors) {
-                setErrors(response.errors)
-                return
-            }
-            else {
-                alert("Chỉnh sửa người dùng thành công")
-            }
-        }
-    }
+
+
 
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
-        setInformations(prevInfo => ({
+        setUserInformation(prevInfo => ({
             ...prevInfo,
             [name]: value
         }));
-
         const isValid = validateInput(name, value);
         setErrors(prevErrors => {
             const newErrors = { ...prevErrors };
@@ -97,10 +64,10 @@ export default function EditUser({ show, close, idUser }) {
             return newErrors;
         });
     };
-    
+
     const handleChangeFile = (e) => {
         const selectedFileImage = e.target.files[0]
-        setAvatar(selectedFileImage);
+        setImage(selectedFileImage);
         setErrors(prevError => {
             const newError = { ...prevError }
             if (selectedFileImage) {
@@ -110,21 +77,47 @@ export default function EditUser({ show, close, idUser }) {
         })
     };
 
+
     const closeModal = () => {
         close()
-        setInformations({
-            name: '',
-            email: '',
-            address: '',
-            phone: '',
-            date_of_birth: '',
-            sex : '',
-            avatar : '',
-            idRole : ''
-        })
+        // setUserInformation({
+        //     name: '',
+        //     idCategory: 0,
+        //     description: ''
+        // })
         setFileInputKey(Date.now());
         setErrors({})
     }
+
+    const handleClickUpdateProduct = async () => {
+        // inputFocusRef.current.focus()
+        // var formData = new FormData()
+        // formData.append('name', product.name)
+        // formData.append('image', image)
+        // formData.append('description', product.description)
+        // formData.append('idCategory', product.idCategory)
+        // selectedOptions?.length > 0 ? selectedOptions?.map((size) => {
+        //     formData.append('sizes[]', size.value)
+        // }) : formData.append('sizes[]', [])
+
+        // const response = await updateProduct(data?._id, formData)
+        // if (response && response?.status === 200) {
+        //     console.log(response.product)
+        //     dispatch(updateProductRedux({
+        //         id: data?._id,
+        //         newData: response?.product
+        //     }))
+        // }
+        // console.log("response107", response)
+        // if (response.errors) {
+        //     setErrors(response.errors)
+        //     return
+        // }
+        // else {
+        //     toast.success("Chỉnh sửa thành công")
+        // }
+    }
+
     const validateInput = (name, value) => {
         switch (name) {
             default:
@@ -134,63 +127,145 @@ export default function EditUser({ show, close, idUser }) {
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="modal-dialog add_product">
-                {informations ? (
+                {show && data ? (
                     <div className=" modal-content">
-                        <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Chỉnh sửa người dùng</p>
+                        {/* <p class="d-inline-flex gap-1 mt-2 d-flex justify-content-center">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="button">Thông tin tài khoản</button>
+                            <button type="button" class="btn btn-primary" disabled data-bs-toggle="button">Thông tin cá nhân</button>
+                        </p>
                         <div className='px-4 py-2 d-flex align-items-center'>
                             <label style={{ fontSize: '14px' }} className="form-label">Tên người dùng</label>
                             <div style={{ width: '100%' }}>
                                 <InputComponent
-                                    name="name"
-                                    value={informations.name}
+                                    name="userName"
+                                    value={userInformation?.userName}
                                     onChange={handleChangeInput}
                                     className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
                                     placeholder={errors.name ? errors.name : ""}
                                 />
-                                {informations.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />}
                             </div>
-                        </div>
 
+                        </div>
                         <div className='px-4 py-2 d-flex align-items-center'>
                             <label style={{ fontSize: '14px' }} className="form-label">Email</label>
                             <div style={{ width: '100%' }}>
                                 <InputComponent
                                     name="email"
-                                    value={informations.email}
+                                    value={userInformation?.email}
                                     onChange={handleChangeInput}
-                                    className={`form-control ${errors.email ? 'is-invalid' : ''} `}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
-                                    placeholder={errors.email ? errors.email : ""}
+                                    placeholder={errors.name ? errors.name : ""}
                                 />
-                                {informations.email != "" && errors.email && <ErrorMessageInput errors={errors} field="email" />}
                             </div>
+
                         </div>
 
+
+                        <div className='px-4 py-2 d-flex align-items-center'>
+                            <label style={{ fontSize: '14px' }} className="form-label">Hình thức đki</label>
+                            <div style={{ width: '100%' }}>
+                                <InputComponent
+                                    name="name"
+                                    value={data?.account?.typeLogin}
+                                    onChange={handleChangeInput}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
+                                />
+                            </div>
+
+                        </div>
+
+
+
+                        <div className='px-4 py-2 d-flex align-items-center'>
+                            <label style={{ fontSize: '14px' }} className="form-label">Quyền</label>
+                            <div style={{ width: '100%' }}>
+                                <select
+                                    value={userInformation?.idRole}
+                                    name="idRole"
+                                    className={`form-control ${errors?.idCategory ? 'is-invalid' : ''} `}
+                                    onChange={handleChangeInput}
+                                >
+                                    <option value="0">Chọn quyền</option>
+                                    {roles?.length > 0 ? (
+                                        roles?.map((role, index) => (
+                                            <option key={index} value={role?._id}>{role?.name}</option>
+                                        ))
+                                    ) : <option>Hiện không có thể loại sản phẩm nào</option>}
+                                </select>
+                            </div>
+                        </div>
+                        <div className='px-4 py-2 d-flex align-items-center'>
+                            <label style={{ fontSize: '14px' }} className="form-label">Created At</label>
+                            <div style={{ width: '100%' }}>
+                                <InputComponent
+                                    name="name"
+                                    value={data?.account?.createdAt}
+                                    onChange={handleChangeInput}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
+                                />
+                            </div>
+
+                        </div>
+                        <div className='px-4 py-2 d-flex align-items-center'>
+                            <label style={{ fontSize: '14px' }} className="form-label">Updated At</label>
+                            <div style={{ width: '100%' }}>
+                                <InputComponent
+                                    name="name"
+                                    value={data?.account?.updatedAt}
+                                    onChange={handleChangeInput}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
+                                />
+                            </div>
+
+                        </div> */}
+
+                        <div className='px-4 py-2 d-flex align-items-center'>
+                            <label style={{ fontSize: '14px' }} className="form-label">Họ tên</label>
+                            <div style={{ width: '100%' }}>
+                                <InputComponent
+                                    name="name"
+                                    value={userInformation?.name}
+                                    onChange={handleChangeInput}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
+                                />
+                            </div>
+
+                        </div>
                         <div className='px-4 py-2 d-flex align-items-center'>
                             <label style={{ fontSize: '14px' }} className="form-label">Địa chỉ</label>
                             <div style={{ width: '100%' }}>
                                 <InputComponent
                                     name="address"
-                                    value={informations.address}
+                                    value={userInformation?.address}
                                     onChange={handleChangeInput}
-                                    className={`form-control `}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
                                 />
                             </div>
                         </div>
 
                         <div className='px-4 py-2 d-flex align-items-center'>
-                            <label style={{ fontSize: '14px' }} className="form-label">Số điện thoại</label>
+                            <label style={{ fontSize: '14px' }} className="form-label">Phone</label>
                             <div style={{ width: '100%' }}>
                                 <InputComponent
                                     name="phone"
-                                    value={informations.phone}
+                                    value={userInformation?.phone}
                                     onChange={handleChangeInput}
-                                    className={`form-control ${errors.phone ? 'is-invalid' : ''} `}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
                                 />
-                                {informations.phone != "" && errors.phone && <ErrorMessageInput errors={errors} field="phone" />}
                             </div>
                         </div>
 
@@ -198,76 +273,49 @@ export default function EditUser({ show, close, idUser }) {
                             <label style={{ fontSize: '14px' }} className="form-label">Ngày sinh</label>
                             <div style={{ width: '100%' }}>
                                 <InputComponent
-                                    type="date"
                                     name="date_of_birth"
-                                    value={informations.date_of_birth}
+                                    value={userInformation?.date_of_birth}
                                     onChange={handleChangeInput}
-                                    className={`form-control ${errors.date_of_birth ? 'is-invalid' : ''} `}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
                                 />
-                                {informations.name != "" && errors.date_of_birth && <ErrorMessageInput errors={errors} field="date_of_birth" />}
                             </div>
                         </div>
+
                         <div className='px-4 py-2 d-flex align-items-center'>
                             <label style={{ fontSize: '14px' }} className="form-label">Giới tính</label>
                             <div style={{ width: '100%' }}>
-                                <select onChange={handleChangeInput} name="sex" id="" className='form-control' value = {informations.sex}>
-                                    <option value="Nam">Nam</option>
-                                    <option value="Nữ">Nữ</option>
-                                    <option value="Khác">Khác</option>
-                                </select>
-                                {/* {product.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />} */}
-                            </div>
-                        </div>
-                        <div className='px-4 py-2 d-flex align-items-center'>
-                            <label style={{ fontSize: '14px' }} className="form-label">Ảnh đại diện</label>
-                            <div style={{ width: '100%' }}>
-                                <div className='d-flex'>
-                                    <InputComponent
-                                        key={fileInputKey}
-                                        type="file"
-                                        name="image"
-                                        onChange={handleChangeFile}
-                                        className={`form-control ${errors.image ? 'is-invalid' : ''} `}
-                                        placeholder={errors.image ? errors.image : ""}
-                                    />
-                                    {informations.avatar ? (
-                                        <img width="60px" height="40px" src={informations.avatar} alt="" />
-                                    ) : 
-                                    (
-                                        <h6>Chưa có ảnh đại diện</h6>
-                                    )
-
-                                    }
-                                </div>
-                                {/* {errors.image && <ErrorMessageInput className errors={errors} field="image" />} */}
-                            </div>
-                        </div>
-
-                        <div className='px-4 py-2 d-flex align-items-center'>
-                            <label style={{ fontSize: '14px' }} className="form-label">Loại tài khoản</label>
-                            <div style={{ width: '100%' }}>
-                                <select
-                                    value={informations.idRole}
-                                    name="idRole"
-                                    className={`form-control  ${errors.idRole ? 'is-invalid' : ''}  `}
+                                <InputComponent
+                                    name="date_of_birth"
+                                    value={userInformation?.date_of_birth}
                                     onChange={handleChangeInput}
-                                >
-                                    <option value="-1" checked>Chọn loại tài khoản</option>
-                                    {roles.length > 0 ? (
-                                        roles.map((role, index) => (
-                                            <option key={index} value={role._id}>{role.name}</option>
-                                        ))
-                                    ) : <option>Hiện không có loại tài khoản nào. Vui lòng thêm vào loại tài khoản để sử dụng chức năng này.</option>}
-                                </select>
-                                {/* {errors.idRole && <ErrorMessageInput errors={errors} field="idRole" />} */}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
+                                />
+                            </div>
+                        </div>
+
+                        <div className='px-4 py-2 d-flex align-items-center'>
+                            <label style={{ fontSize: '14px' }} className="form-label">Avatarr</label>
+                            <div style={{ width: '100%' }}>
+                                <InputComponent
+                                    name="date_of_birth"
+                                    value={userInformation?.date_of_birth}
+                                    onChange={handleChangeInput}
+                                    className={`form-control ${errors.name ? 'is-invalid' : ''} `}
+                                    ref={inputFocusRef}
+                                    placeholder={errors.name ? errors.name : ""}
+                                />
                             </div>
                         </div>
 
                         <div className="modal-footer d-flex justify-content-between ">
                             <button onClick={() => closeModal()} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button onClick={handleClickUpdateUser} type="button" className="btn btn-primary">Edit</button>
+                            <button onClick={handleClickUpdateProduct} type="button" className="btn btn-primary">Edit</button>
                         </div>
+
                     </div>
                 ) : <p>123</p>}
             </div>

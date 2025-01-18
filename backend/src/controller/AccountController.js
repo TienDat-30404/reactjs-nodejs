@@ -76,7 +76,8 @@ export default class AccountController {
                 totalPage,
                 limit,
                 totalUser,
-                users
+                users,
+                status : 200
             })
         }
         catch (err) {

@@ -12,7 +12,6 @@ import { getAllSizeService } from '../../../../services/SizeService'
 import { initDataCategory } from '../../../../redux/Category/categoriesSlice'
 import { initDataSize } from '../../../../redux/Size/sizesSlice'
 import { visiblePagination } from '../../../../until/function'
-import { toast } from 'react-toastify'
 export default function Product() {
   const dispatch = useDispatch()
   const products = useSelector(state => state?.products?.products)
@@ -49,11 +48,6 @@ export default function Product() {
           queryProduct += `&idCategory=${searchCriteria.idCategory}`
         }
         if (displayTextSearch === 'price') {
-
-          // if(!Number(searchCriteria.priceFrom))
-          // {
-          //   return
-          // }
           queryProduct += `&priceFrom=${searchCriteria.priceFrom}&priceTo=${searchCriteria.priceTo}`
         }
 
@@ -221,7 +215,6 @@ export default function Product() {
           </select>
         </div>
       )}
-
 
 
       <table class="table">
