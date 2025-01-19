@@ -95,9 +95,6 @@ export default function Product() {
       if (products?.length === 1 && page > 1) {
         dispatch(switchPage(page - 1))
       }
-      else if (products?.length === 1) {
-        dispatch(switchPage(page - 1))
-      }
     }
   }
 
@@ -112,9 +109,7 @@ export default function Product() {
     setDisplayTextSearch("")
     setDisplayTextSearch(e.target.value)
   }
-  console.log(searchCriteria.priceFrom)
 
-  console.log("searchCriteria", searchCriteria)
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>

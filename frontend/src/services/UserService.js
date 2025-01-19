@@ -82,12 +82,12 @@ export const getAllUser = async (query) => {
 }
 
 export const deleteUser = async (id) => {
-    const token = Cookies.get('accessToken')
+    // const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-user/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        }
+        method: 'DELETE'
+        // headers: {
+        //     'Authorization': `Bearer ${token}`,
+        // }
     })
     return response.json()
 }
@@ -156,4 +156,16 @@ export const logoutUser = async () => {
     })
     Cookies.remove('accessToken', { path: '' });
     localStorage.removeItem('avatar')
+}
+
+
+export const addUser = async (data) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/add-user`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+    return response.json()
 }

@@ -96,27 +96,17 @@ const validateLogin = async (req, res, next) => {
 }
 
 // validate update user
-const validateUpdateUser = async (req, res, next) => {
+const updateUserMiddleware = async (req, res, next) => {
     try {
-        const { name, email, password, phone, date_of_birth, oldPassword, confirmPassword } = req.body
-        const idUser = req.params.idUser
+        const { name, address, phone, date_of_birth } = req.body
         const phoneRegex = /^09\d{8,9}$/;
-        const countNameUser = await User.countDocuments({ name })
-        const countEmailUser = await User.countDocuments({ email })
-        const isCheckUser = await User.findOne({ _id: idUser })
         const errors = {}
 
         if (name == "") {
             errors.name = "Tên không được để trống"
         }
-        if (countNameUser == 1 && name !== isCheckUser.name) {
-            errors.name = "Tên người dùng đã tồn tại"
-        }
-        if (countEmailUser == 1 && email !== isCheckUser.email) {
-            errors.email = "Email đã tồn tại"
-        }
-        if (!validateEmail(email)) {
-            errors.email = "Email không hợp lệ"
+        if (address == "") {
+            errors.address = "Địa chỉ không được để trống"
         }
         if (date_of_birth) {
             const today = new Date();
@@ -125,8 +115,13 @@ const validateUpdateUser = async (req, res, next) => {
                 errors.date_of_birth = "Ngày sinh không được vượt quá ngày hiện tại";
             }
         }
-        if (!phoneRegex.test(phone) && phone != "") {
-            errors.phone = "Số điện thoại không hợp lệ"
+        if (phone == "") {
+            errors.phone = "Số điện thoại không được để trống"
+        }
+        else {
+            if (!phoneRegex.test(phone)) {
+                errors.phone = "Số điện thoại không hợp lệ"
+            }
         }
 
         if (Object.keys(errors).length > 0) {
@@ -164,7 +159,7 @@ const validateChangePassword = async (req, res, next) => {
                 errors.email = "Email không chính xác"
             }
             else {
-                
+
                 console.log(oldPassword)
                 const comparePassword = bcrypt.compareSync(oldPassword, isCheckAccount.password);
                 console.log(comparePassword)
@@ -207,4 +202,63 @@ const authLoginGoogle = async (req, res, next) => {
         next(error)
     }
 }
-export { validateSignIn, validateLogin, validateUpdateUser, validateChangePassword, authLoginGoogle }
+
+const addUserMiddleWare = async (req, res, next) => {
+    const { userName, email, password, role, name, phone } = req.body
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^09\d{8,9}$/;
+    const isCheckUserName = await Account.countDocuments({ userName })
+    const isCheckEmail = await Account.countDocuments({ email })
+    const errors = {}
+    if (userName === "") {
+        errors.userName = "Tên tài khoản không được để trống"
+    }
+    else {
+        if (isCheckUserName > 0) {
+            errors.userName = "Tên tài khoản đã tồn tại"
+        }
+    }
+    if (email === "") {
+        errors.email = "Email không được để trống"
+    }
+    else {
+        if (!emailRegex.test(email)) {
+            errors.email = "Email không hợp lệ"
+        }
+        else {
+            if (isCheckEmail > 0) {
+                errors.email = "Email đã tồn tại"
+            }
+        }
+    }
+
+    if (password === "") {
+        errors.password = "Mật khẩu không được để trống"
+    }
+    else {
+        if (password.length < 6) {
+            errors.password = "Mật khẩu tối thiểu 6 kí tự"
+        }
+    }
+    if (role === "") {
+        errors.role = "Vui lòng chọn loại tài khoản"
+    }
+    if (name === "") {
+        errors.name = "Tên không được để trống"
+    }
+    if (phone === "") {
+        errors.phone = "Số điện thoại không được để trống"
+    }
+    else 
+    {
+        if(!phoneRegex.test(phone))
+        {
+            errors.phone = "Số điện thoại không hợp lệ"
+        }
+    }
+    if (Object.keys(errors).length > 0) {
+        return res.status(400).json({ errors })
+    }
+    next()
+}
+export { validateSignIn, validateLogin, updateUserMiddleware, validateChangePassword, authLoginGoogle, addUserMiddleWare }

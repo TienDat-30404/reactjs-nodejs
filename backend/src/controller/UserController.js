@@ -8,9 +8,89 @@ import User from '../model/UserModel.js';
 import cloudinary from '../config/cloudinary.js';
 import mongoose from 'mongoose';
 import refreshTokenJWT from '../utils/jwt.js';
+import Account from '../model/AccountModel.js';
+import { userInfo } from 'os';
 // [PUT] : /update-user/:id
 
 export default class UserController {
+
+
+    static async getAllUser(req, res, next) {
+        try {
+            const page = parseInt(req.query.page) || 1
+            const limit = parseInt(req.query.limit) || 5
+            const startPage = (page - 1) * limit
+            const objectFilter = { deletedAt: null }
+            if (req.query.idUser) {
+                if (mongoose.Types.ObjectId.isValid(req.query.idUser)) {
+                    objectFilter._id = req.query.idUser
+                }
+                else {
+                    return res.status(200).json({
+                        page: '',
+                        totalPage: '',
+                        limit: '',
+                        totalUser: '',
+                        users: [],
+                        status: 200
+                    })
+                }
+            }
+            if (req.query.name) {
+                objectFilter.name = req.query.name
+            }
+
+            if (req.query.phone) {
+                objectFilter.phone = { $regex: req.query.phone, $options: 'i' }
+            }
+            const emailFilter = req.query.email ? { email: { $regex: req.query.email, $options: 'i' } } : {};
+
+            let users = await User.find(objectFilter)
+                .skip(startPage)
+                .limit(limit)
+                .populate({
+                    path: 'idAccount',
+                    match: emailFilter,
+                    populate: {
+                        path: 'idRole',
+                        model: 'Role'
+                    }
+                })
+                .lean()
+            if (req.query.email) {
+                users = users.filter(user => user.idAccount)
+            }
+            const totalUser = req.query.email 
+                ? users.length 
+                : await User.countDocuments(objectFilter);
+            // const totalUser = await User.countDocuments(objectFilter)
+            const totalPage = Math.ceil(totalUser / limit);
+            users = users.map(user => {
+                if (user?.idAccount) {
+                    user.account = user.idAccount;
+                    delete user.idAccount;
+                }
+                if (user?.account) {
+                    user.account.role = user.account.idRole
+                    delete user.account.idRole
+                }
+
+                return user;
+            });
+            return res.status(200).json({
+                page,
+                totalPage,
+                limit,
+                totalUser,
+                users,
+                status: 200
+            })
+        }
+        catch (err) {
+            next(err)
+        }
+    }
+
 
     static async updateUser(req, res, next) {
         try {
@@ -31,11 +111,8 @@ export default class UserController {
             };
 
             if (req.file) {
-                console.log("confid", cloudinary.config())
-                
                 const fielAvatar = await cloudinary.uploader.upload(req.file.path);
                 newData.avatar = fielAvatar.secure_url
-                console.log("123")
             }
             const dataUpdate = await User.findByIdAndUpdate(idUser, newData, {
                 new: true,
@@ -53,29 +130,40 @@ export default class UserController {
         }
     };
 
-    static async deleteUser(req, res, next)  {
+    static async deleteUser(req, res, next) {
         try {
             const idUser = req.params.idUser
-            const delUser = await User.deleteOne({ _id: idUser })
-            if (delUser.deletedCount > 0) {
+            const user = await User.findOne({ _id: idUser })
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+            const [deleteUser, deleteAccount] = await Promise.all([
+                User.updateOne({ _id: idUser }, { deletedAt: Date.now() }),
+                Account.updateOne({ _id: user.idAccount }, { deletedAt: Date.now() })
+            ])
+            console.log("deleteUser", deleteUser)
+            console.log("deleteAccount", deleteAccount)
+            if (deleteUser.modifiedCount > 0 && deleteAccount.modifiedCount > 0) {
                 return res.status(200).json({
                     message: "Delete Successfully",
+                    status: 200
                 })
             }
             else {
                 return res.status(400).json({
-                    message: "Delete Fail",
+                    message: "Delete User fail",
+                    status: 400
                 })
             }
         }
         catch (error) {
-            next(error)
+            return res.status(500).json({ message: `Fail when delete user : ${error}` })
         }
     }
 
 
 
-    static async detailUser(req, res, next)  {
+    static async detailUser(req, res, next) {
         try {
             const detailUser = await User.findOne({ _id: req.params.idUser })
             if (detailUser == null) {
@@ -92,7 +180,7 @@ export default class UserController {
         }
     }
 
-    static async refreshToken(req, res, next)  {
+    static async refreshToken(req, res, next) {
         try {
             const token = req.cookies.refreshToken
             if (!token) {
@@ -109,13 +197,13 @@ export default class UserController {
             if (error.name === 'TokenExpiredError') {
                 res.status(401).json({ message: "Token has expired" });
             } else {
-                res.status(500).json({ message: `Error Refresh Token : ${error}`})
+                res.status(500).json({ message: `Error Refresh Token : ${error}` })
             }
         }
     }
 
 
-    static async logoutRefreshToken (req, res, next)  {
+    static async logoutRefreshToken(req, res, next) {
         try {
             res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
             return res.status(200).json({
@@ -128,11 +216,51 @@ export default class UserController {
 
     }
 
+    static async addUser(req, res, next) {
+        const { userName, email, password, role, name, phone } = req.body
+        try {
+            var account = new Account({
+                userName,
+                email,
+                password,
+                idRole: role,
+                typeLogin: "normal"
+            })
+            const savedAccount = await account.save()
+            const user = new User({
+                name,
+                phone,
+                idAccount: savedAccount._id
+            })
+            const savedUser = await user.save()
+            let userInformation = await User.findOne({ _id: savedUser._id })
+                .populate({
+                    path: 'idAccount',
+                    populate: {
+                        path: 'idRole',
+                        model: 'Role'
+                    }
+                }).lean()
+            if (userInformation?.idAccount) {
+                userInformation.idAccount.role = userInformation.idAccount.idRole
+                userInformation.account = userInformation.idAccount
+                delete userInformation.idAccount.idRole
+                delete userInformation.idAccount
+            }
+            return res.status(201).json({
+                userInformation,
+                status: 201
+            })
+        }
+        catch (err) {
+            return res.status(500).json({ message: `Fail when add account : ${err}` })
+        }
+
+    }
 
 
 
-
-    static async searchUser(req, res, next)  {
+    static async searchUser(req, res, next) {
         const { idUser, name, email, phone, idRole } = req.query
         const searchParams = {}
         if (idUser) {

@@ -1,23 +1,17 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
-import { getAllProduct, deleteProduct } from '../../../../services/ProductService'
 import AddUser from './AddUser'
 import EditUser from './EditUser'
-import { InputComponent } from '../../../../components/InputComponent'
-import { getAllCategory } from '../../../../services/CategoryService'
 import { handleChangeInput } from '../../../../until/function'
 import { useSelector, useDispatch } from 'react-redux'
-import { deleteProductRedux, initDataProduct, switchPage } from '../../../../redux/Products/productsSlice'
-import { getAllSizeService } from '../../../../services/SizeService'
-import { initDataCategory } from '../../../../redux/Category/categoriesSlice'
-import { initDataSize } from '../../../../redux/Size/sizesSlice'
 import { visiblePagination } from '../../../../until/function'
-import { getAllUser } from '../../../../services/UserService'
-import { initDataUser } from '../../../../redux/User/usersSlice'
+import { deleteUser, getAllUser } from '../../../../services/UserService'
+import { deleteUserRedux, initDataUser, switchPage } from '../../../../redux/User/usersSlice'
 import { getAllRole } from '../../../../services/RoleService'
 import { initDataRole } from '../../../../redux/Role/rolesSlice'
 export default function Product() {
   const dispatch = useDispatch()
+  const roles = useSelector(state => state?.roles?.roles)
   const users = useSelector(state => state?.users?.users)
   const page = useSelector(state => state?.users?.page)
   const totalPage = useSelector(state => state?.users?.totalPage)
@@ -26,13 +20,13 @@ export default function Product() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEdit, setShowEdit] = useState(false)
-  const [displayTextSearch, setDisplayTextSearch] = useState('idProduct')
+  const [displayTextSearch, setDisplayTextSearch] = useState('idUser')
   const [searchCriteria, setSearchCriteria] = useState({
-    idProduct: '',
-    name: '',
-    idCategory: '',
-    priceFrom: '',
-    priceTo: ''
+    idUser: '',
+    userName: '',
+    email: '',
+    role: '',
+    phone: ''
   })
 
 
@@ -41,18 +35,23 @@ export default function Product() {
 
       try {
         let query = `page=${page}&limit=${limit}`
+        if(searchCriteria.idUser != "") { 
+          query += `&idUser=${searchCriteria.idUser}`
+        }
+        if(searchCriteria.phone != "")
+        {
+          query += `&phone=${searchCriteria.phone}`
+        }
         let [responseUser, responseRole] = await Promise.all(
           [
             getAllUser(query),
             getAllRole()
           ])
-        if(responseUser && responseUser.status === 200)
-        {
-            dispatch(initDataUser(responseUser))
+        if (responseUser && responseUser.status === 200) {
+          dispatch(initDataUser(responseUser))
         }
-        if(responseRole && responseRole.status === 200)
-        {
-            dispatch(initDataRole(responseRole))
+        if (responseRole && responseRole.status === 200) {
+          dispatch(initDataRole(responseRole))
         }
       }
       catch (error) {
@@ -60,7 +59,7 @@ export default function Product() {
       }
     }
     fetchData()
-  }, [page, limit])
+  }, [page, limit, searchCriteria, displayTextSearch])
 
   const handleSwitchPageEdit = (data) => {
     setShowEdit(true)
@@ -72,30 +71,27 @@ export default function Product() {
 
 
   // handle delete product
-  const handleDeleteProduct = async (id) => {
-    // const response = await deleteProduct(id)
-    // console.log(response)
-    // if (response && response?.status === 200) {
-    //   dispatch(deleteProductRedux(id))
-    //   if (products?.length === 1 && page > 1) {
-    //     dispatch(switchPage(page - 1))
-    //   }
-    //   else if (products?.length === 1) {
-    //     dispatch(switchPage(page - 1))
-    //   }
-    // }
+  const handleDeleteUser = async (id) => {
+    const response = await deleteUser(id)
+    console.log(response)
+    if (response && response?.status === 200) {
+      dispatch(deleteUserRedux(id))
+      if (users.length === 1) {
+        dispatch(switchPage(page - 1))
+      }
+    }
   }
 
   const handleChangeSearchSelect = (e) => {
-    // setSearchCriteria({
-    //   idProduct: '',
-    //   name: '',
-    //   idCategory: '',
-    //   priceFrom: '',
-    //   priceTo: ''
-    // })
-    // setDisplayTextSearch("")
-    // setDisplayTextSearch(e.target.value)
+    setSearchCriteria({
+      idUser: '',
+      userName: '',
+      email: '',
+      role: '',
+      phone: ''
+    })
+    setDisplayTextSearch("")
+    setDisplayTextSearch(e.target.value)
   }
   console.log(users)
   return (
@@ -122,50 +118,15 @@ export default function Product() {
         onChange={handleChangeSearchSelect}
         class="form-select mt-2"
       >
-        <option value="idProduct" selected>Tìm kiếm theo Id</option>
-        <option value="name">Tìm kiếm theo tên</option>
-        <option value="idCategory">Tìm kiếm theo thể loại</option>
-        <option value="price">Tìm kiếm theo giá</option>
+        <option value="idUser" selected>Tìm kiếm theo idUser</option>
+        <option value="userName">Tìm kiếm theo userName</option>
+        <option value="email">Tìm kiếm theo email</option>
+        <option value="quyền">Tìm kiếm theo quyền</option>
+        <option value="phone">Tìm kiếm theo số điện thoại</option>
       </select>
 
-      {displayTextSearch == 'price' && (
-        <div className='d-flex align-items-center justify-content-between'>
-          <div class="input-group mb-3 mt-1 w-40 me-2">
-            <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Giá bắt đầu</button>
-            <input
-              type="text"
-              class="form-control"
-              name="priceFrom"
-              value={searchCriteria[`${displayTextSearch}From`]}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === "" || Number(value)) {
-                  handleChangeInput(e, setSearchCriteria);
-                }
 
-              }}
-            />
-          </div>
-
-          <div class="input-group mb-3 mt-1 w-40">
-            <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Giá kết thúc</button>
-            <input
-              type="text"
-              class="form-control"
-              name="priceTo"
-              value={searchCriteria[`${displayTextSearch}To`]}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value === "" || Number(value)) {
-                  handleChangeInput(e, setSearchCriteria);
-                }
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {displayTextSearch != 'idCategory' && displayTextSearch != 'price' && (
+      {displayTextSearch != 'quyền' ? (
         <div class="input-group mb-3 mt-1">
           <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
           <input
@@ -176,7 +137,24 @@ export default function Product() {
             onChange={(e) => handleChangeInput(e, setSearchCriteria)}
           />
         </div>
-      )}
+      ) :
+        <div>
+          <select
+            name={displayTextSearch}
+            value={searchCriteria[`${displayTextSearch}`]}
+            class="form-select"
+            onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+          >
+            {roles && roles?.length > 0 ? (
+              roles?.map((role, index) => (
+                <option key={index} value={role._id}>{role.name}</option>
+              )
+              )) :
+              <option value="" selected>Không tồn tại quyền</option>
+            }
+          </select>
+        </div>
+      }
 
 
 
@@ -223,11 +201,11 @@ export default function Product() {
                   </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button onClick={() => handleDeleteProduct(user._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                  <button onClick={() => handleDeleteUser(user._id)} type="button" className="btn btn-outline-danger">Delete</button>
                 </td>
               </tr>
             ))
-          ) : <p>Không có sản phẩm tồn tại</p>}
+          ) : <p>Không có người dùng tồn tại</p>}
 
         </tbody>
       </table>

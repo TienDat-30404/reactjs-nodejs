@@ -24,75 +24,16 @@ import errorHandler from 'http-errors';
 import refreshTokenJWT from '../utils/jwt.js';
 export default class AccountController {
 
-    static async getAllUser(req, res, next)  {
-        try {
-            const page = parseInt(req.query.page) || 1
-            const limit = parseInt(req.query.limit) || 10
-            const startPage = (page - 1) * limit
-            const objectFilter = {deletedAt : null}
-            if (req.query.idUser) {
-                objectFilter._id = req.query.idUser
-            }
-            if (req.query.name) {
-                objectFilter.name = req.query.name
-            }
-            if (req.query.email) {
-                objectFilter.email = req.query.email
-            }
-            if (req.query.phone) {
-                objectFilter.phone = req.query.phone
-            }
-            const totalUser = Object.keys(objectFilter).length === 0
-                ? await User.countDocuments({deletedAt : null})
-                : await User.countDocuments(objectFilter);
-            const totalPage = Math.ceil(totalUser / limit);
     
-            let users = await User.find(objectFilter)
-                .skip(startPage)
-                .limit(limit)
-                .populate({
-                    path : 'idAccount',
-                    populate : {
-                        path : 'idRole',
-                        model : 'Role'
-                    }
-                })
-                .lean()
-            users = users.map(user => {
-                if (user?.idAccount) {
-                    user.account = user.idAccount;
-                    delete user.idAccount;
-                }
-                if(user?.account)
-                {
-                    user.account.role = user.account.idRole
-                    delete user.account.idRole
-                }
-    
-                return user;
-            });
-            return res.status(200).json({
-                page,
-                totalPage,
-                limit,
-                totalUser,
-                users,
-                status : 200
-            })
-        }
-        catch (err) {
-            next(err)
-        }
-    }
-    
+
     // [POST] : /sign-in
     static async sendOtpForCreateAccount(req, res, next) {
         try {
             // Tạo OTP
-            const {email} = req.body;
-    
+            const { email } = req.body;
+
             const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
-    
+
             // Lưu OTP và thông tin tạm thời vào Redis
             await redisClient.setEx(`otp:${email}`, 300, otp); // Lưu 5 phút
             // Gửi OTP qua email
@@ -117,73 +58,71 @@ export default class AccountController {
                 subject: 'Xác nhận OTP',
                 text: `Mã OTP của bạn là: ${otp}`,
             });
-    
-            res.status(200).json({ message: 'OTP đã được gửi đến email của bạn', status : 200});
-    
-    
+
+            res.status(200).json({ message: 'OTP đã được gửi đến email của bạn', status: 200 });
+
+
         } catch (error) {
             next(error);
             console.log("error", error)
         }
     };
-    
-    
+
+
     static async verifyOtpForCreateAccount(req, res, next) {
         const { userName, name, email, password, typeLogin, idRole, otp } = req.body;
         const typeOfLogin = typeLogin ? "google" : 'normal'
-        const role = await Role.findOne({name : "Customer"})
+        const role = await Role.findOne({ name: "Customer" })
         const roleDefault = idRole ? idRole : role._id
         const otpCorrect = await redisClient.get(`otp:${email}`)
-        if(otp != otpCorrect)
-        {
+        if (otp != otpCorrect) {
             return res.status(400).json({
-                message : "Otp không hợp lệ",
-                status : 400
+                message: "Otp không hợp lệ",
+                status: 400
             })
         }
         const account = new Account({
             userName,
             email,
             password: hashPassword(password),
-            idRole : roleDefault,
-            typeLogin : typeOfLogin
+            idRole: roleDefault,
+            typeLogin: typeOfLogin
         });
-    
+
         const savedAccount = await account.save();
         const user = new User({
             name,
-            idAccount : savedAccount._id
+            idAccount: savedAccount._id
         })
         await user.save();
-    
+
         const accounts = await Account.findById(account._id).populate('idRole');
         let accountObject = accounts.toObject();
         if (accountObject.idRole) {
             accountObject.role = accountObject.idRole;
             delete accountObject.idRole;
         }
-    
-        const userData = await User.findOne({idAccount : savedAccount._id})
-        if(userData)
-        {
+
+        const userData = await User.findOne({ idAccount: savedAccount._id })
+        if (userData) {
             accountObject.userInformation = userData
         }
-        res.status(200).json({  account : accountObject });
+        res.status(200).json({ account: accountObject });
     }
-    
-    
-    static async authLoginGoogle(req, res, next)  {
+
+
+    static async authLoginGoogle(req, res, next) {
         try {
-            const { userName, email, typeLogin="google", name, idRole } = req.body
+            const { userName, email, typeLogin = "google", name, idRole } = req.body
             const role = await Role.findOne({ name: "Customer" })
             const roleDefault = idRole ? idRole : role._id
             const account = new Account({
                 userName,
                 email,
-                typeLogin : typeLogin,
+                typeLogin: typeLogin,
                 idRole: roleDefault
             })
-    
+
             const savedAccount = await account.save();
             const user = new User({
                 name,
@@ -196,24 +135,23 @@ export default class AccountController {
                 accountObject.role = accountObject.idRole;
                 delete accountObject.idRole;
             }
-    
-            const userData = await User.findOne({idAccount : savedAccount._id})
-            if(userData)
-            {
+
+            const userData = await User.findOne({ idAccount: savedAccount._id })
+            if (userData) {
                 accountObject.userInformation = userData
             }
             res.status(200).json({ account: accountObject });
         }
         catch (error) {
             console.error("Google token verification failed:", error);
-            res.status(400).json({ success: false, error: error});
+            res.status(400).json({ success: false, error: error });
         }
     }
-    
-    
-    
+
+
+
     // [POST] : /sign-in
-    static async loginUser(req, res, next)  {
+    static async loginUser(req, res, next) {
         const { userName } = req.body
         const isCheckAccount = await Account.findOne({ userName })
         if (isCheckAccount == null) {
@@ -225,17 +163,17 @@ export default class AccountController {
             idUser: isCheckUser._id,
             name: isCheckUser.name,
             userName: isCheckAccount.userName,
-            email : isCheckAccount.email,
-            typeLogin : isCheckAccount.typeLogin,
+            email: isCheckAccount.email,
+            typeLogin: isCheckAccount.typeLogin,
             address: isCheckUser.address,
             phone: isCheckUser.phone,
             sex: isCheckUser.sex,
             date_of_birth: isCheckUser.date_of_birth,
             idRole: isCheckAccount.idRole,
-            idAccount : isCheckAccount._id,
+            idAccount: isCheckAccount._id,
             avatar
         };
-    
+
         const accessToken = refreshTokenJWT.generateToken(payloadToken)
         const refreshToken = refreshTokenJWT.generateRefreshToken(payloadToken)
         // Lưu refresh token vào cookie
@@ -251,7 +189,7 @@ export default class AccountController {
             avatar: avatar,
         })
     }
-    
+
     static async changePassword(req, res, next) {
         try {
             const idAccount = req.params.idAccount
@@ -259,18 +197,16 @@ export default class AccountController {
             const { password } = req.body
             const newPassword = hashPassword(password)
             const response = await Account.updateOne({ _id: idAccount }, { $set: { password: newPassword } })
-            if(response.modifiedCount > 0)
-            {
+            if (response.modifiedCount > 0) {
                 return res.status(200).json({
                     message: "Change Password Successful"
                 })
             }
-          
+
         }
         catch (error) {
-            return res.status(500).json({message : "Error when change password : ", error})
+            return res.status(500).json({ message: "Error when change password : ", error })
         }
     };
 }
 
- 

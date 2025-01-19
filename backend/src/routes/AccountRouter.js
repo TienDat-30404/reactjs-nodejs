@@ -8,7 +8,6 @@ const router = express.Router();
 
 
 
-router.get('/get-all-user', AccountController.getAllUser)
 router.post('/send-otp-signup', validateSignIn, AccountController.sendOtpForCreateAccount)
 router.post('/verify-otp-signup', AccountController.verifyOtpForCreateAccount)
 router.post('/auth/google', AccountController.authLoginGoogle)

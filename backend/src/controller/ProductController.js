@@ -65,7 +65,6 @@ export default class ProductController {
             else if (sortBy && type) {
                 const attributes = await ProductAttribute.find({}).sort(objectSort).select('idProduct')
                 productIds = attributes.map(attr => attr.idProduct);
-
             }
 
             if (productIds && req.query.priceFrom && req.query.priceTo) {

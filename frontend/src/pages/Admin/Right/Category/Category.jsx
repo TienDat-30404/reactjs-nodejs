@@ -74,9 +74,6 @@ export default function Category() {
       if (categories?.length === 1 && page > 1) {
         dispatch(switchPage(page - 1))
       }
-      else if (categories?.length === 1) {
-        dispatch(switchPage(page - 1))
-      }
     }
   }
 
