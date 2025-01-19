@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { Fragment, useEffect, useState, useRef } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
 import AddUser from './AddUser'
 import EditUser from './EditUser'
@@ -9,6 +9,7 @@ import { deleteUser, getAllUser } from '../../../../services/UserService'
 import { deleteUserRedux, initDataUser, switchPage } from '../../../../redux/User/usersSlice'
 import { getAllRole } from '../../../../services/RoleService'
 import { initDataRole } from '../../../../redux/Role/rolesSlice'
+import ChangePassword from './ChangePassword'
 export default function Product() {
   const dispatch = useDispatch()
   const roles = useSelector(state => state?.roles?.roles)
@@ -16,10 +17,13 @@ export default function Product() {
   const page = useSelector(state => state?.users?.page)
   const totalPage = useSelector(state => state?.users?.totalPage)
   const totalUser = useSelector(state => state?.users?.totalUser)
-  const limit = useSelector(state => state?.users?.limit)
+  let limit = useSelector(state => state?.users?.limit)
   const [showAddModal, setShowAddModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState(null);
   const [showEdit, setShowEdit] = useState(false)
+  const [showChangePassword, setShowChangePassword] = useState(false)
+  const [selectedEditUser, setSelectedEditUser] = useState(null);
+  const [selectedChangePassword, setSelectedChangePassword] = useState(null);
+  const tableRef = useRef();
   const [displayTextSearch, setDisplayTextSearch] = useState('idUser')
   const [searchCriteria, setSearchCriteria] = useState({
     idUser: '',
@@ -35,13 +39,22 @@ export default function Product() {
 
       try {
         let query = `page=${page}&limit=${limit}`
-        if(searchCriteria.idUser != "") { 
+        if (searchCriteria.idUser != "") {
           query += `&idUser=${searchCriteria.idUser}`
         }
-        if(searchCriteria.phone != "")
-        {
+        if (searchCriteria.phone != "") {
           query += `&phone=${searchCriteria.phone}`
         }
+        if (searchCriteria.email != "") {
+          query += `&email=${searchCriteria.email}`
+        }
+        if (searchCriteria.userName != "") {
+          query += `&userName=${searchCriteria.userName}`
+        }
+        if (searchCriteria.role != "") {
+          query += `&role=${searchCriteria.role}`
+        }
+
         let [responseUser, responseRole] = await Promise.all(
           [
             getAllUser(query),
@@ -63,7 +76,7 @@ export default function Product() {
 
   const handleSwitchPageEdit = (data) => {
     setShowEdit(true)
-    setSelectedUser(data)
+    setSelectedEditUser(data)
   }
   const handlePagination = (page) => {
     dispatch(switchPage(page))
@@ -92,8 +105,36 @@ export default function Product() {
     })
     setDisplayTextSearch("")
     setDisplayTextSearch(e.target.value)
+    dispatch(switchPage(1))
   }
-  console.log(users)
+
+  const handleSelectedRow = (data) => {
+    setSelectedChangePassword(data)
+
+  }
+
+  const handleClickOutside = (event) => {
+    if (
+      (tableRef.current && tableRef.current.contains(event.target)) ||
+      event.target.closest(".modal") ||
+      event.target.closest(".btn-change-password")
+    ) {
+      return; 
+    }
+    setSelectedChangePassword(null);
+  };
+  
+
+
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+
+  console.log(selectedChangePassword)
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
@@ -101,6 +142,17 @@ export default function Product() {
           <h3>User</h3>
           <h6 className='ms-3'>({totalUser} user found)</h6>
           <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo tài khoản</button>
+          <button
+            onClick={() => {
+              setShowChangePassword(true)
+            }}
+            type="button"
+            className="btn btn-outline-success ms-3 btn-change-password"
+            disabled={selectedChangePassword === null}
+          >
+            Đổi mật khẩu
+          </button>
+
         </div>
         <div className='d-flex align-items-center'>
           <i className="bi bi-bell me-3"></i>
@@ -121,12 +173,12 @@ export default function Product() {
         <option value="idUser" selected>Tìm kiếm theo idUser</option>
         <option value="userName">Tìm kiếm theo userName</option>
         <option value="email">Tìm kiếm theo email</option>
-        <option value="quyền">Tìm kiếm theo quyền</option>
+        <option value="role">Tìm kiếm theo quyền</option>
         <option value="phone">Tìm kiếm theo số điện thoại</option>
       </select>
 
 
-      {displayTextSearch != 'quyền' ? (
+      {displayTextSearch != 'role' ? (
         <div class="input-group mb-3 mt-1">
           <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
           <input
@@ -143,7 +195,11 @@ export default function Product() {
             name={displayTextSearch}
             value={searchCriteria[`${displayTextSearch}`]}
             class="form-select"
-            onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+            onChange={(e) => {
+              handleChangeInput(e, setSearchCriteria);
+              dispatch(switchPage(1)
+              )
+            }}
           >
             {roles && roles?.length > 0 ? (
               roles?.map((role, index) => (
@@ -158,7 +214,7 @@ export default function Product() {
 
 
 
-      <table class="table">
+      <table ref={tableRef} >
         <thead>
           <tr>
             <th scope="col">Id</th>
@@ -174,7 +230,14 @@ export default function Product() {
         <tbody>
           {users && users?.length > 0 ? (
             users?.map((user, index) => (
-              <tr key={index}>
+              <tr
+                key={index}
+                onClick={() => handleSelectedRow(user)}
+                style={{
+                  cursor: 'pointer',
+                  backgroundColor: selectedChangePassword?.account?._id === user?.account?._id ? 'lightgray' : 'white'
+                }}
+              >
                 <th scope="row">{(user?.account?._id)?.slice(0, 10)}...</th>
                 <td>
                   <ImageComponent
@@ -234,7 +297,8 @@ export default function Product() {
       )}
 
       <AddUser show={showAddModal} close={() => setShowAddModal(false)} />
-      <EditUser show={showEdit} close={() => setShowEdit(false)} data={selectedUser} />
+      <EditUser show={showEdit} close={() => setShowEdit(false)} data={selectedEditUser} />
+      <ChangePassword show={showChangePassword} close={() => setShowChangePassword(false)} data={selectedChangePassword} />
     </div>
   )
 }

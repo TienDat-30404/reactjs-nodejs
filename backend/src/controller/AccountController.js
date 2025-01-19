@@ -193,13 +193,13 @@ export default class AccountController {
     static async changePassword(req, res, next) {
         try {
             const idAccount = req.params.idAccount
-            console.log(idAccount)
             const { password } = req.body
             const newPassword = hashPassword(password)
             const response = await Account.updateOne({ _id: idAccount }, { $set: { password: newPassword } })
             if (response.modifiedCount > 0) {
                 return res.status(200).json({
-                    message: "Change Password Successful"
+                    message: "Change Password Successful",
+                    status : 200
                 })
             }
 

@@ -20,7 +20,7 @@ export default class UserController {
             const page = parseInt(req.query.page) || 1
             const limit = parseInt(req.query.limit) || 5
             const startPage = (page - 1) * limit
-            const objectFilter = { deletedAt: null }
+            let objectFilter = { deletedAt: null }
             if (req.query.idUser) {
                 if (mongoose.Types.ObjectId.isValid(req.query.idUser)) {
                     objectFilter._id = req.query.idUser
@@ -43,27 +43,37 @@ export default class UserController {
             if (req.query.phone) {
                 objectFilter.phone = { $regex: req.query.phone, $options: 'i' }
             }
-            const emailFilter = req.query.email ? { email: { $regex: req.query.email, $options: 'i' } } : {};
-
+            let idAccounts;
+            if (req.query.email) {
+                const account = await Account.find({ deletedAt: null, email: { $regex: req.query.email, $options: 'i' } })
+                idAccounts = account.map(acc => acc._id)
+                objectFilter.idAccount = { $in: idAccounts }
+            }
+            if(req.query.userName)
+            {
+                const account = await Account.find({deletedAt: null, userName: { $regex: req.query.userName, $options: 'i' }})
+                idAccounts = account.map(acc => acc._id) 
+                objectFilter.idAccount = { $in: idAccounts }
+            }
+            if(req.query.role)
+            {
+                const role = await Account.find({deletedAt : null, idRole: req.query.role})
+                idAccounts = role.map(acc => acc._id)
+                objectFilter.idAccount = { $in: idAccounts }
+            }
             let users = await User.find(objectFilter)
                 .skip(startPage)
                 .limit(limit)
                 .populate({
                     path: 'idAccount',
-                    match: emailFilter,
                     populate: {
                         path: 'idRole',
                         model: 'Role'
                     }
                 })
                 .lean()
-            if (req.query.email) {
-                users = users.filter(user => user.idAccount)
-            }
-            const totalUser = req.query.email 
-                ? users.length 
-                : await User.countDocuments(objectFilter);
-            // const totalUser = await User.countDocuments(objectFilter)
+
+            const totalUser = await User.countDocuments(objectFilter)
             const totalPage = Math.ceil(totalUser / limit);
             users = users.map(user => {
                 if (user?.idAccount) {

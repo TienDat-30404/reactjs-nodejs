@@ -2,31 +2,36 @@ import React, { Fragment, useEffect, useReducer, useRef, useState } from 'react'
 import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
 import { changePassword, getDetailUser } from '../../../../services/UserService'
-export default function ChangePassword({ show, close, idUser }) {
+import { toast } from 'react-toastify'
+export default function ChangePassword({ show, close, data }) {
     const [password, setPassword] = useState('')
-    const [user, setUser] = useState([])
-    const handleChangeInput = (e) => {
-        setPassword(e.target.value)
-    };
-
-    useEffect(() => {
-        const fetchDataUser = async () => {
-            const response = await getDetailUser(idUser)
-            setUser(response.detailUser)
-        }
-        fetchDataUser()
-    }, [idUser])
-
+    const [error, setError] = useState({})
     const closeModal = () => {
         close()
         setPassword('')
+        setPassword('')
     }
 
-    const handleChangePassword = async() => {
-        const response = await changePassword(idUser, {password})
-        if(response.message)
+    const handleChangePassword = async () => {
+        if(password === "")
         {
-            alert("Đổi mật khẩu thành công")
+            setError({
+                password : "Mật khẩu không được để trống"
+            })
+            return
+        }
+        else {
+            if (password.length < 6) {
+            setError({
+                password : "Mật khẩu phải lớn 6 kí tự"
+            })
+            return
+        }
+        }
+        const response = await changePassword(data?.account?._id, { password })
+        if (response && response.status === 200) {
+            toast.success("Đổi mật khẩu thành công")
+            setError({})
         }
     }
     return (
@@ -34,14 +39,24 @@ export default function ChangePassword({ show, close, idUser }) {
             <div className="modal-dialog add_product">
                 <div className=" modal-content">
                     <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Đổi mật khẩu</p>
-                    {user ? (
+                    {show ? (
                         <Fragment>
+                            <div className='px-4 py-2 d-flex align-items-center'>
+                                <label style={{ fontSize: '14px' }} className="form-label">Id Account</label>
+                                <div style={{ width: '100%' }}>
+                                    <InputComponent
+                                        value={data?.account?._id}
+                                        className={`form-control `}
+                                        disabled
+                                    />
+                                </div>
+                            </div>
                             <div className='px-4 py-2 d-flex align-items-center'>
                                 <label style={{ fontSize: '14px' }} className="form-label">Email</label>
                                 <div style={{ width: '100%' }}>
                                     <InputComponent
                                         name="email"
-                                        value={user.email}
+                                        value={data?.account?.email}
                                         className={`form-control `}
                                         disabled
                                     />
@@ -53,9 +68,11 @@ export default function ChangePassword({ show, close, idUser }) {
                                     <InputComponent
                                         name="password"
                                         value={password}
-                                        onChange={handleChangeInput}
-                                        className={`form-control `}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className={`form-control ${Object.keys(error).length > 0 ? 'is-invalid' : ''} `}
                                     />
+                                    {error && <ErrorMessageInput errors={error} field="password" />}
+
                                 </div>
                             </div>
                         </Fragment>
