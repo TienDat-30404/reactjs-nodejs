@@ -2,117 +2,165 @@ import React, { useEffect, useState } from 'react';
 import { detailOrder } from '../../../../services/OrderService';
 import { confirmOrder } from '../../../../services/OrderService';
 import { useSelector, useDispatch } from 'react-redux';
-export default function DetailOrder({ show, close, idOrder, onSuccess, nameCustomer, isStatus, createdAt }) {
-    const date = new Date(createdAt);
-    const day = date.getUTCDate();
-    const month = date.getUTCMonth() + 1;
-    const year = date.getUTCFullYear();
+import { confirmOrderRedux } from '../../../../redux/Order/ordersSlice';
+export default function DetailOrder({ show, close, data }) {
+    const dispatch = useDispatch()
+    const statuss = useSelector(state => state?.statuss?.data)
+    const [status, setStatus] = useState('')
+    const { isAuhenticated, userData } = useSelector((state) => state.auth);
+    const totalPrice = data?.orderDetails.reduce((sum, order) => {
+        return sum + order?.quantity * order?.attribute?.priceBought
+    }, 0)
 
-    const [orderDetail, setOrderDetail] = useState([]);
-    const [updateOrder, setUpdateOrder] = useState(isStatus);
-
-    const { isAuthenticated, userData } = useSelector((state) => state.auth);
     useEffect(() => {
-        const fetchDataOrderDetail = async () => {
-            if (idOrder && isStatus) {
-                const responseOrderDetail = await detailOrder(idOrder);
-                setOrderDetail(responseOrderDetail.detailOrder);
-                setUpdateOrder(isStatus)
-            }
-        };
-        fetchDataOrderDetail();
-    }, [idOrder]);
+        setStatus(data?.status?._id)
+    }, [data])
 
-    const handleConfirmOrder = async() => {
-        if(idOrder && userData) 
-        {
-            if(window.confirm("Xác nhận đơn hàng?"))
-            {
-                await confirmOrder(idOrder, {
-                    isStatus : updateOrder,
-                    idStaff : userData.dataLogin.idUser
+    const handleConfirmOrder = async () => {
+        if (data) {
+            if (window.confirm("Xác nhận đơn hàng?")) {
+                const response = await confirmOrder(data?._id, {
+                    status: status,
+                    staff: userData.dataLogin.idUser
                 })
-                onSuccess()
+                if(response && response.status === 200)
+                {
+                    dispatch(confirmOrderRedux({
+                        idOrder : data?._id,
+                        status : status
+                    }))
+                }
             }
         }
     }
-
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
-            {orderDetail.length > 0 && nameCustomer ? (
-                <div className="detail_order px-2 py-3">
-                    <div className='d-flex align-items-center justify-content-around'>
+            <div className="detail_order px-2 py-3">
+                <div className='d-flex align-items-center justify-content-around '>
+                    <div className="row col-3">
                         <div className='d-flex align-items-center'>
                             <p style={{ fontFamily: "Verdana, sans-serif", fontSize: '14px' }} className='px-2'>Customer :</p>
-                            <p style={{ fontFamily: "Times New Roman, Times, serif" }}>{nameCustomer}</p>
+                            <p style={{ fontFamily: "Times New Roman, Times, serif" }}>{data?.user?.name}</p>
                         </div>
                         <div className='d-flex align-items-center'>
-                            <p style={{ fontFamily: "Verdana, sans-serif", fontSize: '14px' }} className='px-2'>Date Created :</p>
-                            <p style={{ fontFamily: "Times New Roman, Times, serif" }}>{day}-{month}-{year}</p>
+                            <p style={{ fontFamily: "Verdana, sans-serif", fontSize: '14px' }} className='px-2'>Created :</p>
+                            <p
+                                style={{ fontFamily: "Times New Roman, Times, serif" }}>{new Date(data?.createdAt).toLocaleString('vi-VN')}</p>
                         </div>
-
-                        <select onChange={(e) => setUpdateOrder(e.target.value)} value = {updateOrder}  className='form-control' style={{ width: '100px' }} name="statusOrder" id="">
-                            <option value="Success">Success</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Cancel">Cancel</option>
-                        </select>
                     </div>
-                    <table className="table caption-top">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Product</th>
-                                <th scope="col">Quantity</th>
-                                <th scope="col">Price</th>
-                                <th>Total Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {orderDetail.map((order, index) => (
-                                <tr key={index}>
-                                    <th style={{ verticalAlign: 'middle' }} scope="row" className="table-cell">{index + 1}</th>
-                                    <td>
-                                        <img width="60px" src={order.product.image} alt="" />
-                                        {order.product.name}
-                                    </td>
-                                    <td style={{ verticalAlign: 'middle' }}>
-                                        <button
-                                            className='hover_quantity-cart'
-                                            style={{ border: '1px solid #ccc', padding: '1px 8px' }}
-                                        >
-                                            -
-                                        </button>
-                                        <span 
-                                            name="quantity"
-                                            style={{ border: '1px solid #ccc', padding: '4px' }}>
-                                            {order.quantity}
-                                        </span>
-                                        <button
-                                            className='hover_quantity-cart'
-                                            style={{ border: '1px solid #ccc', padding: '1px 8px' }}
-                                        >
-                                            +
-                                        </button>
-                                    </td>
-                                    <td style={{ verticalAlign: 'middle' }}>{order.product.price}</td>
-                                    <td style={{ verticalAlign: 'middle' }}>{order.product.price * order.quantity}</td>
-                                </tr>
-                            ))}
+                    <div className='row col-4'>
+                        <div className='d-flex align-items-center'>
+                            <p style={{ fontFamily: "Verdana, sans-serif", fontSize: '14px' }} className='px-2'>Phone</p>
+                            <p style={{ fontFamily: "Times New Roman, Times, serif" }}>{data?.phone}</p>
+                        </div>
+                        <div className='d-flex'>
+                            <p style={{ fontFamily: "Verdana, sans-serif", fontSize: '14px', }} className='px-2'>Address</p>
+                            <p style={{ fontFamily: "Times New Roman, Times, serif", maxWidth: '80%', wordWrap: "break-word", }}>{data?.address}</p>
+                        </div>
+                    </div>
+                    <div className='row col-5'>
+                        <div className='d-flex'>
+                            <p style={{ fontFamily: "Verdana, sans-serif", fontSize: '14px' }} className='px-2'>Voucher:</p>
+                            <p style={{ fontFamily: "Times New Roman, Times, serif" }}>
+                                {data?.voucher !== null ? data?.voucher?.description : "Không"}
+                            </p>
+                        </div>
+                        <div className='d-flex'>
+                            <p style={{ fontFamily: "Verdana, sans-serif", fontSize: '14px' }} className='px-2'>Payment Method:</p>
+                            <p style={{ fontFamily: "Times New Roman, Times, serif" }}>
+                                {data?.paymentMethod?.name}
+                            </p>
+                        </div>
+                    </div>
 
-                            <tr>
-                                <th colSpan="4" style={{ textAlign: 'right', verticalAlign: 'middle' }}>Total:</th>
-                                <td style={{ verticalAlign: 'middle', color: 'red', fontWeight: '600' }}>
-                                    {orderDetail.reduce((sum, order) => sum + order.quantity * order.product.price, 0)}
+
+                </div>
+                <table className="table caption-top">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Product</th>
+                            <th scope="col">Size</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Unit Price</th>
+                            <th>Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data?.orderDetails && data?.orderDetails?.length > 0 && data?.orderDetails?.map((order, index) => (
+                            <tr key={index}>
+                                <th style={{ verticalAlign: 'middle' }} scope="row" className="table-cell">{index + 1}</th>
+                                <td>
+                                    {/* <img className='me-2' width="60px" src={order?.attribute?.product?.image} alt="" /> */}
+                                    {order?.attribute?.product?.name}
                                 </td>
-                            </tr>   
-                        </tbody>
-                    </table>
-                    <div className='d-flex justify-content-between'>
-                        <button onClick={() => close()} className='btn btn-secondary'>Close</button>
+                                <td style={{ verticalAlign: 'middle' }}>
+                                    <span
+                                        name="quantity">
+                                        {order?.attribute?.size?.name}
+                                    </span>
+
+                                </td>
+                                <td style={{ verticalAlign: 'middle' }}>
+
+                                    <span
+                                        name="quantity">
+                                        {order.quantity}
+                                    </span>
+
+                                </td>
+                                <td style={{ verticalAlign: 'middle' }}>{order.attribute.priceBought}</td>
+                                <td style={{ verticalAlign: 'middle' }}>{order.attribute.priceBought * order.quantity}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <div className='d-flex justify-content-end '>
+                    <div className='d-flex align-items-center'>
+                        <p className='me-1'>Total : </p>
+                        <p>
+                            {data && (totalPrice).toLocaleString('vi-VN')}đ
+                        </p>
+                    </div>
+                </div>
+                <div className='d-flex justify-content-end py-1 border-bottom'>
+                    <div className='d-flex align-items-center'>
+                        <p className='me-1'>Voucher : </p>
+                        <p>{data?.voucher !== null ? data?.voucher?.discountVoucher : 0}%</p>
+                    </div>
+                </div>
+                <div className='d-flex justify-content-end py-1'>
+                    <div className='d-flex align-items-center'>
+                        <p className='me-1'>TotalPrice : </p>
+                        <p>
+                            {data?.voucher !== null ?
+                                (totalPrice * (1 - data?.voucher?.discountVoucher)).toLocaleString('vi-VN') : totalPrice.toLocaleString('vi-VN') + "đ"
+                            }
+                        </p>
+                    </div>
+                </div>
+                <div className='d-flex justify-content-between'>
+                    <button onClick={() => close()} className='btn btn-secondary'>Close</button>
+                    <div className='d-flex'>
+                        <select
+                            className='form-control me-2'
+                            name="statusOrder"
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                        >
+                            {statuss && statuss?.length > 0 && statuss?.map((status, index) => (
+                                <option
+                                    selected={status === status?._id}
+                                    value={status?._id}
+                                >
+                                    {status?.name}
+                                </option>
+                            ))}
+                        </select>
                         <button onClick={() => handleConfirmOrder()} className='btn btn-primary'>Xác nhận</button>
                     </div>
                 </div>
-            ) : "Loading..."}
+            </div>
         </div>
     );
 }

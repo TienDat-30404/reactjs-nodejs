@@ -116,7 +116,6 @@ export default class ProductController {
                 page,
                 totalProduct,
                 totalPage,
-                objectSort,
                 limit,
                 objectFilter,
                 status: 200

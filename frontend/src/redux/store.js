@@ -10,6 +10,8 @@ import vouchersReducer from './Voucher/vouchersSlice'
 import notificationsReducer from './Notification/notificationsSlice'
 import favoritesReducer from './Favorite/favoritesSlice'
 import sizesReducer from './Size/sizesSlice'
+import ordersReducer from './Order/ordersSlice'
+import statussReducer from './Status/statusSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -22,6 +24,8 @@ export default configureStore({
     vouchers : vouchersReducer,
     notifications : notificationsReducer,
     favorites : favoritesReducer,
-    sizes : sizesReducer
+    sizes : sizesReducer,
+    orders : ordersReducer,
+    statuss : statussReducer
   }
 })

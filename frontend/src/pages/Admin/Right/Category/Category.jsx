@@ -155,8 +155,8 @@ export default function Category() {
                   />
                   {category?.name}
                 </td>
-                <td>{category?.createdAt}</td>
-                <td>{category?.updatedAt}</td>
+                <td>{new Date(category?.createdAt).toLocaleString('vi-VN')}</td>
+                <td>{new Date(category?.updatedAt).toLocaleString('vi-VN')}</td>
                 <td style={{ width: '6%' }} className='text-center'>
                   <button
                     onClick={() => handleSwitchPageEdit(category)}

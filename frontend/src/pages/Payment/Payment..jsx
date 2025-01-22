@@ -10,13 +10,14 @@ import { addVoucher, deleteVoucher } from '../../redux/Voucher/vouchersSlice';
 import { removeUseVoucher } from '../../redux/Voucher/vouchersSlice';
 import { paymentByMomo, paymentByVnpService, paymentByZaloPay } from '../../services/PaymentService';
 import { validateInformationPayment } from '../../until/function';
+import { getAllPaymentMethod } from '../../services/PaymentMethod';
 export default function Payment() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const [payments, setPayments] = useState([])
     const useVoucher = useSelector(state => state?.vouchers?.useVoucher)
     const location = useLocation();
     let { cartsCheck } = location.state || {};
-
     let { isAuthenticated, userData, dataCart } = useSelector(state => state.auth)
     const idUser = isAuthenticated && userData?.dataLogin?.idUser
     const phone = isAuthenticated && userData?.dataLogin?.phone
@@ -46,7 +47,7 @@ export default function Payment() {
         district: '',
         ward: ''
     })
-    const [showPayment, setShowPayment] = useState('payLater')
+    const [showPayment, setShowPayment] = useState('')
     // const [banks, setBanks] = useState([])
 
     const [informations, setInformations] = useState({
@@ -54,11 +55,9 @@ export default function Payment() {
         phone: '',
         address: '',
         paymentMethod: '',
-        bankAccount: '',
         products: [],
         totalPrice: '',
         paymentMethod: '',
-        bankAccount: '',
         useVoucher: []
     })
 
@@ -123,6 +122,22 @@ export default function Payment() {
     //     fetchDatasBank()
     // }, [])
     // set value Input
+
+    useEffect(() => {
+        try {
+            const fetchDataPaymentMethod = async () => {
+                const response = await getAllPaymentMethod()
+                if (response && response.status === 200) {
+                    setPayments(response.paymentMethods)
+                    setShowPayment(response?.paymentMethods[0]?._id)
+                }
+            }
+            fetchDataPaymentMethod()
+        }
+        catch (err) {
+            console.log(`Fail when get all payment method : ${err}`)
+        }
+    }, [])
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
         setInformations(prevInfor => ({
@@ -141,9 +156,10 @@ export default function Payment() {
 
     // handle pay
     const handleBuy = async () => {
-
-        if (showPayment === 'payLater') {
+        const paymentMethod = payments?.find(payment => payment._id === showPayment)
+        if (paymentMethod?.code === "payLater") {
             const response = await addOrder(informations)
+            console.log("responnse", response)
             if (response.errors) {
                 setErrors(response.errors)
                 return
@@ -166,7 +182,7 @@ export default function Payment() {
                 }, 2500)
             }
         }
-        else if(showPayment === 'vnpay') {
+        else if (paymentMethod?.code === 'vnpay') {
             const validateInputErrors = validateInformationPayment(informations)
             if (Object.keys(validateInputErrors).length > 0) {
                 setErrors(validateInputErrors)
@@ -181,7 +197,7 @@ export default function Payment() {
             localStorage.setItem('informationPayment', JSON.stringify(informations))
             return;
         }
-        else if (showPayment === 'momo') {
+        else if (paymentMethod?.code === 'momo') {
             const validateInputErrors = validateInformationPayment(informations)
             if (Object.keys(validateInputErrors).length > 0) {
                 setErrors(validateInputErrors)
@@ -196,17 +212,15 @@ export default function Payment() {
             localStorage.setItem('informationPayment', JSON.stringify(informations))
             return;
         }
-        else if(showPayment === 'zalopay')
-        {
+        else if (paymentMethod?.code === 'zalopay') {
             const validateInputErrors = validateInformationPayment(informations)
-            if(Object.keys(validateInputErrors).length > 0)
-            {
+            if (Object.keys(validateInputErrors).length > 0) {
                 setErrors(validateInputErrors)
                 return
             }
             const response = await paymentByZaloPay(
                 {
-                    amount : totalPrice
+                    amount: totalPrice
 
                 }
             )
@@ -216,7 +230,7 @@ export default function Payment() {
         }
     }
 
-
+    console.log(showPayment)
     return (
         <div>
             <div className='w-100 bg-white'>
@@ -355,71 +369,21 @@ export default function Payment() {
                                 </div>
                             </div>
                             <div className='col-auto mb-3 d-flex justify-content-evenly align-items-center'>
-                                <div class="form-check">
-                                    <InputComponent
-                                        value="payLater"
-                                        onChange={(e) => setShowPayment(e.target.value)}
-                                        checked={showPayment === 'payLater'}
-                                        style={{ border: '1px solid #ccc' }}
-                                        class="form-check-input" type="radio"
-                                        name="flexRadioDefault"
-                                    />
-                                    <label class="form-check-label" for="flexRadioDefault2">
-                                        Thanh toán khi đã nhận hàng
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <InputComponent
-                                        value="vnpay"
-                                        onChange={(e) => setShowPayment(e.target.value)}
-                                        checked={showPayment === 'vnpay'}
-                                        style={{ border: '1px solid #ccc' }} class="form-check-input"
-                                        type="radio"
-                                        name="flexRadioDefault"
-                                    />
-                                    <label class="form-check-label" for="flexRadioDefault1">
-                                        Thanh toán bằng vnpay
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <InputComponent
-                                        value="momo"
-                                        onChange={(e) => setShowPayment(e.target.value)}
-                                        checked={showPayment === 'momo'}
-                                        style={{ border: '1px solid #ccc' }}
-                                        class="form-check-input" type="radio"
-                                        name="flexRadioDefault"
-                                    />
-                                    <label class="form-check-label" for="flexRadioDefault2">
-                                        Thanh toán bằng momo
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <InputComponent
-                                        value="zalopay"
-                                        onChange={(e) => setShowPayment(e.target.value)}
-                                        checked={showPayment === 'zalopay'}
-                                        style={{ border: '1px solid #ccc' }}
-                                        class="form-check-input" type="radio"
-                                        name="flexRadioDefault"
-                                    />
-                                    <label class="form-check-label" for="flexRadioDefault2">
-                                        Thanh toán bằng zalopay
-                                    </label>
-                                </div>
-                                {/* <div class="form-check me-5">
-                                    <InputComponent
-                                        value="payNow"
-                                        onChange={(e) => setShowPayment(e.target.value)}
-                                        checked={showPayment === 'payNow'}
-                                        style={{ border: '1px solid #ccc' }} class="form-check-input"
-                                        type="radio"
-                                        name="flexRadioDefault"
-                                    />
-                                    <label class="form-check-label" for="flexRadioDefault1">
-                                        Thanh toán ngay
-                                    </label>
-                                </div> */}
+                                {payments && payments?.length > 0 && payments.map((payment, index) => (
+                                    <div key = {index} class="form-check">
+                                        <InputComponent
+                                            value={payment?._id}
+                                            onChange={(e) => setShowPayment(e.target.value)}
+                                            checked={showPayment === payment?._id}
+                                            style={{ border: '1px solid #ccc' }}
+                                            class="form-check-input" type="radio"
+                                            name="flexRadioDefault"
+                                        />
+                                        <label class="form-check-label" for="flexRadioDefault2">
+                                            {payment?.name}
+                                        </label>
+                                    </div>
+                                ))}
 
                             </div>
                             {/* {showPayment === 'payNow' ? (

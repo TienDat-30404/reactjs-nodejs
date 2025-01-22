@@ -27,8 +27,6 @@ export const cartsSlice = createSlice({
 
     updateQuantity : (state, action) => {
       const newQuantity = action.payload.quantity
-      console.log(newQuantity)
-      console.log(action.payload)
       const cartIndex = state.carts.findIndex(cart => cart._id === action.payload._id)
       console.log(cartIndex)
       if(cartIndex != -1)

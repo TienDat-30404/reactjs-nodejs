@@ -12,10 +12,8 @@ const RoleSchema = new Schema(
 
 const Role = mongoose.model('Role', RoleSchema);
 
-// Hàm khởi tạo dữ liệu mặc định
 const createDefaultRoles = async () => {
     try {
-        // Kiểm tra xem collection đã có dữ liệu hay chưa
         const roleCount = await Role.countDocuments();
         
         if (roleCount === 0) {
@@ -33,7 +31,6 @@ const createDefaultRoles = async () => {
     }
 };
 
-// Gọi hàm khởi tạo khi ứng dụng khởi động
 createDefaultRoles();
 
 export default Role

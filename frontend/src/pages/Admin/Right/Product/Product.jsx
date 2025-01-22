@@ -241,8 +241,8 @@ export default function Product() {
                 </td>
                 <td>{product?.category?.name}</td>
                 <td>{product?.description}</td>
-                <td>{product?.createdAt}</td>
-                <td>{product?.updatedAt}</td>
+                <td>{new Date(product?.createdAt).toLocaleString('vi-VN')}</td>
+                <td>{new Date(product?.updatedAt).toLocaleString('vi-VN')}</td>
                 <td style={{ width: '6%' }} className='text-center'>
                   <button
                     onClick={() => handleSwitchPageEdit(product)}

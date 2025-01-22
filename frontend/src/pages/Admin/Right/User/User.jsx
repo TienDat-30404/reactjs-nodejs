@@ -253,8 +253,8 @@ export default function Product() {
                 <td>{user?.account?.typeLogin}</td>
                 <td>{user?.account?.role?.name}</td>
 
-                <td>{user?.account?.createdAt}</td>
-                <td>{user?.account?.updatedAt}</td>
+                <td>{new Date(user?.account?.createdAt).toLocaleString('vi-VN')}</td>
+                <td>{new Date(user?.account?.updatedAt).toLocaleString('vi-VN')}</td>
                 <td style={{ width: '6%' }} className='text-center'>
                   <button
                     onClick={() => handleSwitchPageEdit(user)}

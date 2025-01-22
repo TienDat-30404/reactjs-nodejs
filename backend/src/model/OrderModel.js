@@ -8,9 +8,8 @@ const OrderSchema = new Schema(
         totalPrice : {type : Number, required : true},
         phone : {type : String, required : true},
         address : {type : String, required : true},
-        paymentMethod : {type : String, required : true},
-        bankAccount : {type : String},
-        isStatus : {type : String, default : 'Pending' },
+        idPaymentMethod : {type : Schema.Types.ObjectId, ref : 'PaymentMethod'},
+        idStatus : {type : Schema.Types.ObjectId, ref : 'Status'},
         deletedAt : {type : Date, default : null}
 
     },

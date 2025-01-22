@@ -66,6 +66,7 @@ export default function ChangePassword({ show, close, data }) {
                                 <label style={{ fontSize: '14px' }} className="form-label">Mật khẩu mới</label>
                                 <div style={{ width: '100%' }}>
                                     <InputComponent
+                                        type="password"
                                         name="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}

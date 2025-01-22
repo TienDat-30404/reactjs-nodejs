@@ -9,8 +9,8 @@ export const addOrder = async(data) => {
     return response.json();
 }
 
-export const getAllOrder = async() => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/orders`, {
+export const getAllOrder = async(query) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/orders?${query}`, {
         method : 'GET',
         headers: {
             'Content-Type': 'application/json',
