@@ -21,18 +21,27 @@ export const ordersSlice = createSlice({
         confirmOrderRedux : (state, action) => {
             const idOrder = action.payload.idOrder 
             const status = action.payload.status
+            const staff = action.payload.staff
+            const updatedAt = action.payload.updatedAt
+            console.log(idOrder, status, staff, updatedAt)
             console.log(idOrder, status)
             const index = state.data.findIndex(order => order._id === idOrder)
             if(index != -1)
             {
                 state.data[index] = {
                     ...state.data[index],
-                    ...state.data[index].status.name = status
+                    status,
+                    staff,
+                    updatedAt
                 }
             }
+        }, 
+
+        switchPage : (state, action) => {
+            state.page = action.payload
         }
     }
 })
 
-export const {initDataOrder, confirmOrderRedux} = ordersSlice.actions 
+export const {initDataOrder, confirmOrderRedux, switchPage} = ordersSlice.actions 
 export default ordersSlice.reducer

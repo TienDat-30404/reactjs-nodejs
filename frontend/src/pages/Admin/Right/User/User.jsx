@@ -10,6 +10,7 @@ import { deleteUserRedux, initDataUser, switchPage } from '../../../../redux/Use
 import { getAllRole } from '../../../../services/RoleService'
 import { initDataRole } from '../../../../redux/Role/rolesSlice'
 import ChangePassword from './ChangePassword'
+import Pagination from '../../../../components/Pagination'
 export default function Product() {
   const dispatch = useDispatch()
   const roles = useSelector(state => state?.roles?.roles)
@@ -119,11 +120,11 @@ export default function Product() {
       event.target.closest(".modal") ||
       event.target.closest(".btn-change-password")
     ) {
-      return; 
+      return;
     }
     setSelectedChangePassword(null);
   };
-  
+
 
 
   React.useEffect(() => {
@@ -274,27 +275,14 @@ export default function Product() {
       </table>
 
       {totalPage > 1 && (
-        <ul class="pagination d-flex justify-content-center">
-          <li style={{ cursor: 'pointer' }} onClick={() => handlePagination(page - 1)} class={`page-item ${page === 1 ? "disabled" : ""}`}>
-            <a class="page-link">Previous</a>
-          </li>
-
-          {visiblePagination(page, totalPage).map((pageNumber) => (
-            <li
-              key={pageNumber}
-              className={`page-item ${page === pageNumber ? "active" : ""}`}
-              onClick={() => handlePagination(pageNumber)}
-            >
-              <button className="page-link">{pageNumber}</button>
-            </li>
-          ))}
-
-          <li style={{ cursor: 'pointer' }} class={`page-item ${page === totalPage ? "disabled" : ""}`}>
-            <button onClick={() => handlePagination(page + 1)}
-              class="page-link">Next</button>
-          </li>
-        </ul>
+        <Pagination
+          totalPage={totalPage}
+          handlePagination={handlePagination}
+          page={page}
+          visiblePagination={visiblePagination}
+        />
       )}
+
 
       <AddUser show={showAddModal} close={() => setShowAddModal(false)} />
       <EditUser show={showEdit} close={() => setShowEdit(false)} data={selectedEditUser} />

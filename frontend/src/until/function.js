@@ -82,7 +82,6 @@ export const validateInformationPayment = (data) => {
 export const visiblePagination = (page, totalPage) => {
     const pages = []
 
-
     if (page == 1 && totalPage >= 3) {
         pages.push(page)
         pages.push(page + 1)

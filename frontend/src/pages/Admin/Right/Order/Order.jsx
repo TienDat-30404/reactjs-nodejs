@@ -6,8 +6,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import { visiblePagination } from '../../../../until/function'
 import { getAllOrder } from '../../../../services/OrderService'
 import { getAllStatus } from '../../../../services/StatusService'
-import { initDataOrder } from '../../../../redux/Order/ordersSlice'
+import { initDataOrder, switchPage } from '../../../../redux/Order/ordersSlice'
 import { initDataStatus } from '../../../../redux/Status/statusSlice'
+import Pagination from '../../../../components/Pagination'
 export default function Product() {
   const dispatch = useDispatch()
   const orders = useSelector(state => state?.orders?.data)
@@ -17,18 +18,15 @@ export default function Product() {
   let limit = useSelector(state => state?.orders?.limit)
 
   const [showAddModal, setShowAddModal] = useState(false)
+  const statuss = useSelector(state => state.statuss.data)
   const [showEdit, setShowEdit] = useState(false)
-  const [showChangePassword, setShowChangePassword] = useState(false)
   const [selectedDetailOrder, setSelectedDetailOrder] = useState(null);
-  const [selectedChangePassword, setSelectedChangePassword] = useState(null);
   const tableRef = useRef();
-  const [displayTextSearch, setDisplayTextSearch] = useState('idUser')
+  const [displayTextSearch, setDisplayTextSearch] = useState('idOrder')
   const [searchCriteria, setSearchCriteria] = useState({
-    idUser: '',
-    userName: '',
-    email: '',
-    role: '',
-    phone: ''
+    idOrder: '',
+    status: '',
+
   })
 
 
@@ -37,12 +35,12 @@ export default function Product() {
 
       try {
         let query = `page=${page}&limit=${limit}`
-        // if (searchCriteria.idUser != "") {
-        //   query += `&idUser=${searchCriteria.idUser}`
-        // }
-        // if (searchCriteria.phone != "") {
-        //   query += `&phone=${searchCriteria.phone}`
-        // }
+        if (searchCriteria.idOrder != "") {
+          query += `&idOrder=${searchCriteria.idOrder}`
+        }
+        if (searchCriteria.status != "") {
+          query += `&status=${searchCriteria.status}`
+        }
         // if (searchCriteria.email != "") {
         //   query += `&email=${searchCriteria.email}`
         // }
@@ -70,14 +68,14 @@ export default function Product() {
       }
     }
     fetchData()
-  }, [page, limit])
+  }, [page, limit, searchCriteria, displayTextSearch])
 
   const handleSwitchDetailOrder = (data) => {
     setShowEdit(true)
     setSelectedDetailOrder(data)
   }
   const handlePagination = (page) => {
-    // dispatch(switchPage(page))
+    dispatch(switchPage(page))
   }
 
 
@@ -94,61 +92,23 @@ export default function Product() {
   }
 
   const handleChangeSearchSelect = (e) => {
-    // setSearchCriteria({
-    //   idUser: '',
-    //   userName: '',
-    //   email: '',
-    //   role: '',
-    //   phone: ''
-    // })
-    // setDisplayTextSearch("")
-    // setDisplayTextSearch(e.target.value)
-    // dispatch(switchPage(1))
+    setSearchCriteria({
+      idOrder: '',
+      status : ''
+    })
+    setDisplayTextSearch("")
+    setDisplayTextSearch(e.target.value)
+    dispatch(switchPage(1))
   }
-
-  const handleSelectedRow = (data) => {
-    // setSelectedChangePassword(data)
-
-  }
-
-  const handleClickOutside = (event) => {
-    // if (
-    //   (tableRef.current && tableRef.current.contains(event.target)) ||
-    //   event.target.closest(".modal") ||
-    //   event.target.closest(".btn-change-password")
-    // ) {
-    //   return; 
-    // }
-    // setSelectedChangePassword(null);
-  };
-
-
-
-  // React.useEffect(() => {
-  //   document.addEventListener('click', handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener('click', handleClickOutside);
-  //   };
-  // }, []);
 
 
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
         <div className='d-flex align-items-center'>
-          <h3>User</h3>
-          <h6 className='ms-3'>({totalOrder} user found)</h6>
-          <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo tài khoản</button>
-          <button
-            onClick={() => {
-              setShowChangePassword(true)
-            }}
-            type="button"
-            className="btn btn-outline-success ms-3 btn-change-password"
-            disabled={selectedChangePassword === null}
-          >
-            Đổi mật khẩu
-          </button>
+          <h3>Order</h3>
+          <h6 className='ms-3'>({totalOrder} order found)</h6>
+          {/* <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo tài khoản</button> */}
 
         </div>
         <div className='d-flex align-items-center'>
@@ -167,15 +127,14 @@ export default function Product() {
         onChange={handleChangeSearchSelect}
         class="form-select mt-2"
       >
-        <option value="idUser" selected>Tìm kiếm theo idUser</option>
-        <option value="userName">Tìm kiếm theo userName</option>
-        <option value="email">Tìm kiếm theo email</option>
+        <option value="idOrder" selected>Tìm kiếm theo idOrder</option>
+        <option value="status">Tìm kiếm theo trạng thái đơn hàng</option>
+        {/* <option value="email">Tìm kiếm theo email</option>
         <option value="role">Tìm kiếm theo quyền</option>
-        <option value="phone">Tìm kiếm theo số điện thoại</option>
+        <option value="phone">Tìm kiếm theo số điện thoại</option> */}
       </select>
 
-
-      {/* {displayTextSearch != 'role' ? (
+      {displayTextSearch != 'status' ? (
         <div class="input-group mb-3 mt-1">
           <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
           <input
@@ -197,16 +156,16 @@ export default function Product() {
               // dispatch(switchPage(1))
             }}
           >
-            {roles && roles?.length > 0 ? (
-              roles?.map((role, index) => (
-                <option key={index} value={role._id}>{role.name}</option>
+            {statuss && statuss?.length > 0 ? (
+              statuss?.map((status, index) => (
+                <option key={index} value={status._id}>{status.name}</option>
               )
               )) :
-              <option value="" selected>Không tồn tại quyền</option>
+              <option value="" selected>Không tồn tại trạng thái đơn hàng</option>
             }
           </select>
         </div>
-      } */}
+      }
 
 
 
@@ -221,7 +180,7 @@ export default function Product() {
             <th scope="col">PaymentMethod</th>
             <th scope="col">Status</th>
             <th scope="col">Timestamps</th>
-            
+
             <th scope="col">Action</th>
           </tr>
         </thead>
@@ -230,10 +189,10 @@ export default function Product() {
             orders?.map((order, index) => (
               <tr key={index}>
                 <th scope="row">{(order?._id)?.slice(0, 7)}...</th>
-             
+
                 <td>
                   <div className='d-flex'>
-                    <strong>User: </strong> 
+                    <strong>User: </strong>
                     <p className='px-1'>{order?.user?.name}</p>
                   </div>
                   <div className='d-flex'>
@@ -247,8 +206,8 @@ export default function Product() {
 
                 <td>{order?.voucher === null ? "null" : order?.voucher?.discountVoucher}</td>
                 <td>
-                  <strong>Phone:</strong> {order?.phone }<br />
-                  <strong>Address:</strong> {order?.address }
+                  <strong>Phone:</strong> {order?.phone}<br />
+                  <strong>Address:</strong> {order?.address}
                 </td>
 
                 <td>{order?.paymentMethod?.name}</td>
@@ -269,37 +228,23 @@ export default function Product() {
                 </td>
               </tr>
             ))
-          ) : <p>Không có người dùng tồn tại</p>}
+          ) : <p>Không có đơn hàng tồn tại</p>}
 
         </tbody>
       </table>
 
       {totalPage > 1 && (
-        <ul class="pagination d-flex justify-content-center">
-          <li style={{ cursor: 'pointer' }} onClick={() => handlePagination(page - 1)} class={`page-item ${page === 1 ? "disabled" : ""}`}>
-            <a class="page-link">Previous</a>
-          </li>
-
-          {visiblePagination(page, totalPage).map((pageNumber) => (
-            <li
-              key={pageNumber}
-              className={`page-item ${page === pageNumber ? "active" : ""}`}
-              onClick={() => handlePagination(pageNumber)}
-            >
-              <button className="page-link">{pageNumber}</button>
-            </li>
-          ))}
-
-          <li style={{ cursor: 'pointer' }} class={`page-item ${page === totalPage ? "disabled" : ""}`}>
-            <button onClick={() => handlePagination(page + 1)}
-              class="page-link">Next</button>
-          </li>
-        </ul>
+        <Pagination
+          totalPage={totalPage}
+          handlePagination={handlePagination}
+          page={page}
+          visiblePagination={visiblePagination}
+        />
       )}
 
       {/* <AddUser show={showAddModal} close={() => setShowAddModal(false)} />
       <ChangePassword show={showChangePassword} close={() => setShowChangePassword(false)} data={selectedChangePassword} /> */}
-            <DetailOrder show={showEdit} close={() => setShowEdit(false)} data={selectedDetailOrder} />
+      <DetailOrder show={showEdit} close={() => setShowEdit(false)} data={selectedDetailOrder} />
 
     </div>
   )

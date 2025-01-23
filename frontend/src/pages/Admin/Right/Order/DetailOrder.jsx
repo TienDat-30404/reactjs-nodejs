@@ -27,7 +27,9 @@ export default function DetailOrder({ show, close, data }) {
                 {
                     dispatch(confirmOrderRedux({
                         idOrder : data?._id,
-                        status : status
+                        status : response?.order?.status,
+                        staff : response?.order?.staff,
+                        updatedAt : response?.order?.updatedAt
                     }))
                 }
             }

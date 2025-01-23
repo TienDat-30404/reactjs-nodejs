@@ -170,10 +170,42 @@ export default class OrderController {
 
     static async getAllOrder(req, res, next) {
         const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 100
+        const limit = parseInt(req.query.limit) || 5
         const startPage = (page - 1) * limit
+        const objectFilter = { deletedAt: null }
+        if (req.query.idOrder) {
+            if (mongoose.Types.ObjectId.isValid(req.query.idOrder)) {
+                objectFilter._id = req.query.idOrder
+            }
+            else {
+                return res.status(200).json({
+                    page: '',
+                    totalPage: '',
+                    limit: '',
+                    totalOrder: '',
+                    orders: [],
+                    status: 200
+                })
+            }
+        }
+        if(req.query.status)
+        {
+            if (mongoose.Types.ObjectId.isValid(req.query.status)) {
+                objectFilter.idStatus = req.query.status
+            }
+            else {
+                return res.status(200).json({
+                    page: '',
+                    totalPage: '',  
+                    limit: '',
+                    totalOrder: '',
+                    orders: [],
+                    status: 200
+                })
+            }
+        }
         let [orders, totalOrder] = await Promise.all([
-            await Order.find({})
+            await Order.find(objectFilter)
                 .skip(startPage)
                 .limit(limit)
                 .populate('idUser')
@@ -200,7 +232,7 @@ export default class OrderController {
                     }
                 })
                 .lean(),
-            await Order.countDocuments({})
+            await Order.countDocuments(objectFilter)
         ])
 
         orders = orders.map(order => {
@@ -275,14 +307,25 @@ export default class OrderController {
         const { status, staff } = req.body;
 
         try {
-            const response = await Order.updateOne({ _id: idOrder }, {
+            let order = await Order.findByIdAndUpdate({ _id: idOrder }, {
                 idStatus: status,
                 idStaff: staff
-            })
+            }, { new: true }
+            ).populate('idStaff')
+                .populate('idStatus')
+                .lean()
+
+            if (order) {
+                order.staff = order.idStaff
+                order.status = order.idStatus
+                delete order.idStaff
+                delete order.idStatus
+            }
+
             return res.status(200).json(
                 {
-                    response,
-                    status : 200
+                    order,
+                    status: 200
                 }
             )
         }

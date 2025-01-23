@@ -9,6 +9,7 @@ import { switchPage } from '../../../../redux/Category/categoriesSlice'
 import { toast } from 'react-toastify'
 import AddCategory from './AddCategory'
 import EditCategory from './EditCategory'
+import Pagination from '../../../../components/Pagination'
 export default function Category() {
   const dispatch = useDispatch()
   const categories = useSelector(state => state?.categories?.categories)
@@ -18,8 +19,8 @@ export default function Category() {
   const limit = useSelector(state => state?.categories?.limit)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
-    const [selectedCategory, setSelectedCategory] = useState(null);
-  
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
   const [displayTextSearch, setDisplayTextSearch] = useState('idCategory')
   const [searchCriteria, setSearchCriteria] = useState({
     idCategory: '',
@@ -38,13 +39,12 @@ export default function Category() {
         if (searchCriteria.idCategory != "") {
           query += `&idCategory=${searchCriteria.idCategory}`
         }
-        
+
 
         const response = await getAllCategory(query)
         console.log(query)
-        if(response && response.status == 200)
-        {
-            dispatch(initDataCategory(response))
+        if (response && response.status == 200) {
+          dispatch(initDataCategory(response))
         }
 
       }
@@ -113,7 +113,7 @@ export default function Category() {
         <option value="name">Tìm kiếm theo tên</option>
       </select>
 
-      
+
       {displayTextSearch && (
         <div class="input-group mb-3 mt-1">
           <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
@@ -127,7 +127,7 @@ export default function Category() {
         </div>
       )}
 
-    
+
 
 
       <table class="table">
@@ -176,26 +176,12 @@ export default function Category() {
       </table>
 
       {totalPage > 1 && (
-        <ul class="pagination d-flex justify-content-center">
-          <li style={{ cursor: 'pointer' }} onClick={() => handlePagination(page - 1)} class={`page-item ${page === 1 ? "disabled" : ""}`}>
-            <a class="page-link">Previous</a>
-          </li>
-
-          {visiblePagination(page, totalPage).map((pageNumber) => (
-            <li
-              key={pageNumber}
-              className={`page-item ${page === pageNumber ? "active" : ""}`}
-              onClick={() => handlePagination(pageNumber)}
-            >
-              <button className="page-link">{pageNumber}</button>
-            </li>
-          ))}
-
-          <li style={{ cursor: 'pointer' }} class={`page-item ${page === totalPage ? "disabled" : ""}`}>
-            <button onClick={() => handlePagination(page + 1)}
-              class="page-link">Next</button>
-          </li>
-        </ul>
+        <Pagination
+          totalPage={totalPage}
+          handlePagination={handlePagination}
+          page={page}
+          visiblePagination={visiblePagination}
+        />
       )}
 
       <AddCategory show={showAddModal} close={() => setShowAddModal(false)} />
