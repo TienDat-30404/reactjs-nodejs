@@ -61,7 +61,6 @@ const validateUpdateProduct = async (req, res, next) => {
     }
     const { name, idCategory, description, sizes } = req.body
 
-
     const product = await Product.findOne({ _id: idProduct })
         .populate('idCategory')
         .populate({

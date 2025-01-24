@@ -117,33 +117,6 @@ export const changePassword = async (id, data, isChange) => {
     return response.json()
 }
 
-export const searchUser = async (idUser, name, email, phone, idRole) => {
-    const params = new URLSearchParams({});
-    if (idUser) {
-        params.append('idUser', idUser)
-    }
-    if (name) {
-        params.append('name', name)
-    }
-    if (email) {
-        params.append('email', email)
-    }
-    if (phone) {
-        params.append('phone', phone)
-    }
-    if (idRole) {
-        params.append('idRole', idRole)
-    }
-    const url = `${process.env.REACT_APP_API_URL}/search-user?${params.toString()}`;
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    return response.json();
-}
-
 
 
 export const logoutUser = async () => {

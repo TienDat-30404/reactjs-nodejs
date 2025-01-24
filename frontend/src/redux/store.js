@@ -12,6 +12,7 @@ import favoritesReducer from './Favorite/favoritesSlice'
 import sizesReducer from './Size/sizesSlice'
 import ordersReducer from './Order/ordersSlice'
 import statussReducer from './Status/statusSlice'
+import suppliersReducer from './Supplier/suppliersSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -26,6 +27,7 @@ export default configureStore({
     favorites : favoritesReducer,
     sizes : sizesReducer,
     orders : ordersReducer,
-    statuss : statussReducer
+    statuss : statussReducer,
+    suppliers : suppliersReducer
   }
 })

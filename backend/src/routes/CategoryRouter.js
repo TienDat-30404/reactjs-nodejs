@@ -8,6 +8,5 @@ router.post('/add-category', uploadImageCategory.single('image'), validateAddCat
 router.put('/update-category/:idCategory', uploadImageCategory.single('image'), CategoryController.updateCategory)
 router.delete('/delete-category/:idCategory', CategoryController.deleteCategory)
 router.get('/get-all-category', CategoryController.getAllCategory)
-router.get('/detail-category/:_id', CategoryController.detailCategory)
 
 export default router

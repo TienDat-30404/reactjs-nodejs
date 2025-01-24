@@ -15,6 +15,7 @@ import FavoriteRouter from './FavoriteRouter.js';
 import PaymentRouter from './PaymentRouter.js';
 import StatusRouter from './StatusRouter.js'
 import PaymentMethodRouter from './PaymentMethodRouter.js'
+import SupplierRouter from './SupplierRouter.js'
 const routes = (app) => {
     app.use('/', UserRouter)
     app.use('/', ProductRouter)
@@ -33,5 +34,6 @@ const routes = (app) => {
     app.use('/', PaymentRouter)
     app.use('/', StatusRouter)
     app.use('/', PaymentMethodRouter)
+    app.use('/', SupplierRouter)
 }
 export default routes

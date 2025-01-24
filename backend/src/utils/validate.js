@@ -3,6 +3,7 @@ import Category from '../model/CategoryModel.js';
 import bcrypt from 'bcrypt';
 import multer from 'multer';
 import path from 'path';
+import Supplier from '../model/SupplierModel.js';
 
 // Check email 
 const validateEmail = (email) => {
@@ -23,6 +24,10 @@ const validateNameProduct = async (name) => {
   return !existNameProduct
 }
 
+const validateNameSupplier = async(name) => {
+  const existNameSupplier = await Supplier.findOne({name})
+  return !existNameSupplier
+}
 
 
 
@@ -77,5 +82,5 @@ const isCheckExistCategory = async (name) => {
 export  {
   validateEmail, hashPassword, validateNameProduct,
   validateNameProductWhenUpdate, isCheckExistNameCategory, conditionLoginMiddleware, shouldUseValidation,
-  conditionChagePasswordMiddleware, shouldUseChangePassword, isCheckExistCategory
+  conditionChagePasswordMiddleware, shouldUseChangePassword, isCheckExistCategory, validateNameSupplier
 }

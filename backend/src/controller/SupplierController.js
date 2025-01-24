@@ -1,0 +1,103 @@
+import Supplier from "../model/SupplierModel.js"
+import mongoose from "mongoose"
+export class SupplierController {
+
+    static async getAllSupplier(req, res, next) {
+        try {
+            const page = parseInt(req.query.page) || 1
+            const limit = parseInt(req.query.limit) || 5
+            const startPage = (page - 1) * limit
+            let [suppliers, totalSupplier] = await Promise.all([
+                Supplier.find({})
+                    .skip(startPage)
+                    .limit(limit),
+                Supplier.countDocuments()
+            ])
+            const totalPage = Math.ceil(totalSupplier / limit)
+            return res.status(200).json({
+                suppliers,
+                page,
+                limit,
+                totalSupplier,
+                totalPage,
+                status: 200
+            })
+        }
+        catch (err) {
+            return res.status(500).json({
+                message: `Fail when get all supplier : ${err}`
+            })
+        }
+    }
+
+    static async addSupplier(req, res, next) {
+        try {
+            const { name, phone, address, email } = req.body
+            const supplier = new Supplier({
+                name,
+                email,
+                phone,
+                address,
+                email
+            })
+            await supplier.save()
+            return res.status(200).json({
+                supplier,
+                status: 201
+            })
+        }
+        catch (err) {
+            return res.status(500).json({
+                message: `Fail when add supllier : ${err}`
+            })
+        }
+    }
+
+    static async updateSupplier(req, res, next) {
+        try {
+            const idSupplier = req.params.idSupplier
+            if (!mongoose.Types.ObjectId.isValid(idSupplier)) {
+                return res.status(400).json({ message: "Invalid Supplier ID" });
+            }
+            const { name, phone, address, email } = req.body
+            const dataUpdate = await Supplier.findByIdAndUpdate(idSupplier,
+                {
+                    name,
+                    phone,
+                    address,
+                    email
+                }, {
+                new: true,
+                runValidators: true,
+            })
+            return res.status(200).json({
+                message: "Update Successfully",
+                dataUpdate,
+                status: 200
+            })
+        }
+        catch (error) {
+            return res.status(500).json({
+                message : `Fail when update supplier : ${error}`
+            })
+        }
+    };
+
+    static async deleteSupplier(req, res, next) {
+        try {
+            const idSupplier = req.params.idSupplier
+            const supplier = await Supplier.deleteOne({ _id: idSupplier })
+            if (supplier.deletedCount > 0) {
+                return res.status(200).json({
+                    supplier,
+                    message: "Xóa nhà cung cấp thành công",
+                    status: 200
+                })
+            }
+
+        }
+        catch (error) {
+            return res.status(500).json({ message: `Fail when delete supplier : ${error}` })
+        }
+    }
+}

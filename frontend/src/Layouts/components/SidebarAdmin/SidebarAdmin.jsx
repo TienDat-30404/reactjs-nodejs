@@ -28,6 +28,10 @@ export default function SidebarAdmin() {
                     <i class="bi bi-p-square"></i>
                     <p class="nav-link">Order</p>
                 </li>
+                <li onClick={() => navigate('/admin/supplier')} class="nav-item">
+                    <i class="bi bi-person-video2"></i>
+                    <p class="nav-link">Supplier</p>
+                </li>
             </ul>
         </div>
     )

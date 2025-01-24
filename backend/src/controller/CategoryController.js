@@ -108,15 +108,6 @@ export default class CategoryController {
         }
     }
 
-    // detail category 
-    static async detailCategory(req, res, next) {
-        const idCategory = req.params.idCategory
-        const category = await Category.find({ _id: idCategory })
-        return res.status(200).json({
-            category
-        })
-    }
-
     static async deleteCategory(req, res, next) {
         try {
             const idCategory = req.params.idCategory
