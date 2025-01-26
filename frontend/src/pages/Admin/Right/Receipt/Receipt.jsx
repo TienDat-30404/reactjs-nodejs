@@ -1,26 +1,24 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
-import { handleChangeInput } from '../../../../until/function'
 import { useSelector, useDispatch } from 'react-redux'
 import { visiblePagination } from '../../../../until/function'
-import { deleteSupplierRedux, switchPage } from '../../../../redux/Supplier/suppliersSlice'
 import Pagination from '../../../../components/Pagination'
-import { deleteSupplier, getAllSupplier } from '../../../../services/SupplierService'
+import { getAllReceipt } from '../../../../services/ReceiptService'
+import { initDataReceipt } from '../../../../redux/Receipt/receiptsSlice'
+import { getAllSupplier } from '../../../../services/SupplierService'
 import { initDataSupplier } from '../../../../redux/Supplier/suppliersSlice'
-import AddSupplier from './AddSupplier'
-import EditSupplier from './EditSupplier'
-import { getAllProduct } from '../../../../services/ProductService'
-import { initDataProduct } from '../../../../redux/Products/productsSlice'
+import AddReceipt from './AddReceipt'
+import { getAllSizeService } from '../../../../services/SizeService'
+import { initDataSize } from '../../../../redux/Size/sizesSlice'
 
-export default function Supplier() {
+export default function Receipt() {
     const dispatch = useDispatch()
-    const products = useSelector(state => state.products.products)
-    console.log(products)
     const suppliers = useSelector(state => state?.suppliers.data)
-    const page = useSelector(state => state?.suppliers?.page)
-    const totalPage = useSelector(state => state?.suppliers?.totalPage)
-    const totalSupplier = useSelector(state => state?.suppliers?.totalSupplier)
-    const limit = useSelector(state => state?.suppliers?.limit)
+    const receipts = useSelector(state => state?.receipts.data)
+    const page = useSelector(state => state?.receipts?.page)
+    const totalPage = useSelector(state => state?.receipts?.totalPage)
+    const totalReceipt = useSelector(state => state?.receipts?.totalReceipt)
+    const limit = useSelector(state => state?.receipts?.limit)
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEdit, setShowEdit] = useState(false)
     const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -45,44 +43,47 @@ export default function Supplier() {
                 // }
 
 
-                const [responseSupplier, responseProduct] = await Promise.all([
-                    await getAllSupplier(query),
-                    await getAllProduct()
+                const [responseReceipt, responseSupplier, responseAttribute] = await Promise.all([
+                    await getAllReceipt(query),
+                    await getAllSupplier(),
+                    await getAllSizeService()
                 ])
+                if (responseReceipt && responseReceipt.status == 200) {
+                    dispatch(initDataReceipt(responseReceipt))
+                }
                 if (responseSupplier && responseSupplier.status == 200) {
                     dispatch(initDataSupplier(responseSupplier))
                 }
-                if(responseProduct && responseProduct.status === 200)
-                {
-                    dispatch(initDataProduct(responseProduct))
+                if (responseSupplier && responseSupplier.status == 200) {
+                    dispatch(initDataSize(responseSupplier))
                 }
             }
             catch (error) {
-                console.log("Fail when get supplier to display")
+                console.log("Fail when get receipt to display")
             }
         }
         fetchData()
     }, [page, limit])
 
     const handleSwitchPageEdit = (data) => {
-        setShowEdit(true)
-        setSelectedSupplier(data)
+        // setShowEdit(true)
+        // setSelectedSupplier(data)
     }
 
     const handlePagination = (page) => {
-        dispatch(switchPage(page))
+        // dispatch(switchPage(page))
     }
 
 
     // handle delete product
     const handleDeleteCategory = async (id) => {
-        const response = await deleteSupplier(id)
-        if (response && response?.status === 200) {
-            dispatch(deleteSupplierRedux(id))
-            if (suppliers?.length === 1 && page > 1) {
-                dispatch(switchPage(page - 1))
-            }
-        }
+        // const response = await deleteSupplier(id)
+        // if (response && response?.status === 200) {
+        //     dispatch(deleteSupplierRedux(id))
+        //     if (suppliers?.length === 1 && page > 1) {
+        //         dispatch(switchPage(page - 1))
+        //     }
+        // }
     }
 
     const handleChangeSearchSelect = (e) => {
@@ -93,12 +94,12 @@ export default function Supplier() {
         // setDisplayTextSearch(e.target.value)
     }
     return (
-        <div  className='px-4 py-2 bg-white product'>
+        <div className='px-4 py-2 bg-white product'>
             <div className='d-flex justify-content-between'>
                 <div className='d-flex align-items-center'>
                     <h3>Supplier</h3>
-                    <h6 className='ms-3'>({totalSupplier} supplier found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo nhà cung cấp</button>
+                    <h6 className='ms-3'>({totalReceipt} supplier found)</h6>
+                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo phiếu nhập</button>
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -139,37 +140,34 @@ export default function Supplier() {
                 <thead>
                     <tr>
                         <th scope="col">Id</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Phone</th>
-                        <th scope="col">Address</th>
-                        <th scope="col">Email</th>
+                        <th scope="col">User</th>
+                        <th scope="col">Supplier</th>
+                        <th scope="col">TotalPrice</th>
                         <th scope="col">Created At</th>
                         <th scope="col">Updated At</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {suppliers && suppliers?.length > 0 ? (
-                        suppliers?.map((supplier, index) => (
+                    {receipts && receipts?.length > 0 ? (
+                        receipts?.map((receipt, index) => (
                             <tr key={index}>
-                                <th scope="row">{(supplier?._id).slice(0, 10)}...</th>
-                                <td>{supplier?.name}</td>
-                                <td>{supplier?.phone}</td>
-                                <td>{supplier?.address}</td>
-                                <td>{supplier?.email}</td>
-
-                                <td>{new Date(supplier?.createdAt).toLocaleString('vi-VN')}</td>
-                                <td>{new Date(supplier?.updatedAt).toLocaleString('vi-VN')}</td>
+                                <th scope="row">{(receipt?._id).slice(0, 10)}...</th>
+                                <td>{receipt?.user?.name}</td>
+                                <td>{receipt?.supplier?.name}</td>
+                                <td>{receipt?.totalPrice}</td>
+                                <td>{new Date(receipt?.createdAt).toLocaleString('vi-VN')}</td>
+                                <td>{new Date(receipt?.updatedAt).toLocaleString('vi-VN')}</td>
                                 <td style={{ width: '6%' }} className='text-center'>
                                     <button
-                                        onClick={() => handleSwitchPageEdit(supplier)}
+                                        onClick={() => handleSwitchPageEdit(receipt)}
                                         type="button"
                                         className="btn btn-outline-primary">
                                         Edit
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteCategory(supplier._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button onClick={() => handleDeleteCategory(receipt._id)} type="button" className="btn btn-outline-danger">Delete</button>
                                 </td>
                             </tr>
                         ))
@@ -187,8 +185,8 @@ export default function Supplier() {
                 />
             )}
 
-            <AddSupplier show={showAddModal} close={() => setShowAddModal(false)} />
-            <EditSupplier show={showEdit} close={() => setShowEdit(false)} data={selectedSupplier} />
+            <AddReceipt show={showAddModal} close={() => setShowAddModal(false)} />
+            {/* <EditSupplier show={showEdit} close={() => setShowEdit(false)} data={selectedSupplier} /> */}
         </div>
     )
 }

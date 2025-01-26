@@ -12,5 +12,11 @@ const SupplierSchema = Schema(
         timestamps : true
     }
 )
+
+SupplierSchema.virtual('supplierDetails', {
+    ref : 'DetailSupplier', 
+    localField : '_id',
+    foreignField : 'idSupplier'
+})
 const Supplier = mongoose.model('Supplier', SupplierSchema)
 export default Supplier

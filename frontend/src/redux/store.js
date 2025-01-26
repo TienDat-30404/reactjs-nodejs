@@ -13,6 +13,7 @@ import sizesReducer from './Size/sizesSlice'
 import ordersReducer from './Order/ordersSlice'
 import statussReducer from './Status/statusSlice'
 import suppliersReducer from './Supplier/suppliersSlice'
+import receiptsReducer from './Receipt/receiptsSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -28,6 +29,7 @@ export default configureStore({
     sizes : sizesReducer,
     orders : ordersReducer,
     statuss : statussReducer,
-    suppliers : suppliersReducer
+    suppliers : suppliersReducer,
+    receipts : receiptsReducer
   }
 })

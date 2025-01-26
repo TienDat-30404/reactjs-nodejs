@@ -6,6 +6,7 @@ import Order from "../pages/Admin/Right/Order/Order";
 import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
 import Category from "../pages/Admin/Right/Category/Category";
 import Supplier from "../pages/Admin/Right/Supplier/Supplier";
+import Receipt from "../pages/Admin/Right/Receipt/Receipt";
 export const adminRoutes = [
 
     {path: '*', page: NotFoundPage, layout : AdminLayout},
@@ -21,5 +22,6 @@ export const adminRoutes = [
 
     {path: '/admin/order', page: Order, layout : AdminLayout},
     {path : '/admin/category', page : Category, layout : AdminLayout},
-    {path : '/admin/supplier', page : Supplier, layout : AdminLayout}
+    {path : '/admin/supplier', page : Supplier, layout : AdminLayout},
+    {path : '/admin/receipt', page : Receipt, layout : AdminLayout}
 ]

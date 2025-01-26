@@ -1,4 +1,5 @@
 import Supplier from "../model/SupplierModel.js"
+import DetailSupplier from "../model/DetailSupplier.js"
 import mongoose from "mongoose"
 export class SupplierController {
 
@@ -10,9 +11,27 @@ export class SupplierController {
             let [suppliers, totalSupplier] = await Promise.all([
                 Supplier.find({})
                     .skip(startPage)
-                    .limit(limit),
+                    .limit(limit)
+                    .populate({
+                        path: 'supplierDetails',
+                        populate: {
+                            path: 'idProduct',
+                            model: 'Product'
+                        }
+                    }).lean(),
                 Supplier.countDocuments()
             ])
+
+            if (suppliers && suppliers?.length > 0) {
+                suppliers = suppliers.map(supplier => {
+                    supplier?.supplierDetails?.map(item => {
+                        item.product = item.idProduct
+                        delete item.idProduct
+                    })
+                    return supplier
+                })
+
+            }
             const totalPage = Math.ceil(totalSupplier / limit)
             return res.status(200).json({
                 suppliers,
@@ -32,15 +51,41 @@ export class SupplierController {
 
     static async addSupplier(req, res, next) {
         try {
-            const { name, phone, address, email } = req.body
-            const supplier = new Supplier({
+            const { name, phone, address, email, products } = req.body
+            const savedSupplier = new Supplier({
                 name,
-                email,
                 phone,
                 address,
                 email
             })
-            await supplier.save()
+            await savedSupplier.save()
+            const detailSupplier = await Promise.all(
+                products.map((product) => {
+                    return DetailSupplier.create({
+                        idSupplier: savedSupplier?._id.toString(),
+                        idProduct: product.idProduct,
+                        price: product.price
+                    })
+                })
+            )
+
+            let supplier = await Supplier.findOne({ _id: savedSupplier?._id.toString() })
+                .populate({
+                    path: 'supplierDetails',
+                    populate: {
+                        path: 'idProduct',
+                        model: 'Product'
+                    }
+                }).lean()
+
+            if (supplier) {
+                if (supplier?.supplierDetails?.length > 0) {
+                    supplier?.supplierDetails?.map(item => {
+                        item.product = item.idProduct
+                        delete item.idProduct
+                    })
+                }
+            }
             return res.status(200).json({
                 supplier,
                 status: 201
@@ -78,7 +123,7 @@ export class SupplierController {
         }
         catch (error) {
             return res.status(500).json({
-                message : `Fail when update supplier : ${error}`
+                message: `Fail when update supplier : ${error}`
             })
         }
     };

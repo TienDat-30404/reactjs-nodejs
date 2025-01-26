@@ -32,6 +32,30 @@ export default function SidebarAdmin() {
                     <i class="bi bi-person-video2"></i>
                     <p class="nav-link">Supplier</p>
                 </li>
+                <li onClick={() => navigate('/admin/receipt')} class="nav-item">
+                    <i class="bi bi-person-video2"></i>
+                    <p class="nav-link">Receipt</p>
+                </li>
+                {/* <li onClick={() => navigate('/admin/voucher')} class="nav-item">
+                    <i class="bi bi-person-video2"></i>
+                    <p class="nav-link">Voucher</p>
+                </li>
+                <li onClick={() => navigate('/admin/discount')} class="nav-item">
+                    <i class="bi bi-person-video2"></i>
+                    <p class="nav-link">Discount</p>
+                </li>
+                <li onClick={() => navigate('/admin/role')} class="nav-item">
+                    <i class="bi bi-person-video2"></i>
+                    <p class="nav-link">Role</p>
+                </li>
+                <li onClick={() => navigate('/admin/review')} class="nav-item">
+                    <i class="bi bi-person-video2"></i>
+                    <p class="nav-link">Review</p>
+                </li>
+                <li onClick={() => navigate('/admin/review')} class="nav-item">
+                    <i class="bi bi-person-video2"></i>
+                    <p class="nav-link">Review</p>
+                </li> */}
             </ul>
         </div>
     )
