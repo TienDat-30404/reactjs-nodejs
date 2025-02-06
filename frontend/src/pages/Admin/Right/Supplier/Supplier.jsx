@@ -47,7 +47,7 @@ export default function Supplier() {
 
                 const [responseSupplier, responseProduct] = await Promise.all([
                     await getAllSupplier(query),
-                    await getAllProduct()
+                    await getAllProduct('typeDisplay=0')
                 ])
                 if (responseSupplier && responseSupplier.status == 200) {
                     dispatch(initDataSupplier(responseSupplier))
@@ -173,7 +173,7 @@ export default function Supplier() {
                                 </td>
                             </tr>
                         ))
-                    ) : <p>Không có thể loại nào</p>}
+                    ) : <p>Không có nhà cung cấp nào</p>}
 
                 </tbody>
             </table>

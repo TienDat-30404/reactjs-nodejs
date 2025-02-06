@@ -6,5 +6,5 @@ router.get('/get-all-supplier', SupplierController.getAllSupplier)
 router.post('/add-supplier', middlewareAddSupplier, SupplierController.addSupplier)
 router.put('/update-supplier/:idSupplier', middlewareAddSupplier, SupplierController.updateSupplier)
 router.delete('/delete-supplier/:idSupplier', SupplierController.deleteSupplier)
-
+router.delete('/delete-product-of-supplier', SupplierController.deleteProductOfSupplier)
 export default router

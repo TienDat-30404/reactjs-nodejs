@@ -1,10 +1,10 @@
 import Cookies from 'js-cookie'
-export const getAllSupplier = async(query) => {
+export const getAllSupplier = async (query) => {
     try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-supplier?${query}`, {
-            method : 'GET',
-            headers : {
-                'Content-Type' : 'application/json'
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             },
         })
         return response.json()
@@ -13,14 +13,14 @@ export const getAllSupplier = async(query) => {
     }
 }
 
-export const addSupplier = async(data) => {
+export const addSupplier = async (data) => {
     try {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/add-supplier`, {
-            method : 'POST',
-            headers : {
-                'Content-Type' : 'application/json'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
             },
-            body : JSON.stringify(data)
+            body: JSON.stringify(data)
         })
         return response.json()
     } catch (error) {
@@ -31,7 +31,7 @@ export const addSupplier = async(data) => {
 export const updateSupplier = async (id, data) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/update-supplier/${id}`, {
         method: 'PUT',
-        headers : {
+        headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
@@ -44,8 +44,19 @@ export const deleteSupplier = async (id) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-supplier/${id}`, {
         method: 'DELETE',
         headers: {
-            'Authorization': `Bearer ${token}`, 
+            'Authorization': `Bearer ${token}`,
         }
     })
+    return response.json()
+}
+
+export const deleteProductOfSupplier = async (data) => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-product-of-supplier`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
     return response.json()
 }

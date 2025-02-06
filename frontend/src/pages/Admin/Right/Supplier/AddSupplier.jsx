@@ -29,7 +29,7 @@ export default function AddSupplier({ show, close }) {
             }
         ]
     )
-
+    console.log(detailSupplier)
     const handleChangeInputDetailSupplier = (e, index) => {
         const { name, value } = e.target;
 
@@ -47,8 +47,7 @@ export default function AddSupplier({ show, close }) {
 
 
     const handleClickDeleteProduct = (index) => {
-        if(detailSupplier.length === 1)
-        {
+        if (detailSupplier.length === 1) {
             return;
         }
         setDetailSupplier(prev => prev.filter((_, item) => item != index))
@@ -56,7 +55,6 @@ export default function AddSupplier({ show, close }) {
 
     // handle click add product
     const handleClickAddSupplier = async () => {
-        console.log(products)
         inputFocusRef.current.focus()
         const response = await addSupplier({
             name: information.name,
@@ -191,7 +189,7 @@ export default function AddSupplier({ show, close }) {
                         </div>
                     </div>
                     <div className='row'>
-                        <p style={{ fontSize: '19px', paddingTop: '10px' }} className='text-center'>Thêm sản phẩm cho nhà cung cấp</p>
+                        {/* <p style={{ fontSize: '19px', paddingTop: '10px' }} className='text-center'>Thêm sản phẩm cho nhà cung cấp</p> */}
                         <div className='d-flex justify-content-evenly'>
                             <div className='px-4 py-2 col-4'>
                                 <label style={{ fontSize: '14px' }} className="form-label w-100">Product</label>
@@ -202,7 +200,6 @@ export default function AddSupplier({ show, close }) {
                         </div>
                     </div>
 
-
                     {detailSupplier?.length > 0 &&
                         detailSupplier?.map((item, index) => (
                             <div className='d-flex justify-content-evenly'>
@@ -210,7 +207,7 @@ export default function AddSupplier({ show, close }) {
                                     <select
                                         value={item.idProduct}
                                         name="idProduct"
-                                        className={`form-control ${errors.idCategory ? 'is-invalid' : ''} `}
+                                        className={`form-control ${errors.product ? 'is-invalid' : ''} `}
                                         onChange={(e) => handleChangeInputDetailSupplier(e, index)}
                                     >
                                         <option value="0" checked>Chọn sản phẩm</option>
@@ -225,6 +222,8 @@ export default function AddSupplier({ show, close }) {
                                             ))
                                         ) : <option>Hiện không có sản phẩm nào</option>}
                                     </select>
+                                    {errors.product && <ErrorMessageInput errors={errors} field="product" />}
+
                                 </div>
 
                                 <div className='px-4 py-2 col-5'>
@@ -235,11 +234,11 @@ export default function AddSupplier({ show, close }) {
                                                 value={item.price}
                                                 onChange={(e) => handleChangeInputDetailSupplier(e, index)}
 
-                                                className={`form-control ${errors.email ? 'is-invalid' : ''} `}
+                                                className={`form-control ${errors.price ? 'is-invalid' : ''} `}
                                                 ref={inputFocusRef}
-                                                placeholder={errors.email ? errors.email : ""}
+                                                placeholder={errors.price ? errors.price : ""}
                                             />
-                                            {information.email != "" && errors.email && <ErrorMessageInput errors={errors} field="price" />}
+                                            {information?.price != "" && errors.price && <ErrorMessageInput errors={errors} field="price" />}
                                         </div>
                                         <div className='d-flex '>
                                             <i
@@ -260,7 +259,7 @@ export default function AddSupplier({ show, close }) {
                                         </div>
                                     </div>
                                 </div>
-                              
+
                             </div>
                         ))}
 

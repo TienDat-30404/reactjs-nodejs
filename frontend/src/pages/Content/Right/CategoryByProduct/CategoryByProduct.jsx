@@ -26,7 +26,7 @@ export default function Category() {
   useEffect(() => {
     const fetchDatasProduct = async () => {
       if (_id && (!isPageReset || page === 1)) {
-        const query = `page=${page}&sortBy=idProduct&type=asc&limit=${limit}&idCategory=${_id}`;
+        const query = `page=${page}&sortBy=idProduct&type=asc&limit=${limit}&idCategory=${_id}&typeDisplay=1`;
         const response = await getAllProduct(query);
         console.log(response);
         if (response) {

@@ -8,8 +8,8 @@ import { initDataReceipt } from '../../../../redux/Receipt/receiptsSlice'
 import { getAllSupplier } from '../../../../services/SupplierService'
 import { initDataSupplier } from '../../../../redux/Supplier/suppliersSlice'
 import AddReceipt from './AddReceipt'
-import { getAllSizeService } from '../../../../services/SizeService'
-import { initDataSize } from '../../../../redux/Size/sizesSlice'
+import { initDataProduct } from '../../../../redux/Products/productsSlice'
+import { getAllProduct } from '../../../../services/ProductService'
 
 export default function Receipt() {
     const dispatch = useDispatch()
@@ -43,10 +43,10 @@ export default function Receipt() {
                 // }
 
 
-                const [responseReceipt, responseSupplier, responseAttribute] = await Promise.all([
+                const [responseReceipt, responseSupplier, responseProduct] = await Promise.all([
                     await getAllReceipt(query),
                     await getAllSupplier(),
-                    await getAllSizeService()
+                    await getAllProduct('typeDisplay=0')
                 ])
                 if (responseReceipt && responseReceipt.status == 200) {
                     dispatch(initDataReceipt(responseReceipt))
@@ -54,8 +54,8 @@ export default function Receipt() {
                 if (responseSupplier && responseSupplier.status == 200) {
                     dispatch(initDataSupplier(responseSupplier))
                 }
-                if (responseSupplier && responseSupplier.status == 200) {
-                    dispatch(initDataSize(responseSupplier))
+                if (responseProduct && responseProduct.status == 200) {
+                    dispatch(initDataProduct(responseProduct))
                 }
             }
             catch (error) {
@@ -97,8 +97,8 @@ export default function Receipt() {
         <div className='px-4 py-2 bg-white product'>
             <div className='d-flex justify-content-between'>
                 <div className='d-flex align-items-center'>
-                    <h3>Supplier</h3>
-                    <h6 className='ms-3'>({totalReceipt} supplier found)</h6>
+                    <h3>Receipt</h3>
+                    <h6 className='ms-3'>({totalReceipt} receipt found)</h6>
                     <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo phiếu nhập</button>
                 </div>
                 <div className='d-flex align-items-center'>
@@ -171,7 +171,7 @@ export default function Receipt() {
                                 </td>
                             </tr>
                         ))
-                    ) : <p>Không có thể loại nào</p>}
+                    ) : <p>Không có phiếu nhập nào</p>}
 
                 </tbody>
             </table>

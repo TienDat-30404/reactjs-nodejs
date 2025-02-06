@@ -18,13 +18,19 @@ export default class ProductController {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 5
             const startPage = (page - 1) * limit;
-
             const sortBy = req.query.sortBy || 'idProduct';
             const type = req.query.type === "asc" ? 1 : -1;
-            const objectSort = {};
+            const objectSort = {}
             objectSort[sortBy] = type;
 
-            const objectFilter = {};
+            const objectFilter = {
+                deletedAt: null
+            };
+            // if (req.query.typeDisplay !== "0") {
+            //     objectFilter.priceImport = { $ne: null }
+            //     objectFilter.priceBought = { $ne: null }
+            // }
+
             if (req.query.idProduct) {
                 if (mongoose.Types.ObjectId.isValid(req.query.idProduct)) {
                     objectFilter._id = req.query.idProduct
@@ -79,6 +85,7 @@ export default class ProductController {
                     .populate('reviews')
                     .populate({
                         path: 'productAttributes',
+                        // match: { priceImport: { $ne: null }, priceBought: { $ne: null } }, 
                         populate: {
                             path: 'idSize',
                             model: 'Size',
@@ -115,9 +122,9 @@ export default class ProductController {
                 products: formattedProducts,
                 page,
                 totalProduct,
+                objectFilter,
                 totalPage,
                 limit,
-                objectFilter,
                 status: 200
             });
         } catch (error) {
@@ -185,7 +192,7 @@ export default class ProductController {
             return res.status(201).json(
                 {
                     product,
-                    status : 201
+                    status: 201
                 }
             )
         }
@@ -318,6 +325,12 @@ export default class ProductController {
                 )
 
             detailProduct = detailProduct.toObject()
+
+            // Sắp xếp productAttributes: cái nào có priceBought trước, null sau
+            detailProduct.productAttributes.sort((a, b) => {
+                return (a.priceBought === null) - (b.priceBought === null);
+            });
+
             detailProduct.productAttributes.map(item => {
                 if (item.idSize) {
                     item.size = item.idSize

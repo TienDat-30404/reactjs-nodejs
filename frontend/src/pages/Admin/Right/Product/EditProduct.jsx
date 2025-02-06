@@ -19,7 +19,6 @@ export default function EditProduct({ data, show, close }) {
     const [selectedOptions, setSelectedOptions] = useState([]);
 
     useEffect(() => {
-            console.log(data)
             setProduct({
                 name: data?.name || '',
                 idCategory: data?.category?._id || '',

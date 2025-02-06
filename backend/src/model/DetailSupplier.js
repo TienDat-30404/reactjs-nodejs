@@ -5,7 +5,7 @@ const DetailSupplierSchema = Schema(
         idSupplier: { type: Schema.Types.ObjectId, ref: 'Supplier' },
         idProduct: { type: Schema.Types.ObjectId, ref: 'Product' },
         price : {type : Number},
-        deletedAt: { type: Date } 
+        deletedAt: { type: Date, default : null } 
     },
     {
         timestamps : true

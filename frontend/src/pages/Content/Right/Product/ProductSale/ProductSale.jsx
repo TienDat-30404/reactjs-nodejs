@@ -17,8 +17,10 @@ export default function ProductSale() {
     // get all product
     useEffect(() => {
         const fetchDatasProduct = async () => {
-            const query = `page=${page}&sortBy=idProduct&type=asc&limit=${limit}`
+            const query = `page=${page}&sortBy=idProduct&type=asc&limit=${limit}&typeDisplay=1`
+            console.log(query)
             const response = await getAllProduct(query)
+            console.log(response)
             if (response) {
                 dispatch(initDataProduct(response))
             }
@@ -40,7 +42,7 @@ export default function ProductSale() {
         }
     }
 
-   
+
 
 
     return (
@@ -60,46 +62,47 @@ export default function ProductSale() {
             </div>
             <div className='row pb-3 d-flex ms-3 product'>
                 {products.length > 0 ? (
-                    products.map((product, index) => (
-                        <CartProduct
-                            key={index}
-                            id={product._id}
-                            image={product.image}
-                            name={product.name}
-                            priceNotDiscount={
-                                product?.discount && product?.discount?.length > 0 ?
-                                    (product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN') + "đ"
-                                    :
-                                    ""
-                            }
-                            percentDiscount={
-                                product?.discount && product?.discount?.length > 0 ?
-                                    ((1 - product.discount[0].discountValue) * 100).toFixed(0) + "%"
-                                    :
-                                    ""
-                            }
-                            price=
-                            {
-                                product?.discount && product?.discount.length > 0 ?
-                                    (product?.productAttributes[0]?.priceBought * product.discount[0].discountValue).toLocaleString('vi-VN')
-                                    :
-                                    (product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN')
-                            }
-                            widthImage="100px"
-                            heightImage="200px"
-                            totalReview = {
-                                product?.reviews?.length > 0
-                                ? 
-                                (product?.reviews?.reduce((sum, review) => sum + review?.rating, 0) / product?.reviews?.length).toFixed(2)
-                                :
-                                0
-                            }
-                        />
-                    ))) :
+                    products.map((product, index) => {
+                        const indexPriceAttribute = product?.productAttributes?.find(attr => attr.priceBought !== null);
+
+                        if (!indexPriceAttribute) return null;
+
+                        return (
+                            <CartProduct
+                                key={index}
+                                id={product?._id}
+                                image={product?.image}
+                                name={product?.name}
+                                priceNotDiscount={
+                                    product?.discount?.length > 0
+                                        ? (indexPriceAttribute?.priceBought * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN') + "đ"
+                                        : ""
+                                }
+                                percentDiscount={
+                                    product?.discount?.length > 0
+                                        ? ((1 - product?.discount[0]?.discountValue) * 100).toFixed(0) + "%"
+                                        : ""
+                                }
+                                price={
+                                    product?.discount?.length > 0
+                                        ? (indexPriceAttribute.priceBought * product?.discount[0]?.discountValue * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN')
+                                        : (indexPriceAttribute.priceBought * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN')
+                                }
+                                widthImage="100px"
+                                heightImage="200px"
+                                totalReview={
+                                    product?.reviews?.length > 0
+                                        ? (product?.reviews?.reduce((sum, review) => sum + review?.rating, 0) / product?.reviews?.length).toFixed(2)
+                                        : 0
+                                }
+                            />
+                        );
+                    })
+                ) : (
                     <div className="loading">
                         <div className="spinner"></div>
                     </div>
-                }
+                )}
                 <div className='d-flex justify-content-center align-items-center mt-3'>
                     <button disabled={page == 1} onClick={() => handlePrevPage()} type="button" className="btn btn-light me-3">Primary</button>
                     <button disabled={page >= totalPage} onClick={() => handleNextPage()} type="button" className="btn btn-light">Next</button>

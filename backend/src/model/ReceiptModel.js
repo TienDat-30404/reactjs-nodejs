@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 const ReceiptSchema = Schema(
     {
         idUser: { type: Schema.Types.ObjectId, ref: 'User' },
+        name : {type : String},
         idSupplier: { type: Schema.Types.ObjectId, ref: 'Supplier' },
         totalPrice: { type: Number },
         deletedAt : {type : Date, default : null}

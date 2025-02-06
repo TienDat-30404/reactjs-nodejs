@@ -9,11 +9,12 @@ export class SupplierController {
             const limit = parseInt(req.query.limit) || 5
             const startPage = (page - 1) * limit
             let [suppliers, totalSupplier] = await Promise.all([
-                Supplier.find({})
+                Supplier.find({deletedAt : null})
                     .skip(startPage)
                     .limit(limit)
                     .populate({
                         path: 'supplierDetails',
+                        match : {deletedAt : null},
                         populate: {
                             path: 'idProduct',
                             model: 'Product'
@@ -104,19 +105,56 @@ export class SupplierController {
             if (!mongoose.Types.ObjectId.isValid(idSupplier)) {
                 return res.status(400).json({ message: "Invalid Supplier ID" });
             }
-            const { name, phone, address, email } = req.body
-            const dataUpdate = await Supplier.findByIdAndUpdate(idSupplier,
+            const { name, phone, address, email, products } = req.body
+
+            await Supplier.findByIdAndUpdate(idSupplier,
                 {
                     name,
                     phone,
                     address,
                     email
-                }, {
-                new: true,
-                runValidators: true,
-            })
+                },
+                {
+                    new: true,
+                    runValidators: true
+                }
+            )
+            if (products?.length > 0) {
+                await Promise.all(products?.map((product) =>
+                    DetailSupplier.findOneAndUpdate(
+                        {
+                            idSupplier,
+                            idProduct: product?.idProduct
+                        },
+                        {
+                            $set: { price: product?.price }
+                        },
+                        {
+                            new: true,
+                            upsert: true
+                        }
+                    )
+                ))
+            }
+
+            const dataUpdate = await Supplier.findOne({ _id: idSupplier })
+                .populate({
+                    path: 'supplierDetails',
+                    populate: {
+                        path: 'idProduct',
+                        model: 'Product'
+                    }
+                }).lean()
+
+            if (dataUpdate && dataUpdate?.supplierDetails?.length > 0) {
+                dataUpdate?.supplierDetails?.map(item => {
+                    item.product = item.idProduct
+                    delete item.idProduct
+                    return item
+                })
+            }
             return res.status(200).json({
-                message: "Update Successfully",
+                message: "Update Supplier Successfully",
                 dataUpdate,
                 status: 200
             })
@@ -131,10 +169,28 @@ export class SupplierController {
     static async deleteSupplier(req, res, next) {
         try {
             const idSupplier = req.params.idSupplier
-            const supplier = await Supplier.deleteOne({ _id: idSupplier })
-            if (supplier.deletedCount > 0) {
+            const [supplier, detailSuppliers] = await Promise.all([
+                Supplier.deleteOne(
+                    {
+                        _id: idSupplier,
+                    },
+                    {
+                        deletedAt: new Date()
+                    }
+                ),
+                DetailSupplier.deleteMany(
+                    {
+                        idSupplier
+                    },
+                    {
+                        deletedAt: new Date()
+                    }
+                )
+            ])
+            console.log(supplier)
+            console.log(detailSuppliers)
+            if (supplier.deletedCount > 0 && detailSuppliers.deletedCount > 0) {
                 return res.status(200).json({
-                    supplier,
                     message: "Xóa nhà cung cấp thành công",
                     status: 200
                 })
@@ -145,4 +201,23 @@ export class SupplierController {
             return res.status(500).json({ message: `Fail when delete supplier : ${error}` })
         }
     }
+
+    static async deleteProductOfSupplier(req, res, next) {
+        const { idSupplier, idProduct } = req.body
+        const result = await DetailSupplier.deleteOne(
+            {
+                idSupplier,
+                idProduct
+            },
+            {
+                deletedAt: new Date()
+            }
+        )
+        return res.status(200).json({
+            status: 200,
+            result
+        })
+    }
+
+
 }

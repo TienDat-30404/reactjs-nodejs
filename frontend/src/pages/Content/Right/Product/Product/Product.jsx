@@ -13,10 +13,9 @@ export default function Product() {
     const products = useSelector(state => state.products.products)
     useEffect(() => {
         const fetchDatasProduct = async () => {
-            const listProduct = await getAllProduct(page, 'idProduct', 'asc',limit)
+            const listProduct = await getAllProduct(page, 'idProduct', 'asc', limit)
             console.log(listProduct)
-            if(listProduct)
-            {
+            if (listProduct) {
                 dispatch(initDataProduct(listProduct))
             }
         }
@@ -83,24 +82,30 @@ export default function Product() {
                         </div>
                     </div>
                     {products.length > 0 ? (
-                        products.map((product, index) => (
-                            <CartProduct
-                                key={index}
-                                id={product._id}
-                                image={product?.image}
-                                name={product.name}
-                                price={(product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN')}
-                            />
-                        ))) :
+                        products.map((product, index) => {
+                            
+                            const indexPriceAttribute = product?.productAttributes.find(attr => attr.priceBought != null)
+                            if (!indexPriceAttribute) return;
+                            
+                            return (
+                                <CartProduct
+                                    key={index}
+                                    id={product._id}
+                                    image={product?.image}
+                                    name={product.name}
+                                    price={(indexPriceAttribute.priceBought).toLocaleString('vi-VN')}
+                                />
+                            )
+                        })) :
                         <div className="loading">
                             <div className="spinner"></div>
                         </div>
-                    } 
+                    }
                     <div className='d-flex justify-content-center align-items-center mt-3'>
                         <button disabled={page == 1} onClick={handlePrevPage} type="button" className="btn btn-light me-3">Primary</button>
                         <button disabled={page >= totalPage} onClick={handleNextPage} type="button" className="btn btn-light">Next</button>
                     </div>
-                    <span className='text-center mt-2'>Page {page} of {totalPage}</span> 
+                    <span className='text-center mt-2'>Page {page} of {totalPage}</span>
 
 
                 </div>

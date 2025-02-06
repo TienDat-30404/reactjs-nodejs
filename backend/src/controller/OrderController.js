@@ -221,7 +221,11 @@ export default class OrderController {
                         populate: [
                             {
                                 path: 'idProduct',
-                                model: 'Product'
+                                model: 'Product',
+                                populate : {
+                                    path : 'discount',
+                                    model : 'Discount'
+                                }
                             },
                             {
                                 path: 'idSize',

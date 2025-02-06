@@ -38,7 +38,7 @@ export default function Product() {
     const fetchData = async () => {
 
       try {
-        let queryProduct = `page=${page}&limit=${limit}`
+        let queryProduct = `page=${page}&limit=${limit}&typeDisplay=0`
         if (searchCriteria.name != "") {
           queryProduct += `&search=${searchCriteria.name}`
         }

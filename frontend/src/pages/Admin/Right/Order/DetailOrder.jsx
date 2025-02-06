@@ -4,12 +4,17 @@ import { confirmOrder } from '../../../../services/OrderService';
 import { useSelector, useDispatch } from 'react-redux';
 import { confirmOrderRedux } from '../../../../redux/Order/ordersSlice';
 export default function DetailOrder({ show, close, data }) {
+    console.log(data)
     const dispatch = useDispatch()
     const statuss = useSelector(state => state?.statuss?.data)
     const [status, setStatus] = useState('')
     const { isAuhenticated, userData } = useSelector((state) => state.auth);
-    const totalPrice = data?.orderDetails.reduce((sum, order) => {
-        return sum + order?.quantity * order?.attribute?.priceBought
+    const totalPrice = data?.orderDetails?.reduce((sum, order) => {
+        return sum +
+            order?.quantity *
+            order?.attribute?.priceBought *
+            order?.attribute?.size?.sizePriceMultiplier *
+            (order?.attribute?.product?.discount?.length > 0 ? order?.attribute?.product?.discount[0]?.discountValue : 1)
     }, 0)
 
     useEffect(() => {
@@ -23,13 +28,12 @@ export default function DetailOrder({ show, close, data }) {
                     status: status,
                     staff: userData.dataLogin.idUser
                 })
-                if(response && response.status === 200)
-                {
+                if (response && response.status === 200) {
                     dispatch(confirmOrderRedux({
-                        idOrder : data?._id,
-                        status : response?.order?.status,
-                        staff : response?.order?.staff,
-                        updatedAt : response?.order?.updatedAt
+                        idOrder: data?._id,
+                        status: response?.order?.status,
+                        staff: response?.order?.staff,
+                        updatedAt: response?.order?.updatedAt
                     }))
                 }
             }
@@ -104,15 +108,27 @@ export default function DetailOrder({ show, close, data }) {
 
                                 </td>
                                 <td style={{ verticalAlign: 'middle' }}>
-
                                     <span
                                         name="quantity">
                                         {order.quantity}
                                     </span>
-
                                 </td>
-                                <td style={{ verticalAlign: 'middle' }}>{order.attribute.priceBought}</td>
-                                <td style={{ verticalAlign: 'middle' }}>{order.attribute.priceBought * order.quantity}</td>
+                                <td style={{ verticalAlign: 'middle' }}>
+                                    {
+                                        order?.attribute?.priceBought * order?.attribute?.size?.sizePriceMultiplier *
+                                        (order?.attribute?.product?.discount.length > 0 ?
+                                            order?.attribute?.product?.discount[0]?.discountValue : 1
+                                        )
+                                    }
+                                </td>
+                                <td style={{ verticalAlign: 'middle' }}>
+                                    {
+                                        order?.attribute?.priceBought * order?.attribute?.size?.sizePriceMultiplier * order?.quantity *
+                                        (order?.attribute?.product?.discount.length > 0 ?
+                                            order?.attribute?.product?.discount[0]?.discountValue : 1
+                                        )
+                                    }
+                                </td>
                             </tr>
                         ))}
                     </tbody>

@@ -82,7 +82,7 @@ export default function Search() {
             setType('asc')
         }
         dispatch(switchPage(1))
-        
+
     }
 
     return (
@@ -146,33 +146,38 @@ export default function Search() {
                     {products ? (
                         <div>
                             <div className='d-flex'>
-                                {products.map((product, index) => (
-                                    <CartProduct
-                                        key={index}
-                                        id={product._id}
-                                        image={product.image}
-                                        name={product.name}
-                                        priceNotDiscount={
-                                            product?.discount && product?.discount?.length > 0 ?
-                                                (product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN') + "đ"
-                                                :
-                                                ""
-                                        }
-                                        percentDiscount={
-                                            product?.discount && product?.discount?.length > 0 ?
-                                                ((1 - product.discount[0].discountValue) * 100).toFixed(0) + "%"
-                                                :
-                                                ""
-                                        }
-                                        price=
-                                        {
-                                            product?.discount && product?.discount.length > 0 ?
-                                                (product?.productAttributes[0]?.priceBought * product.discount[0].discountValue).toLocaleString('vi-VN')
-                                                :
-                                                (product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN')
-                                        }
-                                    />
-                                ))}
+                                {products.map((product, index) => {
+                                    const indexPriceAttribute = product?.productAttributes?.find(attr => attr.priceBought !== null)
+                                    if (!indexPriceAttribute) return;
+
+                                    return (
+                                        <CartProduct
+                                            key={index}
+                                            id={product._id}
+                                            image={product.image}
+                                            name={product.name}
+                                            priceNotDiscount={
+                                                product?.discount && product?.discount?.length > 0 ?
+                                                    (indexPriceAttribute?.priceBought).toLocaleString('vi-VN') + "đ"
+                                                    :
+                                                    ""
+                                            }
+                                            percentDiscount={
+                                                product?.discount && product?.discount?.length > 0 ?
+                                                    ((1 - product.discount[0].discountValue) * 100).toFixed(0) + "%"
+                                                    :
+                                                    ""
+                                            }
+                                            price=
+                                            {
+                                                product?.discount && product?.discount.length > 0 ?
+                                                    (indexPriceAttribute?.priceBought * product.discount[0].discountValue).toLocaleString('vi-VN')
+                                                    :
+                                                    (indexPriceAttribute?.priceBought).toLocaleString('vi-VN')
+                                            }
+                                        />
+                                    )
+                                })}
                             </div>
                             {products.length > 0 ? (
                                 <div>

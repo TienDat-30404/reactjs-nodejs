@@ -55,9 +55,8 @@ export default function Detail() {
 
         toast.success("Thêm vào giỏ hàng thành công")
     }
-
     const totalReview = details?.detailProduct?.reviews?.length > 0 ? (details?.detailProduct?.reviews?.reduce((sum, review) => sum + review?.rating, 0) / details?.detailProduct?.reviews?.length).toFixed(2) : 0
-    console.log(Math.ceil(totalReview))
+    console.log(details)
     return (
         <div className="container mt-3 detail">
 
@@ -89,7 +88,7 @@ export default function Detail() {
                                     src={details.detailProduct.image}
                                 />
                             </div>
-        
+
                         </div>
                     </div>
 
@@ -118,7 +117,7 @@ export default function Detail() {
                                 })}
                                 <p className='me-2 ms-1'>
                                     (
-                                    {details?.detailProduct?.reviews?.length > 0 ? 
+                                    {details?.detailProduct?.reviews?.length > 0 ?
                                         details?.detailProduct?.reviews?.length : 0
                                     })
                                 </p>
@@ -182,24 +181,29 @@ export default function Detail() {
                         </div>
                         <h6 className='mt-2 mb-0'>Kích thước</h6>
                         <div className='mt-3 click_number'>
-                            {details?.detailProduct?.productAttributes.map((attribute, index) => (
-                                <>
-                                    <button
-                                        onClick={() => handleSelectedSize(index)}
-
-                                        type="button"
-                                        className={`btn me-2 ${index === size ? 'bg-secondary text-white' : ''}`} >
-                                        {attribute.size.name}
-                                    </button>
-                                </>
-                            ))}
+                            {details?.detailProduct?.productAttributes.map((attribute, index) => {
+                                if (attribute?.priceBought === null) return;
+                                return (
+                                    <>
+                                        <button
+                                            onClick={() => handleSelectedSize(index)}
+                                            type="button"
+                                            className={`btn me-2 ${index === size ? 'bg-secondary text-white' : ''}`} >
+                                            {attribute.size.name}
+                                        </button>
+                                    </>
+                                )
+                            })}
                         </div>
                         <h6 className='mt-3 mb-0'>Tạm tính</h6>
                         <div className="d-flex align-items-center">
                             {details?.detailProduct?.discount?.length > 0 ? (
                                 <div className='d-flex align-items-center'>
-                                    <h5 className='py-2 text-decoration-line-through text-danger'>{(details?.detailProduct?.productAttributes[size].priceBought).toLocaleString('vi-VN')}đ</h5>
-                                    <h6 className='me-5'>-{((1 - details?.detailProduct?.discount[0].discountValue) * 100).toFixed(0)}%</h6>
+                                    <h5 className='py-2 text-decoration-line-through text-danger'>
+                                        {(details?.detailProduct?.productAttributes[size]?.priceBought * details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier).toLocaleString('vi-VN')}
+                                        đ
+                                    </h5>
+                                    <h6 className='me-5'>-{((1 - details?.detailProduct?.discount[0]?.discountValue) * 100).toFixed(0)}%</h6>
                                 </div>
                             ) : ""}
 
@@ -208,7 +212,8 @@ export default function Detail() {
                                 {(details?.detailProduct?.productAttributes[size].priceBought *
                                     (details?.detailProduct?.discount.length > 0 ?
                                         details?.detailProduct?.discount[0].discountValue : 1
-                                    )
+                                    ) *
+                                    details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier
                                 )
                                     .toLocaleString('vi-VN')}đ
                             </h5>

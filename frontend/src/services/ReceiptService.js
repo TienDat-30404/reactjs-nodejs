@@ -17,7 +17,7 @@ export const getAllReceipt = async (query) => {
 
 export const addReceipt = async (data) => {
     try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/add-supplier`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/add-receipt`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

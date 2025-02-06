@@ -1,6 +1,6 @@
-import { populate } from "dotenv";
 import DetailReceipt from "../model/DetailReceipt.js";
 import Receipt from "../model/ReceiptModel.js";
+import ProductAttribute from '../model/ProductAttribute.js'
 export default class ReceiptController {
 
     static async getAllReceipt(req, res, next) {
@@ -66,22 +66,42 @@ export default class ReceiptController {
 
     static async importProduct(req, res, next) {
         try {
-            const { idUser, idSupplier, totalPrice, products } = req.body
+            const { idUser, name, idSupplier, totalPrice, products } = req.body
             const savedReceipt = await Receipt.create({
                 idUser,
+                name,
                 idSupplier,
                 totalPrice
             })
             const detailReceipt = await Promise.all(
-                products.map((product) => {
-                    return DetailReceipt.create({
+                products.map(async (product) => {
+                    await DetailReceipt.create({
                         idReceipt: savedReceipt?._id,
                         idProduct: product?.idProduct,
                         idAttribute: product?.idAttribute,
                         priceImport: product?.price,
                         quantity: product?.quantity
-                    })
+                    });
+
+                    await ProductAttribute.updateOne(
+                        {
+                            idProduct : product?.idProduct,
+                            idSize : product?.idAttribute
+                        },
+                        {
+                            $set : {
+                                priceImport : product?.price,
+                                priceBought : product?.price + ( (20 * product?.price) / 100 )
+                            },
+                            $inc : {
+                                quantity : product?.quantity
+                            }
+                        }
+                    )
+                    
+
                 })
+
             )
 
             let receipt = await Receipt.findOne({ _id: savedReceipt?._id.toString() })

@@ -38,11 +38,26 @@ export const suppliersSlice = createSlice({
         deleteSupplierRedux  : (state, action) => {   
             const idSupplier = action.payload
             const index = state.data.findIndex(supplier => supplier._id === idSupplier)
-            state.data.splice(index, 1)
-            state.totalSupplier -= 1
+            if(index != -1)
+            {
+                console.log(state.data)
+                state.data.splice(index, 1)
+                state.totalSupplier -= 1
+            }
         },
+
+
+        deleteProductOfSupplierRedux : (state, action) => {
+            const idSupplier = action.payload
+            console.log(idSupplier)
+            const index = state.data.findIndex(supplier => supplier._id === idSupplier)
+            if(index != -1)
+            {
+                state.data[0]?.supplierDetails.splice(0, 1)
+            }
+        }
     }
 })
 
-export const {initDataSupplier, addSupplierRedux, switchPage, updateSupplierRedux, deleteSupplierRedux} = suppliersSlice.actions
+export const {initDataSupplier, addSupplierRedux, switchPage, updateSupplierRedux, deleteSupplierRedux, deleteProductOfSupplierRedux} = suppliersSlice.actions
 export default suppliersSlice.reducer

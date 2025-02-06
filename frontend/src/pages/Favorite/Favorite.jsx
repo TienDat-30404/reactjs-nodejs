@@ -15,7 +15,7 @@ export default function Favorite() {
   const totalPage = useSelector(state => state?.favorites.totalPage)
   const favorites = useSelector(state => state?.favorites?.data)
   const totalFavorite = useSelector(state => state?.favorites?.totalFavorite)
- 
+
   useEffect(() => {
 
     const query = `idUser=${idUser}&page=${page}&limit=${limit}`
@@ -45,8 +45,7 @@ export default function Favorite() {
         if (favorites?.length === 1 && page > 1) {
           dispatch(switchPage(page - 1))
         }
-        else if(favorites?.length === 1)
-        {
+        else if (favorites?.length === 1) {
           console.log("123")
           dispatch(switchPage(page - 1))
         }
@@ -59,17 +58,22 @@ export default function Favorite() {
   return (
     <div className='col-9 row bg-white'>
       {favorites.length > 0 && totalFavorite > 0 ?
-        favorites?.map((favorite, index) => (
-          <div key={index} class=" col-3 mt-2">
-            <img style={{ width: '220px', height: '200px' }} src={favorite?.product?.image} class="card-img-top" alt="..." />
-            <div class="card-body">
-              <h6 class="card-title text-center mt-1">{favorite?.product?.name}</h6>
-              <p class="card-text text-primary text-center fw-semibold mt-1">{(favorite?.product?.productAttributes[0]?.priceBought).toLocaleString('vi-VN')}đ</p>
-              <button onClick={() => navigate(`/detail/${favorite?.product?._id}`)} type="button" class="btn btn-outline-primary text-center w-100 mt-1">Chi tiết sản phẩm</button>
-              <p onClick={() => handleDeleteFavorite(favorite?._id)} style={{ cursor: 'pointer' }} class="text-center text-danger mt-1">Xóa sản phẩm</p>
+        favorites?.map((favorite, index) => {
+          const indexPriceAttribute = favorite?.product?.productAttributes?.find(attr => attr.priceBought !== null)
+          if (!indexPriceAttribute) return;
+
+          return (
+            <div key={index} class=" col-3 mt-2">
+              <img style={{ width: '220px', height: '200px' }} src={favorite?.product?.image} class="card-img-top" alt="..." />
+              <div class="card-body">
+                <h6 class="card-title text-center mt-1">{favorite?.product?.name}</h6>
+                <p class="card-text text-primary text-center fw-semibold mt-1">{(indexPriceAttribute?.priceBought).toLocaleString('vi-VN')}đ</p>
+                <button onClick={() => navigate(`/detail/${favorite?.product?._id}`)} type="button" class="btn btn-outline-primary text-center w-100 mt-1">Chi tiết sản phẩm</button>
+                <p onClick={() => handleDeleteFavorite(favorite?._id)} style={{ cursor: 'pointer' }} class="text-center text-danger mt-1">Xóa sản phẩm</p>
+              </div>
             </div>
-          </div>
-        )) :
+          )
+        }) :
         <div className='text-center'>
           <img style={{ width: '300px' }} src="https://www.freeiconspng.com/uploads/favorites-icon-png-30.png" alt="" />
           <p className='fs-4'>Bạn chưa thêm vào danh sách yêu thích sản phẩm nào</p>

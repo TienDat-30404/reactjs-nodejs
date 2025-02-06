@@ -95,10 +95,10 @@ export default function Cart() {
         (cart?.attribute?.priceBought * cart?.quantity *
             (cart?.attribute?.product?.discount?.length > 0 ?
                 cart?.attribute?.product.discount[0].discountValue : 1
-            )
+            ) * cart?.attribute?.size?.sizePriceMultiplier
         )
         , 0)
-        
+
     const totalPriceDiscountProduct = cartsCheck.reduce((sum, cart) =>
         sum +
         (
@@ -119,17 +119,15 @@ export default function Cart() {
     }
 
     const handleCheckAllCart = () => {
-        if(cartsCheck.length > 0)
-        {
+        if (cartsCheck.length > 0) {
             setCartsCheck([])
         }
-        else 
-        {
+        else {
             setCartsCheck(carts)
         }
     }
 
-   
+
     return (
         <div className='col-12 container mt-4'>
             <h3 style={{ fontSize: '21px', fontWeight: '500', fontFamily: 'Georgia, serif', width: '100%' }}>GIỎ HÀNG</h3>
@@ -171,8 +169,8 @@ export default function Cart() {
                                         {(cart?.attribute?.priceBought *
                                             (cart?.attribute?.product?.discount?.length > 0 ?
                                                 cart?.attribute?.product?.discount[0]?.discountValue : 1
-                                            ))
-                                            ?.toLocaleString('vi-VN')}đ
+                                            ) * cart?.attribute?.size?.sizePriceMultiplier
+                                        ).toLocaleString('vi-VN')}đ
                                     </span>
                                     <div className='col-2'>
                                         <button
@@ -196,7 +194,7 @@ export default function Cart() {
                                         {(cart?.attribute?.priceBought * cart?.quantity *
                                             (cart?.attribute?.product?.discount?.length > 0 ?
                                                 cart?.attribute?.product?.discount[0]?.discountValue : 1
-                                            )
+                                            ) * cart?.attribute?.size?.sizePriceMultiplier
                                         )
                                             .toLocaleString('vi-VN')}
                                     </span>
