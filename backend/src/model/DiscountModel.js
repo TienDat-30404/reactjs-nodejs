@@ -4,7 +4,8 @@ const DiscountSchema = new Schema(
     {
         idProduct: { type: Schema.Types.ObjectId, required: true, ref: 'Product' },
         discountValue: { type: Number, required: true },
-        endDate : {type : Date, required : true}
+        endDate : {type : Date, required : true},
+        status : {type : Number, default : 1}
     },
     { timestamps: true }
 

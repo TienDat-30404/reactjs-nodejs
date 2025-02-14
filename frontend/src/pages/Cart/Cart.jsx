@@ -94,7 +94,7 @@ export default function Cart() {
         sum +
         (cart?.attribute?.priceBought * cart?.quantity *
             (cart?.attribute?.product?.discount?.length > 0 ?
-                cart?.attribute?.product.discount[0].discountValue : 1
+                (1 - cart?.attribute?.product.discount[0].discountValue) : 1
             ) * cart?.attribute?.size?.sizePriceMultiplier
         )
         , 0)
@@ -168,7 +168,7 @@ export default function Cart() {
                                         className='col-2 '>
                                         {(cart?.attribute?.priceBought *
                                             (cart?.attribute?.product?.discount?.length > 0 ?
-                                                cart?.attribute?.product?.discount[0]?.discountValue : 1
+                                                (1 - cart?.attribute?.product?.discount[0]?.discountValue) : 1
                                             ) * cart?.attribute?.size?.sizePriceMultiplier
                                         ).toLocaleString('vi-VN')}đ
                                     </span>
@@ -193,7 +193,7 @@ export default function Cart() {
                                         className='col-2 text-danger fw-bold'>
                                         {(cart?.attribute?.priceBought * cart?.quantity *
                                             (cart?.attribute?.product?.discount?.length > 0 ?
-                                                cart?.attribute?.product?.discount[0]?.discountValue : 1
+                                                (1 - cart?.attribute?.product?.discount[0]?.discountValue) : 1
                                             ) * cart?.attribute?.size?.sizePriceMultiplier
                                         )
                                             .toLocaleString('vi-VN')}
@@ -261,7 +261,7 @@ export default function Cart() {
                                     useVoucher && useVoucher?.length > 0 ? (
                                         totalPrice * (1 - useVoucher[0]?.discountVoucher)
                                     ) :
-                                        totalPrice
+                                        Math.ceil(totalPrice)
                                 }
                             </p>
                         </div>

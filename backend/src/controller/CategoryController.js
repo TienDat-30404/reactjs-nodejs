@@ -6,16 +6,14 @@ export default class CategoryController {
     static async addCategory(req, res, next) {
         try {
             const { name } = req.body
-            // console.log("name", name)
-            // const result = await cloudinary.uploader.upload(req.file.path);
-            // if (!req.file) {
-            //     return res.status(400).json({ error: "File image is required." });
-            // }
-            // console.log("result", result)
+            const result = await cloudinary.uploader.upload(req.file.path);
+            if (!req.file) {
+                return res.status(400).json({ error: "File image is required." });
+            }
             const category = new Category(
                 {
                     name,
-                    // image: result.secure_url
+                    image: result.secure_url
                 }
             )
             await category.save()

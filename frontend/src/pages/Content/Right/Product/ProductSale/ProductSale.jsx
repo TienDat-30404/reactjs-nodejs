@@ -80,12 +80,12 @@ export default function ProductSale() {
                                 }
                                 percentDiscount={
                                     product?.discount?.length > 0
-                                        ? ((1 - product?.discount[0]?.discountValue) * 100).toFixed(0) + "%"
+                                        ? (product?.discount[0]?.discountValue * 100).toFixed(0) + "%"
                                         : ""
                                 }
                                 price={
                                     product?.discount?.length > 0
-                                        ? (indexPriceAttribute.priceBought * product?.discount[0]?.discountValue * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN')
+                                        ? (indexPriceAttribute.priceBought * (1 - product?.discount[0]?.discountValue) * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN')
                                         : (indexPriceAttribute.priceBought * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN')
                                 }
                                 widthImage="100px"

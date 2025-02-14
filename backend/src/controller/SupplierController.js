@@ -8,19 +8,38 @@ export class SupplierController {
             const page = parseInt(req.query.page) || 1
             const limit = parseInt(req.query.limit) || 5
             const startPage = (page - 1) * limit
+            const objectFilter = { deletedAt: null }
+            if (req.query.idSupplier) {
+                if (mongoose.Types.ObjectId.isValid(req.query.idSupplier)) {
+                    objectFilter._id = req.query.idSupplier
+                } else {
+                    return res.json({
+                        suppliers: [],
+                        page: 1,
+                        totalSupplier: 0,
+                        totalPage: 0,
+                        limit: 0,
+                        status: 200
+                    });
+                }
+            }
+            if(req.query.name)
+            {
+                objectFilter.name = {$regex : req.query.name, $options : 'i'}
+            }
             let [suppliers, totalSupplier] = await Promise.all([
-                Supplier.find({deletedAt : null})
+                Supplier.find(objectFilter)
                     .skip(startPage)
                     .limit(limit)
                     .populate({
                         path: 'supplierDetails',
-                        match : {deletedAt : null},
+                        match: { deletedAt: null },
                         populate: {
                             path: 'idProduct',
                             model: 'Product'
                         }
                     }).lean(),
-                Supplier.countDocuments()
+                Supplier.countDocuments(objectFilter)
             ])
 
             if (suppliers && suppliers?.length > 0) {

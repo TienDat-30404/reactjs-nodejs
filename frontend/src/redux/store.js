@@ -14,6 +14,7 @@ import ordersReducer from './Order/ordersSlice'
 import statussReducer from './Status/statusSlice'
 import suppliersReducer from './Supplier/suppliersSlice'
 import receiptsReducer from './Receipt/receiptsSlice'
+import discountsReducer from './Discount/discountsSlice'
 export default configureStore({
   reducer: {
     auth : authReducer,
@@ -30,6 +31,7 @@ export default configureStore({
     orders : ordersReducer,
     statuss : statussReducer,
     suppliers : suppliersReducer,
-    receipts : receiptsReducer
+    receipts : receiptsReducer,
+    discounts : discountsReducer
   }
 })

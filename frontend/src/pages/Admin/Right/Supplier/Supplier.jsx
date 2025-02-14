@@ -15,7 +15,6 @@ import { initDataProduct } from '../../../../redux/Products/productsSlice'
 export default function Supplier() {
     const dispatch = useDispatch()
     const products = useSelector(state => state.products.products)
-    console.log(products)
     const suppliers = useSelector(state => state?.suppliers.data)
     const page = useSelector(state => state?.suppliers?.page)
     const totalPage = useSelector(state => state?.suppliers?.totalPage)
@@ -24,36 +23,35 @@ export default function Supplier() {
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEdit, setShowEdit] = useState(false)
     const [selectedSupplier, setSelectedSupplier] = useState(null);
-
-    const [displayTextSearch, setDisplayTextSearch] = useState('idCategory')
+    const [displayTextSearch, setDisplayTextSearch] = useState('idSupplier')
     const [searchCriteria, setSearchCriteria] = useState({
-        idCategory: '',
+        idSupplier: '',
         name: ''
     })
 
-
+    console.log(totalPage)
     useEffect(() => {
         const fetchData = async () => {
 
             try {
                 let query = `page=${page}&limit=${limit}`
-                // if (searchCriteria.name != "") {
-                //   query += `&search=${searchCriteria.name}`
-                // }
-                // if (searchCriteria.idCategory != "") {
-                //   query += `&idCategory=${searchCriteria.idCategory}`
-                // }
-
+                if (searchCriteria.idSupplier != "") {
+                    query += `&idSupplier=${searchCriteria.idSupplier}`
+                }
+                if (searchCriteria.name != "") {
+                    query += `&name=${searchCriteria.name}`
+                }
 
                 const [responseSupplier, responseProduct] = await Promise.all([
                     await getAllSupplier(query),
-                    await getAllProduct('typeDisplay=0')
+                    // await getAllProduct('typeDisplay=0')
+                    await getAllProduct()
+
                 ])
                 if (responseSupplier && responseSupplier.status == 200) {
                     dispatch(initDataSupplier(responseSupplier))
                 }
-                if(responseProduct && responseProduct.status === 200)
-                {
+                if (responseProduct && responseProduct.status === 200) {
                     dispatch(initDataProduct(responseProduct))
                 }
             }
@@ -62,7 +60,7 @@ export default function Supplier() {
             }
         }
         fetchData()
-    }, [page, limit])
+    }, [page, limit, displayTextSearch, searchCriteria])
 
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
@@ -86,14 +84,14 @@ export default function Supplier() {
     }
 
     const handleChangeSearchSelect = (e) => {
-        // setSearchCriteria({
-        //     idCategory: '',
-        //     name: ''
-        // })
-        // setDisplayTextSearch(e.target.value)
+        setSearchCriteria({
+            idSupplier: '',
+            name: ''
+        })
+        setDisplayTextSearch(e.target.value)
     }
     return (
-        <div  className='px-4 py-2 bg-white product'>
+        <div className='px-4 py-2 bg-white product'>
             <div className='d-flex justify-content-between'>
                 <div className='d-flex align-items-center'>
                     <h3>Supplier</h3>
@@ -116,23 +114,23 @@ export default function Supplier() {
                 onChange={handleChangeSearchSelect}
                 class="form-select mt-2"
             >
-                <option value="idProduct" selected>Tìm kiếm theo Id</option>
+                <option value="idSupplier" selected>Tìm kiếm theo Id</option>
                 <option value="name">Tìm kiếm theo tên</option>
             </select>
 
 
-            {/* {displayTextSearch && (
-            <div class="input-group mb-3 mt-1">
-                <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
-                <input
-                    type="text"
-                    class="form-control"
-                    name={displayTextSearch}
-                    value={searchCriteria[`${displayTextSearch}`]}
-                    onChange={(e) => handleChangeInput(e, setSearchCriteria)}
-                />
-            </div>
-        )} */}
+            {displayTextSearch && (
+                <div class="input-group mb-3 mt-1">
+                    <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
+                    <input
+                        type="text"
+                        class="form-control"
+                        name={displayTextSearch}
+                        value={searchCriteria[`${displayTextSearch}`]}
+                        onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+                    />
+                </div>
+            )}
 
 
             <table class="table">

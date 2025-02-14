@@ -16,7 +16,7 @@ export default function EditSupplier({ data, show, close }) {
         products: []
     })
     const products = useSelector(state => state?.products?.products)
-
+    console.log(information.products)
     useEffect(() => {
         if (data) {
             setInformation({
@@ -69,6 +69,7 @@ export default function EditSupplier({ data, show, close }) {
     };
 
     const closeModal = () => {
+       
         close()
         setInformation({})
         setFileInputKey(Date.now());
@@ -231,14 +232,14 @@ export default function EditSupplier({ data, show, close }) {
                                         <select
                                             value={item?.idProduct}
                                             name="idProduct"
-                                            className={`form-control ${errors.product ? 'is-invalid' : ''} `}
+                                            className={`form-control ${item.idProduct === "" ? 'is-invalid' : ''} `}
                                             onChange={(e) => handleChangeInputDetailSupplier(e, index)}
                                         >
                                             <option value="0" checked>Chọn sản phẩm</option>
                                             {products && products.length > 0 ? (
                                                 products.map((product, index) => (
                                                     <option
-                                                        // disabled={detailSupplier?.some(item => item.idProduct === product._id)}
+                                                        disabled={information?.products?.some(item => item.idProduct === product._id)}
                                                         key={index} value={product._id}
                                                     >
                                                         {product.name}
@@ -246,7 +247,7 @@ export default function EditSupplier({ data, show, close }) {
                                                 ))
                                             ) : <option>Hiện không có sản phẩm nào</option>}
                                         </select>
-                                        {errors.product && <ErrorMessageInput errors={errors} field="product" />}
+                                        {item.idProduct === "" && <ErrorMessageInput errors={errors} field="product" />}
 
                                     </div>
 
@@ -257,12 +258,11 @@ export default function EditSupplier({ data, show, close }) {
                                                     name="price"
                                                     value={item.price}
                                                     onChange={(e) => handleChangeInputDetailSupplier(e, index)}
-
-                                                    className={`form-control ${errors.price ? 'is-invalid' : ''} `}
+                                                    className={`form-control ${item.price === "" ? 'is-invalid' : ''} `}
                                                     ref={inputFocusRef}
-                                                    placeholder={errors.price ? errors.price : ""}
+                                                    placeholder={item.price === "" ? errors.price : ""}
                                                 />
-                                                {information?.price != "" && errors.price && <ErrorMessageInput errors={errors} field="price" />}
+                                                {item?.price === "" && errors.price && <ErrorMessageInput errors={errors} field="price" />}
                                             </div>
                                             <div className='d-flex '>
                                                 <i
@@ -273,7 +273,7 @@ export default function EditSupplier({ data, show, close }) {
                                                     style={{ fontSize: '30px', cursor: 'pointer' }}
                                                     class="bi bi-file-plus text-success">
                                                 </i>
-                                                {index !== 0 && (
+                                                {information?.products?.length > 1 && (
                                                     <i
                                                         onClick={() => handleDeleteProductOfSupplier(
                                                             {

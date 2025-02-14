@@ -203,7 +203,7 @@ export default function Detail() {
                                         {(details?.detailProduct?.productAttributes[size]?.priceBought * details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier).toLocaleString('vi-VN')}
                                         đ
                                     </h5>
-                                    <h6 className='me-5'>-{((1 - details?.detailProduct?.discount[0]?.discountValue) * 100).toFixed(0)}%</h6>
+                                    <h6 className='me-5'>-{(details?.detailProduct?.discount[0]?.discountValue * 100).toFixed(0)}%</h6>
                                 </div>
                             ) : ""}
 
@@ -211,7 +211,7 @@ export default function Detail() {
                                 className='py-2 text-danger'>
                                 {(details?.detailProduct?.productAttributes[size].priceBought *
                                     (details?.detailProduct?.discount.length > 0 ?
-                                        details?.detailProduct?.discount[0].discountValue : 1
+                                        (1 - details?.detailProduct?.discount[0].discountValue) : 1
                                     ) *
                                     details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier
                                 )
