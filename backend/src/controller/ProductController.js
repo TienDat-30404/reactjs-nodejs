@@ -82,7 +82,10 @@ export default class ProductController {
                     .skip(startPage)
                     .limit(limit)
                     .populate('idCategory')
-                    .populate('discount')
+                    .populate({
+                        path : 'discount',
+                        match : {status : 1}
+                    })
                     .populate('reviews')
                     .populate({
                         path: 'productAttributes',
@@ -313,7 +316,10 @@ export default class ProductController {
             const idProduct = req.params._id
             let detailProduct = await Product.findOne({ _id: idProduct })
                 .populate('idCategory')
-                .populate('discount')
+                .populate({
+                    path : 'discount',
+                    match : {status : 1}
+                })
                 .populate('reviews')
                 .populate(
                     {

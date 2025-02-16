@@ -11,6 +11,8 @@ export default function AddDiscount({ show, close }) {
 
     const dispatch = useDispatch()
     const products = useSelector(state => state.products.products)
+    const discounts = useSelector(state => state?.discounts?.data)
+
     const [informations, setInformations] = useState({
         product: 0,
         discountValue: '',
@@ -24,14 +26,12 @@ export default function AddDiscount({ show, close }) {
     // handle click add product
     const handleClickAddDiscount = async () => {
         inputFocusRef.current.focus()
-
-
         const response = await addDiscount({
             product: informations?.product,
-            discountValue: informations?.discountValue / 100,
+            discountValue: informations?.discountValue,
             endDate: informations?.endDate
         })
-        console.log(response)
+
         if (response.errors) {
             setErrors(response.errors)
             return
@@ -76,7 +76,11 @@ export default function AddDiscount({ show, close }) {
 
     const closeModal = () => {
         close()
-        setInformations({})
+        setInformations({
+            product: 0,
+            discountValue: '',
+            endDate: ''
+        })
         setFileInputKey(Date.now());
         setErrors({})
     }
@@ -107,7 +111,7 @@ export default function AddDiscount({ show, close }) {
                                 {products && products.length > 0 ? (
                                     products.map((product, index) => (
                                         <option
-                                            // disabled={detailSupplier?.some(item => item.idProduct === product._id)}
+                                            disabled={discounts?.some(item => item?.product?._id === product._id && item.status === 1)}
                                             key={index} value={product._id}
                                         >
                                             {product.name}

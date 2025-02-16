@@ -59,6 +59,8 @@ export default function Category() {
     setShowEdit(true)
     setSelectedCategory(data)
   }
+  console.log(deleteCategory)
+  console.log(searchCriteria)
 
   const handlePagination = (page) => {
     dispatch(switchPage(page))
@@ -109,7 +111,7 @@ export default function Category() {
         onChange={handleChangeSearchSelect}
         class="form-select mt-2"
       >
-        <option value="idProduct" selected>Tìm kiếm theo Id</option>
+        <option value="idCategory" selected>Tìm kiếm theo Id</option>
         <option value="name">Tìm kiếm theo tên</option>
       </select>
 

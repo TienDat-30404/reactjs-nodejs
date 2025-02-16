@@ -94,16 +94,17 @@ export default function Cart() {
         sum +
         (cart?.attribute?.priceBought * cart?.quantity *
             (cart?.attribute?.product?.discount?.length > 0 ?
-                (1 - cart?.attribute?.product.discount[0].discountValue) : 1
-            ) * cart?.attribute?.size?.sizePriceMultiplier
+                ((100 - cart?.attribute?.product.discount[0].discountValue) / 100) : 1
+            ) * ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
         )
         , 0)
-
+        console.log("ta tự hỏi", cartsCheck)
     const totalPriceDiscountProduct = cartsCheck.reduce((sum, cart) =>
         sum +
         (
             cart?.attribute?.product?.discount?.length > 0 ?
-                (1 - cart?.attribute?.product?.discount[0]?.discountValue) * cart?.attribute?.priceBought
+                (cart?.attribute?.product?.discount[0]?.discountValue / 100) * cart?.attribute?.priceBought *
+                ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
                 : 0
         ), 0)
 
@@ -168,8 +169,8 @@ export default function Cart() {
                                         className='col-2 '>
                                         {(cart?.attribute?.priceBought *
                                             (cart?.attribute?.product?.discount?.length > 0 ?
-                                                (1 - cart?.attribute?.product?.discount[0]?.discountValue) : 1
-                                            ) * cart?.attribute?.size?.sizePriceMultiplier
+                                                ((100 - cart?.attribute?.product?.discount[0]?.discountValue) / 100) : 1
+                                            ) * ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
                                         ).toLocaleString('vi-VN')}đ
                                     </span>
                                     <div className='col-2'>
@@ -193,8 +194,8 @@ export default function Cart() {
                                         className='col-2 text-danger fw-bold'>
                                         {(cart?.attribute?.priceBought * cart?.quantity *
                                             (cart?.attribute?.product?.discount?.length > 0 ?
-                                                (1 - cart?.attribute?.product?.discount[0]?.discountValue) : 1
-                                            ) * cart?.attribute?.size?.sizePriceMultiplier
+                                                ((100 - cart?.attribute?.product?.discount[0]?.discountValue) / 100) : 1
+                                            ) * ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100 )
                                         )
                                             .toLocaleString('vi-VN')}
                                     </span>

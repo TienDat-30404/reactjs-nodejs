@@ -6,6 +6,7 @@ dotenv.config();
 import connectDB from './config/connect.js';
 connectDB();
 
+import "./utils/cronJobs/discountStatus.js";
 const app = express();
 const port = process.env.PORT;
 

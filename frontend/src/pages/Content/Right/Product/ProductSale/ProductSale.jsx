@@ -75,18 +75,23 @@ export default function ProductSale() {
                                 name={product?.name}
                                 priceNotDiscount={
                                     product?.discount?.length > 0
-                                        ? (indexPriceAttribute?.priceBought * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN') + "đ"
+                                        ? (indexPriceAttribute?.priceBought * ((100 - indexPriceAttribute?.size?.sizePriceMultiplier) / 100))
+                                        .toLocaleString('vi-VN') + "đ"
                                         : ""
                                 }
                                 percentDiscount={
                                     product?.discount?.length > 0
-                                        ? (product?.discount[0]?.discountValue * 100).toFixed(0) + "%"
+                                        ? (product?.discount[0]?.discountValue).toFixed(0) + "%"
                                         : ""
                                 }
                                 price={
                                     product?.discount?.length > 0
-                                        ? (indexPriceAttribute.priceBought * (1 - product?.discount[0]?.discountValue) * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN')
-                                        : (indexPriceAttribute.priceBought * indexPriceAttribute?.size?.sizePriceMultiplier).toLocaleString('vi-VN')
+                                        ? ((indexPriceAttribute?.priceBought *
+                                            ((100 - product?.discount[0]?.discountValue) / 100)) *
+                                            ((100 - indexPriceAttribute?.size?.sizePriceMultiplier) / 100))
+                                            .toLocaleString('vi-VN')
+                                        : (indexPriceAttribute.priceBought * ((100 - indexPriceAttribute?.size?.sizePriceMultiplier) / 100))
+                                        .toLocaleString('vi-VN')
                                 }
                                 widthImage="100px"
                                 heightImage="200px"

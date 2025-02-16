@@ -23,17 +23,17 @@ export default function Payment() {
     const phone = isAuthenticated && userData?.dataLogin?.phone
 
     // total Price
-    const totalPrice = Math.round(cartsCheck.reduce((sum, cart) =>
+    const totalPrice = (cartsCheck.reduce((sum, cart) =>
         sum +
         (cart?.attribute?.priceBought * cart?.quantity *
             (cart?.attribute?.product?.discount?.length > 0 ?
-                (1 - cart?.attribute?.product.discount[0].discountValue) : 1
+                ((100 - cart?.attribute?.product.discount[0].discountValue) / 100) : 1
             ) *
             (
                 useVoucher?.length > 0 ?
                     (1 - useVoucher[0]?.discountVoucher) : 1
             ) * 
-            cart?.attribute?.size?.sizePriceMultiplier
+            ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
         )
         , 0))
 
