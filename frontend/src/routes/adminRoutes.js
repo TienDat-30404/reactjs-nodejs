@@ -8,6 +8,7 @@ import Category from "../pages/Admin/Right/Category/Category";
 import Supplier from "../pages/Admin/Right/Supplier/Supplier";
 import Receipt from "../pages/Admin/Right/Receipt/Receipt";
 import Discount from "../pages/Admin/Right/Discount/Discount";
+import Attribute from "../pages/Admin/Right/Attribute/Attribute";
 export const adminRoutes = [
 
     {path: '*', page: NotFoundPage, layout : AdminLayout},
@@ -26,5 +27,6 @@ export const adminRoutes = [
     {path : '/admin/supplier', page : Supplier, layout : AdminLayout},
     {path : '/admin/receipt', page : Receipt, layout : AdminLayout},
     {path : '/admin/discount', page : Discount, layout : AdminLayout},
+    {path : '/admin/attribute', page : Attribute, layout : AdminLayout},
 
 ]

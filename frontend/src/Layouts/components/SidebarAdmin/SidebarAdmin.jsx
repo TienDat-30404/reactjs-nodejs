@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 export default function SidebarAdmin() {
     const navigate = useNavigate()
+    const [showContetProduct, setShowContetProduct] = useState(false)
     return (
         <div className='admin_left'>
             <ul class="nav flex-column admin_left-content">
@@ -16,14 +17,28 @@ export default function SidebarAdmin() {
                     <i class="bi bi-person-gear"></i>
                     <p class="nav-link">User</p>
                 </li>
-                <li onClick={() => navigate('/admin/product')} class="nav-item">
-                    <i class="bi bi-p-square"></i>
-                    <p class="nav-link">Product</p>
+
+                <li onClick={() => setShowContetProduct(!showContetProduct)} class="nav-item d-flex align-items-center justify-content-between">
+                    <div className='d-flex align-items-center'>
+                        <i class="bi bi-p-square"></i>
+                        <p class="nav-link">Product</p>
+                    </div>
+                    <i class="bi bi-chevron-compact-down px-3"></i>
                 </li>
-                <li onClick={() => navigate('/admin/category')} class="nav-item">
-                    <i class="bi bi-p-square"></i>
-                    <p class="nav-link">Category</p>
-                </li>
+
+                <ul className={`${showContetProduct ? 'd-block' : 'd-none'}`}>
+                    <li onClick={() => navigate('/admin/attribute')} class="nav-item">
+                        <div className='d-flex align-items-center'>
+                            <i class="bi bi-p-square"></i>
+                            <p class="nav-link">Attribute</p>
+                        </div>
+                    </li>
+                    <li onClick={() => navigate('/admin/category')} class="nav-item">
+                        <i class="bi bi-p-square"></i>
+                        <p class="nav-link">Category</p>
+                    </li>
+                </ul>
+
                 <li onClick={() => navigate('/admin/order')} class="nav-item">
                     <i class="bi bi-p-square"></i>
                     <p class="nav-link">Order</p>

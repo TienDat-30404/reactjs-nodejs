@@ -107,7 +107,7 @@ export default class DiscountController {
     static deleteDiscount = async (req, res, next) => {
         try {
             const { id } = req.params
-            const discount = await Discount.findByIdAndDelete(id)
+            const discount = await Discount.updateOne({ _id: id }, { deletedAt: Date.now(), status : 0 }, { new: true })
             return res.status(200).json({
                 status: 200,
                 discount

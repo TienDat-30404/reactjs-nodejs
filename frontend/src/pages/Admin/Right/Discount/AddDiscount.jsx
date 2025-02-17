@@ -99,7 +99,7 @@ export default function AddDiscount({ show, close }) {
                     <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Tạo giảm giá cho sản phẩm</p>
 
                     <div className='px-4 py-2 d-flex align-items-center'>
-                        <label style={{ fontSize: '14px' }} className="form-label">Ngày kết thúc</label>
+                        <label style={{ fontSize: '14px' }} className="form-label">Sản phẩm</label>
                         <div style={{ width: '100%' }}>
                             <select
                                 value={informations.product}

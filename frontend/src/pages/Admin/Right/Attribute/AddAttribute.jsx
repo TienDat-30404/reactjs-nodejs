@@ -1,46 +1,50 @@
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { InputComponent } from '../../../../components/InputComponent'
 import { ErrorMessageInput } from '../../../../components/InputComponent'
-import { addProduct } from '../../../../services/ProductService'
-import { addCategory, getAllCategory } from '../../../../services/CategoryService'
 import { useDispatch, useSelector } from 'react-redux'
-import Select from "react-select";
-import { addCategoryRedux, initDataCategory } from '../../../../redux/Category/categoriesSlice'
 import { toast } from 'react-toastify'
+import { addDiscountRedux } from '../../../../redux/Discount/discountsSlice'
+import { addDiscount } from '../../../../services/DiscountService'
+import { addSizeService } from '../../../../services/SizeService'
+import { addSizeRedux } from '../../../../redux/Size/sizesSlice'
 
-export default function AddCategory({ show, close }) {
+export default function AddAttribute({ show, close }) {
 
 
     const dispatch = useDispatch()
-    const [name, setName] = useState('')
 
-    const [image, setImage] = useState(null);
-    const [fileInputKey, setFileInputKey] = useState(Date.now());
+    const [informations, setInformations] = useState({
+        name: '',
+        sizePriceMultiplier: ''
+    })
+
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
 
     // handle click add product
-    const handleClickAddCategory = async () => {
+    const handleClickAddAttribute = async () => {
         inputFocusRef.current.focus()
-        var formData = new FormData()
-        formData.append('name', name)
-        formData.append('image', image)
+        const response = await addSizeService({
+            name: informations?.name,
+            sizePriceMultiplier: informations?.sizePriceMultiplier
+        })
 
-        const response = await addCategory(formData)
-        console.log(response)
         if (response.errors) {
             setErrors(response.errors)
             return
         }
-        if(response && response.status == 201) {
-            toast.success("Thêm thể loại thành công")
-            dispatch(addCategoryRedux(response.category))
+        if (response && response.status == 201) {
+            toast.success("Thêm thuộc tính cho sản phẩm thành công")
+            dispatch(addSizeRedux(response.size))
         }
     }
 
     const handleChangeInput = (e) => {
         const { name, value } = e.target;
-        setName(e.target.value)
+        setInformations(prev => ({
+            ...prev,
+            [name]: value
+        }))
         const isValid = validateInput(name, value);
         setErrors(prevErrors => {
             const newErrors = { ...prevErrors };
@@ -55,23 +59,14 @@ export default function AddCategory({ show, close }) {
         });
     };
 
-    const handleChangeFile = (e) => {
-        const selectedFileImage = e.target.files[0]
-        setImage(selectedFileImage);
-        setErrors(prevError => {
-            const newError = { ...prevError }
-            if (selectedFileImage) {
-                delete newError.image
-            }
-            return newError
-        })
-    };
 
 
     const closeModal = () => {
         close()
-        setName('')
-        setFileInputKey(Date.now());
+        setInformations({
+            name: '',
+            sizePriceMultiplier: ''
+        })
         setErrors({})
     }
     const validateInput = (name, value) => {
@@ -80,48 +75,54 @@ export default function AddCategory({ show, close }) {
                 return value.trim() !== '';
         }
     };
-
+    console.log(informations)
 
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="modal-dialog add_product">
                 <div className=" modal-content">
-                    <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Tạo thể loại</p>
+                    <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Tạo thuộc tính cho sản phẩm</p>
+
                     <div className='px-4 py-2 d-flex align-items-center'>
-                        <label style={{ fontSize: '14px' }} className="form-label">Tên thể loại</label>
+                        <label style={{ fontSize: '14px' }} className="form-label">Tên thuộc tính</label>
                         <div style={{ width: '100%' }}>
                             <InputComponent
                                 name="name"
-                                value={name}
+                                value={informations.name}
                                 onChange={handleChangeInput}
                                 className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                 ref={inputFocusRef}
                                 placeholder={errors.name ? errors.name : ""}
                             />
-                            {name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />}
+                            {informations.name != "" && errors.name && <ErrorMessageInput errors={errors} field="name" />}
                         </div>
-
                     </div>
 
                     <div className='px-4 py-2 d-flex align-items-center'>
-                        <label style={{ fontSize: '14px' }} className="form-label">Ảnh thể loại</label>
+                        <label style={{ fontSize: '14px' }} className="form-label">Hệ số nhân giá</label>
                         <div style={{ width: '100%' }}>
                             <InputComponent
-                                key={fileInputKey}
-                                type="file"
-                                name="image"
-                                onChange={handleChangeFile}
-                                className={`form-control ${errors.image ? 'is-invalid' : ''} `}
-                                placeholder={errors.image ? errors.image : ""}
+                                name="sizePriceMultiplier"
+                                value={informations.sizePriceMultiplier}
+                                onChange={handleChangeInput}
+                                className={`form-control ${errors.sizePriceMultiplier ? 'is-invalid' : ''} `}
+                                ref={inputFocusRef}
+                                placeholder={errors.sizePriceMultiplier ? errors.sizePriceMultiplier : ""}
                             />
-                            {errors.image && <ErrorMessageInput className errors={errors} field="image" />}
+                            {informations.sizePriceMultiplier != "" && errors.sizePriceMultiplier && <ErrorMessageInput errors={errors} field="sizePriceMultiplier" />}
                         </div>
+
                     </div>
+
+
+
+
+
 
 
                     <div className="modal-footer d-flex justify-content-between ">
                         <button onClick={() => closeModal()} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button onClick={handleClickAddCategory} type="button" className="btn btn-primary">Add</button>
+                        <button onClick={handleClickAddAttribute} type="button" className="btn btn-primary">Add</button>
                     </div>
                 </div>
             </div>
