@@ -6,6 +6,7 @@ import { visiblePagination } from '../../../../until/function'
 import Pagination from '../../../../components/Pagination'
 import { deleteVoucher, getAllVoucher } from '../../../../services/VoucherService'
 import { deleteVoucherReduxAdmin, initDataVoucher, switchPage } from '../../../../redux/Voucher/vouchersSlice'
+import EditVoucher from './EditVoucher'
 
 
 export default function Voucher() {
@@ -17,7 +18,7 @@ export default function Voucher() {
     const limit = useSelector(state => state?.vouchers?.limit)
     const [showAddModal, setShowAddModal] = useState(false)
     const [showEdit, setShowEdit] = useState(false)
-    const [selectedAttribute, setSelectedAttribute] = useState(null);
+    const [selectedVouchr, setSelectedVoucher] = useState(null);
 
     const [displayTextSearch, setDisplayTextSearch] = useState('idVoucher')
     const [searchCriteria, setSearchCriteria] = useState({
@@ -51,8 +52,8 @@ export default function Voucher() {
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria]);
     const handleSwitchPageEdit = (data) => {
-        // setShowEdit(true)
-        // setSelectedAttribute(data)
+        setShowEdit(true)
+        setSelectedVoucher(data)
     }
 
     const handlePagination = (page) => {
@@ -193,8 +194,7 @@ export default function Voucher() {
                     visiblePagination={visiblePagination}
                 />
             )}
-            {/* <AddAttribute show={showAddModal} close={() => setShowAddModal(false)} />
-            <EditAttribute show={showEdit} close={() => setShowEdit(false)} data={selectedAttribute} /> */}
+            <EditVoucher show={showEdit} close={() => setShowEdit(false)} data={selectedVouchr} /> 
         </div>
     )
 }

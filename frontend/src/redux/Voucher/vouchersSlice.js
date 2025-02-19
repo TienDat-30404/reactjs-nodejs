@@ -51,9 +51,19 @@ export const vouchersSlice = createSlice({
 
         switchPage : (state, action) => {
             state.page = action.payload
+        },
+
+        editVoucherRedux : (state, action) => {
+            state.data = state.data.map(voucher => {
+                if(voucher._id === action.payload._id)
+                {
+                    return action.payload.newData
+                }
+                return voucher
+            })
         }
     }
 })
 
-export const {initDataVoucher, applyVoucher, removeUseVoucher, deleteVoucher, addVoucher, deleteVoucherReduxAdmin, switchPage} = vouchersSlice.actions
+export const {initDataVoucher, applyVoucher, removeUseVoucher, deleteVoucher, addVoucher, deleteVoucherReduxAdmin, switchPage, editVoucherRedux} = vouchersSlice.actions
 export default vouchersSlice.reducer

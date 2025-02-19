@@ -131,8 +131,8 @@ export default class VoucherController {
             }
         }
         catch(error) {
-            return res.status(500).json({ status: 500, error: `Fail when edit voucher : ${error.message}` })
+            return res.status(500).json({ status: 500, error: `Fail when edit voucher : ${error}` })
         }
-    }F
+    }
 }
 

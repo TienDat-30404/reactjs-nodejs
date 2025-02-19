@@ -58,5 +58,49 @@ export default class NotificationController {
         }
     
     }
+
+    static async getAllNotification(req, res, next) {
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 5 
+        const startPage = (page - 1) * limit 
+        const objectFilter = {deletedAt : null}
+        const [notifications, totalNotification] = await Promise.all([
+            Notification.find(objectFilter)
+                        .skip(startPage)
+                        .limit(limit),
+            Notification.countDocuments(objectFilter)
+        ])
+        const totalPage = Math.ceil(totalNotification / limit)
+        return res.status(200).json({
+            status : 200,
+            notifications,
+            page,
+            limit,
+            totalPage,
+            totalNotification
+        })
+    }
+
+    static async createNotificationForAll(req, res, next) {
+        try {
+            const {title, content} = req.body
+            const notification = new Notification({
+                title,
+                content
+            })
+            await notification.save()
+            return res.status(200).json({
+                status : 200,
+                message : 'Create notification successfully',
+                notification
+            })
+        }
+        catch (error) {
+            return res.status(500).json({
+                status : 500,
+                message : 'Fail when create notification'
+            })
+        }
+    }
 }
 

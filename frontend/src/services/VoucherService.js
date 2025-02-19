@@ -64,3 +64,21 @@ export const deleteVoucher = async (id) => {
         return { error: error.message };
     }
 }
+
+
+export const editVoucher = async(id, data) => {
+    try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/edit-voucher/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        return response.json();
+    } catch (error) {
+        console.error('Error editing voucher:', error);
+        return { error: error.message };
+    }
+}
