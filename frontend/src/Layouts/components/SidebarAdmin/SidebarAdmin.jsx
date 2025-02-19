@@ -27,11 +27,13 @@ export default function SidebarAdmin() {
                 </li>
 
                 <ul className={`${showContetProduct ? 'd-block' : 'd-none'}`}>
+                    <li onClick={() => navigate('/admin/product')} class="nav-item">
+                        <i class="bi bi-p-square"></i>
+                        <p class="nav-link">Product</p>
+                    </li>
                     <li onClick={() => navigate('/admin/attribute')} class="nav-item">
-                        <div className='d-flex align-items-center'>
-                            <i class="bi bi-p-square"></i>
-                            <p class="nav-link">Attribute</p>
-                        </div>
+                        <i class="bi bi-p-square"></i>
+                        <p class="nav-link">Attribute</p>
                     </li>
                     <li onClick={() => navigate('/admin/category')} class="nav-item">
                         <i class="bi bi-p-square"></i>
@@ -55,10 +57,11 @@ export default function SidebarAdmin() {
                     <i class="bi bi-person-video2"></i>
                     <p class="nav-link">Discount</p>
                 </li>
-                {/* <li onClick={() => navigate('/admin/voucher')} class="nav-item">
+                <li onClick={() => navigate('/admin/voucher')} class="nav-item">
                     <i class="bi bi-person-video2"></i>
                     <p class="nav-link">Voucher</p>
                 </li>
+                {/* 
                 <li onClick={() => navigate('/admin/role')} class="nav-item">
                     <i class="bi bi-person-video2"></i>
                     <p class="nav-link">Role</p>

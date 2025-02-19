@@ -66,17 +66,17 @@ export default class OrderController {
             const priceRewardVoucher = 1000000;
             let currentDiscount = vouchersOfUser?.length > 0
                 ? vouchersOfUser[vouchersOfUser.length - 1]?.discountVoucher
-                : 0.005;
+                : 0.5;
             let voucherAdded = []
             let notificationAdded = []
             for (var i = 1; i <= (Math.floor(totalPriceOrderOfUser) / priceRewardVoucher) - vouchersOfUser?.length; i++) {
-                currentDiscount += 0.005;
+                currentDiscount += 0.5;
 
                 const voucher = new Voucher({
                     idUser,
                     discountVoucher: currentDiscount.toFixed(3),
                     description: "giảm giá "
-                        + ((currentDiscount * 100).toFixed(1))
+                        + ((currentDiscount).toFixed(1))
                         + "% khi mua hàng đạt mốc " + (vouchersOfUser?.length + i)
                         + " triệu "
                 });
@@ -87,7 +87,7 @@ export default class OrderController {
                 const notification = new Notification({
                     idUser,
                     content: "Chúc mừng bạn nhận được voucher giảm giá " +
-                        ((currentDiscount * 100).toFixed(1))
+                        ((currentDiscount).toFixed(1))
                         + "% khi mua hàng đạt mốc " + (vouchersOfUser?.length + i)
                         + " triệu "
                 })

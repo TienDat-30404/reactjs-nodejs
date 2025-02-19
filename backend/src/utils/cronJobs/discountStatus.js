@@ -7,9 +7,9 @@ async function updateStatusDiscount() {
             { endDate: { $lt: currentDate }, status: 1 }, 
             { $set: { status: 0 } } 
         );
-        console.log(`✅ Đã cập nhật ${result.modifiedCount} sản phẩm hết hạn.`);
+        console.log(`Đã cập nhật ${result.modifiedCount} sản phẩm hết hạn.`);
     } catch (error) {
-        console.error("❌ Lỗi khi cập nhật status discount:", error);
+        console.error("Lỗi khi cập nhật status discount:", error);
     }
 }
 

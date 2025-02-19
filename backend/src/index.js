@@ -7,6 +7,7 @@ import connectDB from './config/connect.js';
 connectDB();
 
 import "./utils/cronJobs/discountStatus.js";
+import "./utils/cronJobs/voucherStatus.js";
 const app = express();
 const port = process.env.PORT;
 

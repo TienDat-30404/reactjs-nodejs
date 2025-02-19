@@ -236,12 +236,12 @@ export default function Cart() {
                                 <div className='d-flex align-items-center'>
                                     <p style={{ fontWeight: '500', fontSize: '14px', fontWeight: '400', cursor: 'pointer' }} className='ms-2 text-danger'>
 
-                                        {"-" + (totalPrice * useVoucher[0]?.discountVoucher).toLocaleString('vi-VN') + "đ"}
+                                        {"-" + (totalPrice * (useVoucher[0]?.discountVoucher / 100)).toLocaleString('vi-VN') + "đ"}
 
                                     </p>
                                     <p style={{ fontWeight: '500', fontSize: '14px', fontWeight: '400', cursor: 'pointer' }} className='ms-2 text-primary'>
                                         {
-                                            " (voucher giảm giá " + (useVoucher[0]?.discountVoucher * 100).toFixed(1) + "% tổng hóa đơn)"
+                                            " (voucher giảm giá " + (useVoucher[0]?.discountVoucher).toFixed(1) + "% tổng hóa đơn)"
                                         }
                                     </p>
                                     <i onClick={() => handleDeleteUserVoucher()} style={{ cursor: 'pointer' }} class="bi bi-x fs-5 ms-2 cursor-pointer"></i>
@@ -260,7 +260,7 @@ export default function Cart() {
                             <p>
                                 {
                                     useVoucher && useVoucher?.length > 0 ? (
-                                        totalPrice * (1 - useVoucher[0]?.discountVoucher)
+                                        totalPrice * ((100 - useVoucher[0]?.discountVoucher) / 100)
                                     ) :
                                         Math.ceil(totalPrice)
                                 }
@@ -278,7 +278,7 @@ export default function Cart() {
                             {cartsCheck.length > 0 ? (
                                 <p style={{ color: 'red', fontWeight: '500', fontSize: '20px' }}>
                                     {(totalPrice * (
-                                        useVoucher?.length > 0 ? (1 - useVoucher[0].discountVoucher) : 1
+                                        useVoucher?.length > 0 ? ((100 - useVoucher[0].discountVoucher) / 100) : 1
                                     ))
                                         .toLocaleString('vi-VN')}
                                     đ

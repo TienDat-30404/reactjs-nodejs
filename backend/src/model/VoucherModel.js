@@ -6,6 +6,10 @@ const VoucherSchema = Schema(
         discountVoucher : {type : Number, default : 0.02},
         description : {type : String},
         status : {type : Number, default : 1},
+        endDate : {
+            type : Date, 
+            default : new Date(new Date().setDate(new Date().getDate() + 7))
+        },
         deletedAt : {type : Date, default : null}
     }, 
     {

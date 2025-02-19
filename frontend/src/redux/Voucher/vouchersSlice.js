@@ -42,9 +42,18 @@ export const vouchersSlice = createSlice({
                 state.useVoucher = id
                 state.data = state.data.filter(voucher => voucher._id != id)
             }
+        }, 
+
+        deleteVoucherReduxAdmin : (state, action) => {
+            state.data = state.data.filter(voucher => voucher._id !== action.payload)
+            state.totalVoucher -= 1
+        },
+
+        switchPage : (state, action) => {
+            state.page = action.payload
         }
     }
 })
 
-export const {initDataVoucher, applyVoucher, removeUseVoucher, deleteVoucher, addVoucher} = vouchersSlice.actions
+export const {initDataVoucher, applyVoucher, removeUseVoucher, deleteVoucher, addVoucher, deleteVoucherReduxAdmin, switchPage} = vouchersSlice.actions
 export default vouchersSlice.reducer

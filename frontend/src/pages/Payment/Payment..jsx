@@ -31,7 +31,7 @@ export default function Payment() {
             ) *
             (
                 useVoucher?.length > 0 ?
-                    (1 - useVoucher[0]?.discountVoucher) : 1
+                    ((100 - useVoucher[0]?.discountVoucher) / 100) : 1
             ) * 
             ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
         )
