@@ -64,10 +64,20 @@ export const notificationsSlice = createSlice({
         deleteNotificationRedux: (state, action) => {
             state.data = state.data.filter(notification => notification._id !== action.payload)
             state.totalNotification -= 1
+        },
+
+        readNotificationCommonRedux : (state, action) => {
+            state.data = state.data.map(notification => {
+                if(notification._id === action.payload.id)
+                {
+                    return action.payload.newDate
+                }
+                return notification
+            })
         }
     }
 })
 
 export const { initDataNotification, readNotificationRedux, 
-    loadMoreNotification, createNotificationRedux, updateNotificationRedux, switchPage, deleteNotificationRedux } = notificationsSlice.actions
+    loadMoreNotification, createNotificationRedux, updateNotificationRedux, switchPage, deleteNotificationRedux, readNotificationCommonRedux } = notificationsSlice.actions
 export default notificationsSlice.reducer

@@ -4,8 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { formatTime } from '../../../until/function';
 import { debounce, useLoadMoreData } from '../../../until/function';
-import { readNotificationRedux, initDataNotification, loadMoreNotification } from '../../../redux/Notification/notificationsSlice';
-import { getNotificationOfUserService, readNotificationService } from '../../../services/NotificationService';
+import { readNotificationRedux, initDataNotification, loadMoreNotification, readNotificationCommonRedux } from '../../../redux/Notification/notificationsSlice';
+import { getNotificationOfUserService, readNotificationCommon, readNotificationService } from '../../../services/NotificationService';
 export default function Notification({ show }) {
     const dispatch = useDispatch()
     const loadMoreData = useLoadMoreData()
@@ -47,6 +47,21 @@ export default function Notification({ show }) {
         }
     }
 
+    const handleCheckReadNotificationCommon = async(idNotification) => {
+        const response = await readNotificationCommon({
+            idUser,
+            idNotification
+        })
+        if(response && response.status === 200)
+        {
+            console.log("123")
+            dispatch(readNotificationCommonRedux({
+                id : idNotification, 
+                newDate : response.notification
+            }))
+        }
+    }
+
     return (
         <div className={` ${show ? "d-block" : "d-none"} notification position-absolute top-100 start-50 translate-middle-x `}>
             <h5 className='p-2'>Thông báo</h5>
@@ -54,8 +69,18 @@ export default function Notification({ show }) {
                 <button type="button" class="btn btn-primary btn-sm me-2">Tất cả</button>
                 <button type="button" class="btn btn-secondary btn-sm">Chưa đọc</button>
             </div>
+            
             {data?.map((notification, index) => (
-                <div onClick={() => { handleCheckReadNotification(index, notification?._id) }} key={index} className={` mb-1`} >
+                // handleCheckReadNotificationCommon(notification?._id)
+                
+                <div 
+                    onClick={() => { 
+                       notification.isRead != undefined ? handleCheckReadNotification(index, notification?._id) 
+                       : handleCheckReadNotificationCommon(notification?._id)
+                    }} 
+                    key={index} 
+                    className={` mb-1`} 
+                >
                     <div className={`px-2 py-1 offcanvas-body`}>
                         <div className='d-flex align-items-center justify-content-between'>
                             <div className='d-flex align-items-center'>
@@ -65,7 +90,8 @@ export default function Notification({ show }) {
                                 </p>
                             </div>
 
-                            <span class={`${notification?.isRead === true ? "d-none" : "d-block"} p-2 bg-primary border border-light rounded-circle`}>
+                            <span class={`${notification?.isRead === true || notification?.readBy?.some(i => i === idUser) ? "d-none" : "d-block"}
+                                 p-2 bg-primary border border-light rounded-circle`}>
                                 <span class="visually-hidden">New alerts</span>
                             </span>
 

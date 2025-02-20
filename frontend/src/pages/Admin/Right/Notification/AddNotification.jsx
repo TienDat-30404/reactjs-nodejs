@@ -22,6 +22,7 @@ export default function AddNotification({ show, close }) {
         const response = await createNotificationForAll({
             content
         })
+        console.log(response)
 
         if (response.errors) {
             setErrors(response.errors)

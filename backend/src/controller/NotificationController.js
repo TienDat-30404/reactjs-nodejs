@@ -13,6 +13,13 @@ export default class NotificationController {
             {$or : [ {idUser}, {type : 'all'} ], deletedAt : null} : 
             {type : 'all', deletedAt : null}
 
+
+            const queryUnread = {
+                ...query,
+                $or : idUser 
+                ? [{idUser, isRead : false}, {type : 'all', readBy : {$not : {$in : [idUser]}}}]
+                : [{type : 'all', readBy : {$not : {$in : [idUser]}}}]
+            }
             const startPage = (page - 1) * limit
             const [notifications, totalNotification, totalNotificationNotRead] = await Promise.all([
                 Notification.find(query)
@@ -21,7 +28,7 @@ export default class NotificationController {
                     .limit(limit),
 
                 Notification.countDocuments(query),
-                Notification.countDocuments({ ...query, isRead: false })
+                Notification.countDocuments(queryUnread)
             ])
             const totalPage = Math.ceil(totalNotification / limit)
             return res.status(200).json({
@@ -59,7 +66,6 @@ export default class NotificationController {
                 message: 'Fail when read notification'
             })
         }
-
     }
 
     static async getAllNotification(req, res, next) {
@@ -116,6 +122,7 @@ export default class NotificationController {
                 type: 'all',
                 readBy: []
             })
+            console.log(notification)
             await notification.save()
             return res.status(201).json({
                 status: 201,
@@ -170,6 +177,29 @@ export default class NotificationController {
                 message : `Fail when delete notification : ${error.message}`
             })
         }
+    }
+
+    static async readNotificationCommon(req, res, next) {
+        try 
+        {
+            const {idUser, idNotification} = req.body 
+            const notification = await Notification.findByIdAndUpdate(idNotification,
+                 {$addToSet : {readBy : idUser}},
+                 {new : true}
+            )
+            return res.status(200).json({
+                status : 200,
+                notification,
+                message : "Read successfully"
+            })
+        }
+        catch(err)
+        {
+            return res.status(500).json({
+                message : `Fail when read notification common : ${err}`
+            })
+        }
+        
     }
 }
 

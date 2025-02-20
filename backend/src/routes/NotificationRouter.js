@@ -9,4 +9,5 @@ router.get('/get-all-notification', NotificationController.getAllNotification)
 router.post('/create-notification', validateNotificationMiddleWare, NotificationController.createNotificationForAll)
 router.patch('/update-notification/:idNotification', validateNotificationMiddleWare, NotificationController.updateNotification)
 router.delete('/delete-notification/:idNotification', NotificationController.deleteNotification)
+router.patch('/read-notification-common', NotificationController.readNotificationCommon)
 export default router
