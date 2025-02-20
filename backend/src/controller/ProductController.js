@@ -26,10 +26,7 @@ export default class ProductController {
             const objectFilter = {
                 deletedAt: null
             };
-            // if (req.query.typeDisplay !== "0") {
-            //     objectFilter.priceImport = { $ne: null }
-            //     objectFilter.priceBought = { $ne: null }
-            // }
+           
 
             if (req.query.idProduct) {
                 if (mongoose.Types.ObjectId.isValid(req.query.idProduct)) {

@@ -89,7 +89,9 @@ export default class OrderController {
                     content: "Chúc mừng bạn nhận được voucher giảm giá " +
                         ((currentDiscount).toFixed(1))
                         + "% khi mua hàng đạt mốc " + (vouchersOfUser?.length + i)
-                        + " triệu "
+                        + " triệu ",
+                    type : 'personal',
+                    isRead : false
                 })
                 notificationAdded.push(notification)
                 await notification.save()

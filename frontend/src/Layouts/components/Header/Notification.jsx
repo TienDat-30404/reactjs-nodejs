@@ -19,6 +19,7 @@ export default function Notification({ show }) {
         const fetchDataNotification = async () => {
             let query = `limit=${limit}`
             const response = await getNotificationOfUserService(idUser, query)
+            console.log("notification", response)
             if (response) {
                 dispatch(initDataNotification(response))
             }

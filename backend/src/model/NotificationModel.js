@@ -2,9 +2,11 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema
 const NotificationSchema = new Schema(
     {
-        idUser: { type: Schema.Types.ObjectId, ref: 'User' },
+        idUser: { type: Schema.Types.ObjectId, ref: 'User', default : undefined },
         content: { type: String },
-        isRead: { type: Boolean, default : false },
+        type : {type : String, enum: ["all", "personal"]},
+        isRead: { type: Boolean},
+        readBy: { type: [{ type: Schema.Types.ObjectId, ref: "User" }], default : undefined }, 
         deletedAt: { type: Date, default: null }
     },
     {

@@ -39,3 +39,74 @@ export const readNotificationService = async(id) => {
         console.log("Fail when read notification", err)
     }
 }
+
+export const getAllNotification = async(query) => {
+    try 
+    {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-notification?${query}`, {
+            method : 'GET',
+            headers : {
+                'Content-Type' : 'application/json'
+            }
+        })
+        return response.json()
+    }
+    catch(err)
+    {
+        console.log("Fail when get all notification", err)
+    }
+}
+
+
+export const createNotificationForAll = async(data) => {
+    try 
+    {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/create-notification`, {
+            method : 'POST',
+            headers : {
+                'Content-Type' : 'application/json'
+            },
+            body : JSON.stringify(data)
+        })
+        return response.json()
+    }
+    catch(err)
+    {
+        console.log("Fail when create notification", err)
+    }
+}
+
+export const updateNotificationService = async(id, data) => {
+    try 
+    {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/update-notification/${id}`, {
+            method : 'PATCH',
+            headers : {
+                'Content-Type' : 'application/json'
+            },
+            body : JSON.stringify(data)
+        })
+        return response.json()
+    }
+    catch(err)
+    {
+        console.log("Fail when update notification", err)
+    }
+}
+
+export const deleteNotificationService = async(id) => {
+    try 
+    {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-notification/${id}`, {
+            method : 'DELETE',
+            headers : {
+                'Content-Type' : 'application/json'
+            }
+        })
+        return response.json()
+    }
+    catch(err)
+    {
+        console.log("Fail when delete notification", err)
+    }
+}

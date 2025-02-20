@@ -1,24 +1,27 @@
-// const Notification = require('../model/NotificationModel')
+import mongoose from 'mongoose';
 import Notification from '../model/NotificationModel.js'
 export default class NotificationController {
 
-    static async getNotificationOfUser(req, res, next)  {
+    static async getNotificationOfUser(req, res, next) {
         try {
-    
-            // const idUser = req.user.idUser
+
             const idUser = req.query.idUser
             const page = Math.max(1, parseInt(req.query.page) || 1);
             const limit = Math.max(1, parseInt(req.query.limit) || 5);
-    
+
+            const query = idUser ? 
+            {$or : [ {idUser}, {type : 'all'} ], deletedAt : null} : 
+            {type : 'all', deletedAt : null}
+
             const startPage = (page - 1) * limit
             const [notifications, totalNotification, totalNotificationNotRead] = await Promise.all([
-                Notification.find({ idUser, deletedAt: null })
+                Notification.find(query)
                     .sort({ createdAt: -1 })
                     .skip(startPage)
                     .limit(limit),
-                // .select('-deletedAt -updatedAt'),
-                Notification.countDocuments({ idUser }),
-                Notification.countDocuments({ idUser, isRead: false })
+
+                Notification.countDocuments(query),
+                Notification.countDocuments({ ...query, isRead: false })
             ])
             const totalPage = Math.ceil(totalNotification / limit)
             return res.status(200).json({
@@ -34,12 +37,12 @@ export default class NotificationController {
             console.error(`Error fetching notifications for user :`, err.message);
             return res.status(500).json({ message: 'Failed to fetch notifications', error: err.message });
         }
-    
+
     }
-    
-    static async readNotification(req, res, next)  {
+
+    static async readNotification(req, res, next) {
         try {
-            const {idNotification} = req.body
+            const { idNotification } = req.body
             const response = await Notification.updateOne({ _id: idNotification }, {
                 isRead: true
             })
@@ -56,49 +59,115 @@ export default class NotificationController {
                 message: 'Fail when read notification'
             })
         }
-    
+
     }
 
     static async getAllNotification(req, res, next) {
         const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 5 
-        const startPage = (page - 1) * limit 
-        const objectFilter = {deletedAt : null}
+        const limit = parseInt(req.query.limit) || 5
+        const startPage = (page - 1) * limit
+        const objectFilter = { deletedAt: null, type: 'all' }
+        if(req.query.idNotification)
+        {
+            if(mongoose.Types.ObjectId.isValid(req.query.idNotification))
+            {
+                objectFilter._id = req.query.idNotification
+            }
+            else 
+            {
+                return res.status(200).json({
+                    status : 200,
+                    page : 1,
+                    totalPage : 1,
+                    totalNotification : 0,
+                    notifications : [],
+                    limit : 1
+                })
+            }
+        }
+        if(req.query.content)
+        {
+            objectFilter.content = { $regex : req.query.content, $options : 'i' }
+        }
         const [notifications, totalNotification] = await Promise.all([
             Notification.find(objectFilter)
-                        .skip(startPage)
-                        .limit(limit),
+                .skip(startPage)
+                .limit(limit)
+                .sort({ createdAt: -1 }),
             Notification.countDocuments(objectFilter)
         ])
         const totalPage = Math.ceil(totalNotification / limit)
         return res.status(200).json({
-            status : 200,
+            status: 200,
             notifications,
             page,
             limit,
             totalPage,
-            totalNotification
+            totalNotification,
+            objectFilter
         })
     }
 
     static async createNotificationForAll(req, res, next) {
         try {
-            const {title, content} = req.body
+            const { content } = req.body
             const notification = new Notification({
-                title,
-                content
+                content,
+                type: 'all',
+                readBy: []
             })
             await notification.save()
-            return res.status(200).json({
-                status : 200,
-                message : 'Create notification successfully',
+            return res.status(201).json({
+                status: 201,
+                message: 'Create notification successfully',
                 notification
             })
         }
         catch (error) {
             return res.status(500).json({
+                status: 500,
+                message: 'Fail when create notification'
+            })
+        }
+    }
+
+    static async updateNotification(req, res,next) {
+        try {
+            const {idNotification} = req.params
+            const {content } = req.body
+            const notification = await Notification.findByIdAndUpdate({ _id : idNotification }, {
+                content
+            }, {new : true})
+           return res.status(200).json({
+                status : 200,
+                notification,
+                message : 'Update notification successfully'
+           })
+        }
+        catch (error) {
+            return res.status(500).json({
+                message: `Fail when update notification : ${error.message}`
+            })
+        }
+    }
+
+    static async deleteNotification(req,res, next) {
+        const {idNotification} = req.params
+        try {
+            const response = await Notification.updateOne({ _id : idNotification }, {
+                deletedAt : new Date()
+            })
+            if(response.modifiedCount > 0) {
+                return res.status(200).json({
+                    status : 200,
+                    message : 'Delete notification successfully'
+                })
+            }
+        }
+        catch(error) {
+            return res.status(500).json({
                 status : 500,
-                message : 'Fail when create notification'
+                message : `Fail when delete notification : ${error.message}`
             })
         }
     }
