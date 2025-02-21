@@ -13,5 +13,11 @@ const ReviewSchema = new Schema(
     }
 )
 
+ReviewSchema.virtual('responseReview', {
+    ref : 'ResponseReview',
+    localField : '_id',
+    foreignField : 'idReview'
+    
+})
 const Review = mongoose.model('Review', ReviewSchema)
 export default Review

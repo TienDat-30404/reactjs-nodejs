@@ -10,7 +10,7 @@ export default function Notification({ show }) {
     const dispatch = useDispatch()
     const loadMoreData = useLoadMoreData()
     const [expandedIndex, setExpandedIndex] = useState(null);
-    const data = useSelector(state => state?.notifications?.data)
+    const notifications = useSelector(state => state?.notifications?.data)
     const limit = useSelector(state => state?.notifications?.limit)
     const totalNotification = useSelector(state => state?.notifications?.totalNotification)
     const {isAuthenticated, userData} = useSelector(state => state.auth)
@@ -30,13 +30,13 @@ export default function Notification({ show }) {
         notificationElement.addEventListener("scroll", debouncedLoadMoreReviews);
 
         return () => notificationElement.removeEventListener("scroll", debouncedLoadMoreReviews);
-    }, [limit, loadMoreData])
+    }, [limit, loadMoreData, idUser])
 
     const handleShowMore = (index) => {
         setExpandedIndex(index === expandedIndex ? null : index);
     };
     const handleCheckReadNotification = async (index, id) => {
-        if (data[index].isRead === false) {
+        if (notifications[index].isRead === false) {
             const response = await readNotificationService({
                 idNotification : id
             })
@@ -54,7 +54,7 @@ export default function Notification({ show }) {
         })
         if(response && response.status === 200)
         {
-            console.log("123")
+            console.log("")
             dispatch(readNotificationCommonRedux({
                 id : idNotification, 
                 newDate : response.notification
@@ -70,8 +70,7 @@ export default function Notification({ show }) {
                 <button type="button" class="btn btn-secondary btn-sm">Chưa đọc</button>
             </div>
             
-            {data?.map((notification, index) => (
-                // handleCheckReadNotificationCommon(notification?._id)
+            {notifications?.map((notification, index) => (
                 
                 <div 
                     onClick={() => { 

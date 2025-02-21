@@ -26,9 +26,19 @@ export const reviewsSlice = createSlice({
 
         loadMoreReview : (state, action) => {
             state.limit += 3
+        },
+
+        replyReviewRedux : (state, action) => {
+            state.reviews = state.reviews.map(review => {
+                if(review?._id === action.payload.id)
+                {
+                    return action.payload.newData
+                }
+                return review
+            })
         }
     }
 })
 
-export const {initDataReview, addReviewRedux,loadMoreReview} = reviewsSlice.actions
+export const {initDataReview, addReviewRedux,loadMoreReview, replyReviewRedux} = reviewsSlice.actions
 export default reviewsSlice.reducer

@@ -74,10 +74,20 @@ export const notificationsSlice = createSlice({
                 }
                 return notification
             })
+            state.totalNotificationNotRead -= 1
+        },
+
+        refreshAllNotificationRedux : (state) => {
+            state.data = []
+            state.page = 0
+            state.totalPage = 0
+            state.limit = 0
+            state.totalNotification = 0
+            state.totalNotificationNotRead = 0
         }
     }
 })
 
-export const { initDataNotification, readNotificationRedux, 
+export const { initDataNotification, readNotificationRedux, refreshAllNotificationRedux,
     loadMoreNotification, createNotificationRedux, updateNotificationRedux, switchPage, deleteNotificationRedux, readNotificationCommonRedux } = notificationsSlice.actions
 export default notificationsSlice.reducer

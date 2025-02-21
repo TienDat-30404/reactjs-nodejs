@@ -7,8 +7,10 @@ import { loginService, loginGoogle } from '../../services/UserService';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-
+import { refreshAllNotificationRedux } from '../../redux/Notification/notificationsSlice';
+import { useDispatch, useSelector } from 'react-redux';
 function LoginModal({ show, handleClose, switchSignIn }) {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [userName, setUserName] = useState('')
   const [password, setPassword] = useState('')
@@ -52,6 +54,8 @@ function LoginModal({ show, handleClose, switchSignIn }) {
 
   const handleClickLogin = async () => {
     try {
+      dispatch(refreshAllNotificationRedux())
+
       const response = await loginService(dataLogin, true)
       console.log(response)
       if (response.errors) {
@@ -79,6 +83,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
   }
 
   const handleClickLoginGoogle = (credentialResponse) => {
+    dispatch(refreshAllNotificationRedux())
     console.log(credentialResponse)
     console.log("Token từ Google:", credentialResponse.credential);
 
@@ -96,9 +101,6 @@ function LoginModal({ show, handleClose, switchSignIn }) {
       .catch((err) => console.error("Lỗi:", err));
   }
 
-  const handleLoginError = () => {
-    console.error("Đăng nhập Google thất bại");
-  };
 
 
   return (

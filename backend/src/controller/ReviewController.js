@@ -2,37 +2,33 @@ import Review from '../model/ReviewModel.js';
 import ResponseReview from '../model/ResponseReview.js';
 
 class ReviewController {
-    static async reviewProduct(req, res, next) {
+    static async getAllReviewOfProduct(req, res, next) {
         try {
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 3;
             const startPage = (page - 1) * limit;
-            const  idProduct  = req.params; 
-            const listReview = await Review.find({ idProduct: idProduct })
-                .skip(startPage)
-                .limit(limit)
-                .populate({
-                    path: 'idUser',
-                    populate: {
-                        path: 'idAccount',
-                        model: 'Account',
-                        populate: {
-                            path: 'idRole',
-                            model: 'Role'
-                        }
-                    }
-                })
-                .populate({
-                    path: 'idProduct',
-                    populate: {
-                        path: 'idCategory'
-                    }
-                });
-
-            const reviews = await Promise.all(listReview.map(async (review) => {
-                let response = await ResponseReview.find({ idReview: review._id })
+            const idProduct = req.params;
+            let [reviews, totalReview] = await Promise.all([
+                Review.find({ idProduct: idProduct })
+                    .skip(startPage)
+                    .limit(limit)
                     .populate({
-                        path: 'idSupportCustomer',
+                        path: 'responseReview',
+                        populate: {
+                            path: 'idSupportCustomer',
+                            model: 'User',
+                            populate: {
+                                path: 'idAccount',
+                                model: 'Account',
+                                populate: {
+                                    path: 'idRole',
+                                    model: 'Role'
+                                }
+                            }
+                        }
+                    })
+                    .populate({
+                        path: 'idUser',
                         populate: {
                             path: 'idAccount',
                             model: 'Account',
@@ -41,47 +37,61 @@ class ReviewController {
                                 model: 'Role'
                             }
                         }
-                    });
+                    })
+                    .populate({
+                        path: 'idProduct',
+                        populate: {
+                            path: 'idCategory'
+                        }
+                    }).lean(),
+                Review.countDocuments({ idProduct: idProduct })
+            ])
 
-                response = response.map(item => {
-                    const { idSupportCustomer, ...rest } = item.toObject();
-                    const { idAccount, ...user } = idSupportCustomer;
-                    const { idRole, ...account } = idAccount;
-                    return {
-                        ...rest,
-                        user: {
-                            ...user,
-                            account: {
-                                ...account,
-                                role: { ...idRole }
+            if (reviews?.length > 0) {
+                reviews = reviews?.map(review => {
+                    let { idUser, idProduct, responseReview, ...rest } = review
+                    const { idAccount, ...userRest } = idUser
+                    const { idRole, ...accountRest } = idAccount
+
+                    const { idCategory, ...productRest } = idProduct
+
+                    responseReview = responseReview?.map(item => {
+                        const { idSupportCustomer, ...replyRest } = item
+                        const { idAccount, ...accountRest } = idSupportCustomer
+                        const { idRole, ...roleRest } = idAccount
+
+                        item = {
+                            ...replyRest,
+                            user: {
+                                ...accountRest,
+                                account: {
+                                    ...roleRest,
+                                    role: idRole
+                                }
                             }
                         }
-                    };
-                });
+                        return item
+                    })
 
-                return {
-                    ...review.toObject(),
-                    response
-                };
-            }));
+                    review = {
+                        ...rest,
+                        user: {
+                            ...userRest,
+                            account: {
+                                ...accountRest,
+                                role: idRole
+                            }
+                        },
+                        product: {
+                            ...productRest,
+                            category: idCategory
+                        },
+                        response: responseReview
+                    }
+                    return review
+                })
+            }
 
-            reviews.map(review => {
-                review.idUser.idAccount.role = review.idUser.idAccount.idRole;
-                review.idUser.account = review.idUser.idAccount;
-                review.user = review.idUser;
-
-                review.idProduct.category = review.idProduct.idCategory;
-                review.product = review.idProduct;
-
-                delete review.idUser.idAccount.idRole;
-                delete review.idUser.idAccount;
-                delete review.idUser;
-
-                delete review.idProduct.idCategory;
-                delete review.idProduct;
-            });
-
-            const totalReview = await Review.countDocuments({ idProduct: idProduct });
             const totalPage = Math.ceil(totalReview / limit);
 
             return res.status(200).json({
@@ -125,6 +135,7 @@ class ReviewController {
                     }
                 }).lean();
 
+
             if (review.idUser) {
                 review.idUser.idAccount.role = review.idUser.idAccount.idRole;
                 review.idUser.account = review.idUser.idAccount;
@@ -152,10 +163,199 @@ class ReviewController {
             const { idReview, idSupportCustomer, reply } = req.body;
             const responseReview = new ResponseReview({ idReview, idSupportCustomer, reply });
             await responseReview.save();
-            return res.status(201).json({ responseReview });
+
+            let review = await Review.findById({ _id: idReview })
+                .populate({
+                    path: 'responseReview',
+                    populate: {
+                        path: 'idSupportCustomer',
+                        model: 'User',
+                        populate: {
+                            path: 'idAccount',
+                            model: 'Account',
+                            populate: {
+                                path: 'idRole',
+                                model: 'Role'
+                            }
+                        }
+                    }
+                })
+                .populate({
+                    path: 'idUser',
+                    populate: {
+                        path: 'idAccount',
+                        model: 'Account',
+                        populate: {
+                            path: 'idRole',
+                            model: 'Role'
+                        }
+                    }
+                })
+                .populate({
+                    path: 'idProduct',
+                    populate: {
+                        path: 'idCategory'
+                    }
+                }).lean()
+            if (review) {
+                let { idUser, idProduct, responseReview, ...rest } = review
+                const { idAccount, ...userRest } = idUser
+                const { idRole, ...accountRest } = idAccount
+
+                const { idCategory, ...productRest } = idProduct
+
+                responseReview = responseReview?.map(item => {
+                    const { idSupportCustomer, ...replyRest } = item
+                    const { idAccount, ...accountRest } = idSupportCustomer
+                    const { idRole, ...roleRest } = idAccount
+
+                    item = {
+                        ...replyRest,
+                        user: {
+                            ...accountRest,
+                            account: {
+                                ...roleRest,
+                                role: idRole
+                            }
+                        }
+                    }
+                    return item
+                })
+
+                review = {
+                    ...rest,
+                    user: {
+                        ...userRest,
+                        account: {
+                            ...accountRest,
+                            role: idRole
+                        }
+                    },
+                    product: {
+                        ...productRest,
+                        category: idCategory
+                    },
+                    response: responseReview
+                }
+            }
+
+            return res.status(201).json({ 
+                status : 200,
+                review,
+                message : 'Reply successfully'
+             });
         } catch (error) {
             next(error);
         }
+    }
+
+    static async getAllReview(req, res, next) {
+        try {
+
+            const page = parseInt(req.query.page) || 1
+            const limit = parseInt(req.query.limit) || 5
+            const startPage = (page - 1) * limit
+            const objectFilter = { deletedAt: null }
+            let [reviews, totalReview] = await Promise.all([
+                Review.find(objectFilter)
+                    .skip(startPage)
+                    .limit(limit)
+                    .populate({
+                        path: 'responseReview',
+                        populate: {
+                            path: 'idSupportCustomer',
+                            model: 'User',
+                            populate: {
+                                path: 'idAccount',
+                                model: 'Account',
+                                populate: {
+                                    path: 'idRole',
+                                    model: 'Role'
+                                }
+                            }
+                        }
+                    })
+                    .populate({
+                        path: 'idUser',
+                        populate: {
+                            path: 'idAccount',
+                            model: 'Account',
+                            populate: {
+                                path: 'idRole',
+                                model: 'Role'
+                            }
+                        }
+                    })
+                    .populate({
+                        path: 'idProduct',
+                        populate: {
+                            path: 'idCategory'
+                        }
+                    }).lean(),
+                Review.countDocuments(objectFilter)
+            ])
+
+            if (reviews?.length > 0) {
+                reviews = reviews?.map(review => {
+                    let { idUser, idProduct, responseReview, ...rest } = review
+                    const { idAccount, ...userRest } = idUser
+                    const { idRole, ...accountRest } = idAccount
+
+                    const { idCategory, ...productRest } = idProduct
+
+                    responseReview = responseReview?.map(item => {
+                        const { idSupportCustomer, ...replyRest } = item
+                        const { idAccount, ...accountRest } = idSupportCustomer
+                        const { idRole, ...roleRest } = idAccount
+
+                        item = {
+                            ...replyRest,
+                            user: {
+                                ...accountRest,
+                                account: {
+                                    ...roleRest,
+                                    role: idRole
+                                }
+                            }
+                        }
+                        return item
+                    })
+
+                    review = {
+                        ...rest,
+                        user: {
+                            ...userRest,
+                            account: {
+                                ...accountRest,
+                                role: idRole
+                            }
+                        },
+                        product: {
+                            ...productRest,
+                            category: idCategory
+                        },
+                        response: responseReview
+                    }
+                    return review
+                })
+            }
+
+            const totalPage = Math.ceil(totalReview / limit)
+            return res.status(200).json({
+                status: 200,
+                page,
+                totalPage,
+                totalReview,
+                reviews,
+                limit
+            })
+        }
+        catch (err) {
+            return res.status(500).json({
+                message: `Fail when get review : ${err}`
+            })
+        }
+
     }
 }
 
