@@ -4,8 +4,8 @@ import { handleChangeInput } from '../../../../until/function'
 import { useSelector, useDispatch } from 'react-redux'
 import { visiblePagination } from '../../../../until/function'
 import Pagination from '../../../../components/Pagination'
-import { getAllReview } from '../../../../services/ReviewService'
-import { initDataReview } from '../../../../redux/Review/reviewsSlice'
+import { deleteReview, getAllReview } from '../../../../services/ReviewService'
+import { deleteReviewRedux, initDataReview, switchPage } from '../../../../redux/Review/reviewsSlice'
 import ReplyReview from './ReplyReview'
 
 export default function Review() {
@@ -19,11 +19,11 @@ export default function Review() {
     const [showEdit, setShowEdit] = useState(false)
     const [selectedReview, setSelectedReview] = useState(null);
 
-    const [displayTextSearch, setDisplayTextSearch] = useState('idDiscount')
+    const [displayTextSearch, setDisplayTextSearch] = useState('idReview')
     const [searchCriteria, setSearchCriteria] = useState({
-        idDiscount: '',
-        status: '',
-        name: ''
+        idReview: '',
+        content: '',
+        rating: ''
     })
 
     
@@ -31,13 +31,16 @@ export default function Review() {
         const fetchData = async () => {
             try {
                 let query = `page=${page}&limit=${limit}`
-                let queryProduct = 'limit=100'
-                // if (searchCriteria.idDiscount != "") {
-                //     query += `&idDiscount=${searchCriteria.idDiscount}`
-                // }
-                // if (searchCriteria.status != "") {
-                //     query += `&status=${searchCriteria.status}`
-                // }
+                if (searchCriteria.idReview != "") {
+                    query += `&idReview=${searchCriteria.idReview}`
+                }
+                if (searchCriteria.content != "") {
+                    query += `&content=${searchCriteria.content}`
+                }
+                if (searchCriteria.rating != "") {
+                    query += `&rating=${searchCriteria.rating}`
+                }
+
                 
                 const response = await getAllReview(query)
                 if(response && response.status === 200)
@@ -51,36 +54,35 @@ export default function Review() {
             }
         }
         fetchData()
-    }, [page, limit]);
+    }, [page, limit, displayTextSearch, searchCriteria]);
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
         setSelectedReview(data)
     }
 
     const handlePagination = (page) => {
-        // dispatch(switchPage(page))
+        dispatch(switchPage(page))
     }
 
 
     // handle delete product
-    const handleDeleteDiscount = async (id) => {
-        // const response = await deleteDiscount(id)
-        // if (response && response?.status === 200) {
-        //     dispatch(deleteDiscountRedux(id))
-        //     if (discounts?.length === 1 && page > 1) {
-        //         dispatch(switchPage(page - 1))
-        //     }
-        // }
+    const handleDeleteReview = async (id) => {
+        const response = await deleteReview(id)
+        if (response && response?.status === 200) {
+            dispatch(deleteReviewRedux(id))
+            if (reviews?.length === 1 && page > 1) {
+                dispatch(switchPage(page - 1))
+            }
+        }
     }
 
     const handleChangeSearchSelect = (e) => {
-        // setSearchCriteria({
-        //     idDiscount: '',
-        //     status: '',
-        //     name: ''
-        // })
-        // console.log(e.target.value)
-        // setDisplayTextSearch(e.target.value)
+        setSearchCriteria({
+            idReview: '',
+            content : '',
+            rating: ''
+        })
+        setDisplayTextSearch(e.target.value)
     }
     return (
         <div className='px-4 py-2 bg-white product'>
@@ -88,7 +90,6 @@ export default function Review() {
                 <div className='d-flex align-items-center'>
                     <h3>Review</h3>
                     <h6 className='ms-3'>({totalReview} review found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo giảm giá cho sản phẩm</button>
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -106,13 +107,13 @@ export default function Review() {
                 class="form-select"
                 onChange={handleChangeSearchSelect}
             >
-                <option value="idDiscount" selected>Tìm kiếm theo Id</option>
-                <option value="status">Tìm kiếm theo trạng thái</option>
-                <option value="name">Tìm kiếm theo tên</option>
+                <option value="idReview" selected>Tìm kiếm theo Id</option>
+                <option value="content">Tìm kiếm theo nội dung</option>
+                <option value="rating">Tìm kiếm theo đánh giá sao</option>
             </select>
 
 
-            {displayTextSearch && displayTextSearch != "status" && (
+            {displayTextSearch && displayTextSearch != "rating" && (
                 <div class="input-group mb-3 mt-1">
                     <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
                     <input
@@ -125,15 +126,18 @@ export default function Review() {
                 </div>
             )}
 
-            {displayTextSearch === "status" && (
+            {displayTextSearch === "rating" && (
                 <select
                     name={displayTextSearch}
                     value={searchCriteria[`${displayTextSearch}`]}
                     onChange={(e) => handleChangeInput(e, setSearchCriteria)}
                     className="form-select mt-2"
                 >
-                    <option value="1">Đang giảm giá</option>
-                    <option value="0">Hết giảm giá</option>
+                    <option value="1">1 star</option>
+                    <option value="2">2 star</option>
+                    <option value="3">3 star</option>
+                    <option value="4">4 star</option>
+                    <option value="5">5 star</option>
                 </select>
             )}
 
@@ -175,7 +179,7 @@ export default function Review() {
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteDiscount(review?._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button onClick={() => handleDeleteReview(review?._id)} type="button" className="btn btn-outline-danger">Delete</button>
                                 </td>
                             </tr>
                         ))

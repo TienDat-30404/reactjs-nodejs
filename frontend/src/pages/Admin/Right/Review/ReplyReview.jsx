@@ -3,8 +3,8 @@ import { detailOrder } from '../../../../services/OrderService';
 import { confirmOrder } from '../../../../services/OrderService';
 import { useSelector, useDispatch } from 'react-redux';
 import { confirmOrderRedux } from '../../../../redux/Order/ordersSlice';
-import { replyReview } from '../../../../services/ReviewService';
-import { replyReviewRedux } from '../../../../redux/Review/reviewsSlice';
+import { editReplyReview, replyReview } from '../../../../services/ReviewService';
+import { editReplyReviewRedux, replyReviewRedux } from '../../../../redux/Review/reviewsSlice';
 import { toast } from 'react-toastify';
 import { ErrorMessageInput } from '../../../../components/InputComponent';
 export default function ReplyReview({ show, close, data }) {
@@ -22,6 +22,7 @@ export default function ReplyReview({ show, close, data }) {
         }
     }, [show, data])
     const handleResponse = async () => {
+        console.log(data)
         const response = await replyReview({
             idReview: data?._id,
             idSupportCustomer: userData?.dataLogin?.idUser,
@@ -37,12 +38,38 @@ export default function ReplyReview({ show, close, data }) {
         if (response?.error) {
             setError(response.error)
         }
-    } 
+    }
+
+    const handleEditResponse = async () => {
+        console.log(data) 
+        const response = await editReplyReview({
+            idReplyReview: data?.response[0]?._id,
+            reply: content
+        })
+        console.log(response)
+        if (response.status === 200) {
+            toast.success('Chỉnh sửa phản hồi thành công')
+            dispatch(editReplyReviewRedux({
+                id: data?.response[0]?._id,
+                newData: response?.review
+            }))
+        }
+        if (response?.error) {
+            setError(response.error)
+        }
+    }
+
+    const handleConfirmResponse = () => {
+        if (Array.isArray(data?.response) && data.response.length > 0) {
+            handleEditResponse();
+        } else {
+            handleResponse();
+        }
+    }
 
     const handleChangeInput = (e) => {
         setContent(e.target.value)
-        if(content != "")
-        {
+        if (content != "") {
             setError({})
         }
     }
@@ -92,7 +119,7 @@ export default function ReplyReview({ show, close, data }) {
                 <div className="mb-3 fw-bold">
                     <label for="exampleFormControlTextarea1" className="form-label">Phản hồi</label>
                     <textarea
-                        name = "reply"
+                        name="reply"
                         value={content}
                         onChange={handleChangeInput}
                         className={`form-control ${error.reply ? 'is-invalid' : ''}`}
@@ -106,7 +133,7 @@ export default function ReplyReview({ show, close, data }) {
                 <div className='d-flex justify-content-end'>
                     <button onClick={() => close()} className='btn btn-secondary me-2'>Close</button>
                     <div className='d-flex'>
-                        <button onClick={() => handleResponse()} className='btn btn-primary'>Xác nhận phản hồi</button>
+                        <button onClick={() => handleConfirmResponse()} className='btn btn-primary'>Xác nhận phản hồi</button>
                     </div>
                 </div>
             </div>
