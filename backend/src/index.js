@@ -1,4 +1,6 @@
 import express from 'express';
+import { Server } from "socket.io";
+
 import http from 'http';
 // import * as socketIo from 'socket.io';  // Thêm socket.io
 import dotenv from 'dotenv';
@@ -28,26 +30,27 @@ const corsOptions = {
 app.use(cors(corsOptions));
 // Tạo server HTTP
 const server = http.createServer(app);
-// Tích hợp socket.io với server
-// const io = socketIo(server, {
-//   cors: {
-//     origin: "http://localhost:3000", // Client domain
-//     methods: ["GET", "POST"],
-//     credentials: true,
-//   },
-// });
 
-// // Lưu io trong app để dùng trong các controller
-// app.set('io', io);
+// Tích hợp socket.io với server
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // Client domain
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+// Lưu io trong app để dùng trong các controller
+app.set('io', io);
 
 // Sự kiện kết nối từ client
-// io.on('connection', (socket) => {
-//   console.log('New client connected', socket.id);
+io.on('connection', (socket) => {
+  console.log('New client connected', socket.id);
 
-//   socket.on('disconnect', () => {
-//     console.log('Client disconnected');
-//   });
-// });
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
 
 // Routes
 import routes from './routes/index.js';

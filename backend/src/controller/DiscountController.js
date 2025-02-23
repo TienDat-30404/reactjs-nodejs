@@ -11,7 +11,7 @@ export default class DiscountController {
                 endDate
             })
 
-            let savedDiscount = await dataDiscount.save()
+            const savedDiscount = await dataDiscount.save()
             let discount = await Discount.findById({ _id: savedDiscount?._id })
                 .populate('idProduct')
                 .lean()

@@ -12,7 +12,6 @@ export default class MessageController {
             // Phát sự kiện 'newMessage' tới tất cả các client
             const io = req.app.get('io');
             io.emit('newMessage', newMessage);
-    
             return res.status(200).json({ newMessage });
         } catch (error) {
             next(error);

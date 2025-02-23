@@ -5,9 +5,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import { visiblePagination } from '../../../../until/function'
 import Pagination from '../../../../components/Pagination'
 import { deleteReview, getAllReview } from '../../../../services/ReviewService'
-import { deleteReviewRedux, initDataReview, switchPage } from '../../../../redux/Review/reviewsSlice'
+import { addReviewRedux, deleteReviewRedux, initDataReview, switchPage } from '../../../../redux/Review/reviewsSlice'
 import ReplyReview from './ReplyReview'
-
+import { io } from 'socket.io-client'
+const socket = io(process.env.REACT_APP_API_URL);
 export default function Review() {
     const dispatch = useDispatch()
     const reviews = useSelector(state => state?.reviews?.reviews)
@@ -55,6 +56,13 @@ export default function Review() {
         }
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria]);
+
+    useEffect(() => {
+        socket.on('review', (review) => {
+            dispatch(addReviewRedux(review))
+        })
+    }, [])
+
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
         setSelectedReview(data)
@@ -75,6 +83,8 @@ export default function Review() {
             }
         }
     }
+
+    
 
     const handleChangeSearchSelect = (e) => {
         setSearchCriteria({

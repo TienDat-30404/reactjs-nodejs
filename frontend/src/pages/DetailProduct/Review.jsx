@@ -1,11 +1,13 @@
 import React, { useCallback, useRef } from 'react'
-import { addReviewRedux, initDataReview, loadMoreReview } from '../../redux/Review/reviewsSlice'
+import { addReviewRedux, deleteReviewRedux, editReplyReviewRedux, initDataReview, loadMoreReview, replyReviewRedux } from '../../redux/Review/reviewsSlice'
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 import { addReview, getAllReviewOfProduct } from '../../services/ReviewService'
 import { formatTime } from '../../until/function'
 import { useLoadMoreData, debounce} from '../../until/function'
+import { io } from 'socket.io-client'
+const socket = io(process.env.REACT_APP_API_URL);
 
 export default function Review({ idProduct }) {
   const dispatch = useDispatch()
@@ -68,6 +70,7 @@ export default function Review({ idProduct }) {
       })
       console.log(response)
       if (response && response.status === 201) {
+        console.log(response.review)
         dispatch(addReviewRedux(response.review))
         toast.success("Bình luận thành công")
         setContent("")
@@ -78,6 +81,27 @@ export default function Review({ idProduct }) {
       console.log("Lỗi khi bình luận sản phẩm", error)
     }
   }
+
+  useEffect(() => {
+    socket.on('replyReview', (replyReview) => {
+      dispatch(replyReviewRedux({
+        id : replyReview?.idReview ,
+        newData : replyReview
+      }))
+    })
+
+    socket.on('deleteReview', (review) => {
+      dispatch(deleteReviewRedux(review))
+    })
+
+    socket.on('editReplyReview', (idReplyReview, review) => {
+      dispatch(editReplyReviewRedux({
+        id : idReplyReview,
+        newData : review
+      }))
+    })
+  }, [])
+  
   return (
     <div className='mt-3'>
       <div class=" mb-3">

@@ -4,7 +4,7 @@ import { confirmOrder } from '../../../../services/OrderService';
 import { useSelector, useDispatch } from 'react-redux';
 import { confirmOrderRedux } from '../../../../redux/Order/ordersSlice';
 import { editReplyReview, replyReview } from '../../../../services/ReviewService';
-import { editReplyReviewRedux, replyReviewRedux } from '../../../../redux/Review/reviewsSlice';
+import { editReplyReviewRedux, ggRedux, replyReviewRedux } from '../../../../redux/Review/reviewsSlice';
 import { toast } from 'react-toastify';
 import { ErrorMessageInput } from '../../../../components/InputComponent';
 export default function ReplyReview({ show, close, data }) {
@@ -22,7 +22,6 @@ export default function ReplyReview({ show, close, data }) {
         }
     }, [show, data])
     const handleResponse = async () => {
-        console.log(data)
         const response = await replyReview({
             idReview: data?._id,
             idSupportCustomer: userData?.dataLogin?.idUser,
@@ -30,9 +29,10 @@ export default function ReplyReview({ show, close, data }) {
         })
         if (response.status === 200) {
             toast.success('Phản hồi thành công')
+            
             dispatch(replyReviewRedux({
                 id: data?._id,
-                newData: response?.review
+                newData: response?.replyReview
             }))
         }
         if (response?.error) {

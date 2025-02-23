@@ -28,14 +28,14 @@ export const reviewsSlice = createSlice({
             state.limit += 3
         },
 
-        replyReviewRedux: (state, action) => {
-            state.reviews = state.reviews.map(review => {
-                if (review?._id === action.payload.id) {
-                    return action.payload.newData
-                }
-                return review
-            })
-        },
+        // replyReviewRedux: (state, action) => {
+        //     state.reviews = state.reviews.map(review => {
+        //         if (review?._id === action.payload.id) {
+        //             return action.payload.newData
+        //         }
+        //         return review
+        //     })
+        // },
 
         editReplyReviewRedux: (state, action) => {
             state.reviews.forEach(review => {
@@ -54,10 +54,22 @@ export const reviewsSlice = createSlice({
         deleteReviewRedux : (state, action) => {
             state.reviews = state.reviews.filter(review => review?._id !== action.payload)
             state.totalReview -= 1
+        },
+
+        replyReviewRedux : (state, action) => {
+            
+            const id = action.payload.id 
+            const indexReview = state.reviews.findIndex(review => review?._id === id)
+            if(indexReview != -1)
+            {
+                state.reviews[indexReview].response.push(action.payload.newData)
+            }
+         
         }
 
     }
 })
 
-export const { initDataReview, addReviewRedux, loadMoreReview, replyReviewRedux, editReplyReviewRedux, switchPage, deleteReviewRedux } = reviewsSlice.actions
+export const { initDataReview, addReviewRedux, loadMoreReview, replyReviewRedux, editReplyReviewRedux,
+     switchPage, deleteReviewRedux } = reviewsSlice.actions
 export default reviewsSlice.reducer

@@ -120,55 +120,8 @@ class ReviewController {
             const savedReview = await dataReview.save();
             let review = await Review.findOne({ _id: savedReview._id })
                 .populate({
-                    path: 'idUser',
-                    populate: {
-                        path: 'idAccount',
-                        model: 'Account',
-                        populate: {
-                            path: 'idRole',
-                            model: 'Role'
-                        }
-                    }
-                })
-                .populate({
-                    path: 'idProduct',
-                    populate: {
-                        path: 'idCategory'
-                    }
-                }).lean();
-
-
-            if (review.idUser) {
-                review.idUser.idAccount.role = review.idUser.idAccount.idRole;
-                review.idUser.account = review.idUser.idAccount;
-                review.user = review.idUser;
-
-                review.idProduct.category = review.idProduct.idCategory;
-                review.product = review.idProduct;
-
-                delete review.idUser.idAccount.idRole;
-                delete review.idUser.idAccount;
-                delete review.idUser;
-
-                delete review.idProduct.idCategory;
-                delete review.idProduct;
-            }
-
-            return res.status(201).json({ review, status: 201 });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    static async replyReview(req, res, next) {
-        try {
-            const { idReview, idSupportCustomer, reply } = req.body;
-            const responseReview = new ResponseReview({ idReview, idSupportCustomer, reply });
-            await responseReview.save();
-
-            let review = await Review.findById({ _id: idReview })
-                .populate({
                     path: 'responseReview',
+                    match: { deletedAt: null },
                     populate: {
                         path: 'idSupportCustomer',
                         model: 'User',
@@ -198,53 +151,88 @@ class ReviewController {
                     populate: {
                         path: 'idCategory'
                     }
-                }).lean()
+                }).lean();
+
+
             if (review) {
-                let { idUser, idProduct, responseReview, ...rest } = review
-                const { idAccount, ...userRest } = idUser
-                const { idRole, ...accountRest } = idAccount
 
-                const { idCategory, ...productRest } = idProduct
+                const { idUser, idProduct, responseReview, ...restReview } = review
+                const { idAccount, ...restUser } = idUser
+                const { idRole, ...restAccount } = idAccount
 
-                responseReview = responseReview?.map(item => {
-                    const { idSupportCustomer, ...replyRest } = item
-                    const { idAccount, ...accountRest } = idSupportCustomer
-                    const { idRole, ...roleRest } = idAccount
-
-                    item = {
-                        ...replyRest,
-                        user: {
-                            ...accountRest,
-                            account: {
-                                ...roleRest,
-                                role: idRole
-                            }
-                        }
-                    }
-                    return item
-                })
+                const { idCategory, ...restProduct } = idProduct
 
                 review = {
-                    ...rest,
+                    ...restReview,
                     user: {
-                        ...userRest,
+                        ...restUser,
                         account: {
-                            ...accountRest,
+                            ...restAccount,
                             role: idRole
                         }
                     },
                     product: {
-                        ...productRest,
+                        ...restProduct,
                         category: idCategory
                     },
                     response: responseReview
                 }
+
+
             }
+            const io = req.app.get('io')
+            io.emit('review', review)
+            return res.status(201).json({
+                review,
+                status: 201
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async replyReview(req, res, next) {
+        try {
+            const { idReview, idSupportCustomer, reply } = req.body;
+            const data = new ResponseReview({ idReview, idSupportCustomer, reply });
+            let savedReplyReview = await data.save()
+            let replyReview = await ResponseReview.findById({ _id: savedReplyReview._id })
+                .populate({
+                    path: 'idSupportCustomer',
+                    populate: {
+                        path: 'idAccount',
+                        model: 'Account',
+                        populate: {
+                            path: 'idRole',
+                            model: 'Role'
+                        }
+                    }
+                }).lean()
+            if (replyReview) {
+                const { idSupportCustomer, ...restReplyReview } = replyReview
+                const { idAccount, ...restUser } = idSupportCustomer
+                const { idRole, ...restAccount } = idAccount
+
+                replyReview = {
+                    ...restReplyReview,
+                    user: {
+                        ...restUser,
+                        account: {
+                            ...restAccount,
+                            role: idRole
+                        }
+                    }
+                }
+            }
+
+            const io = req.app.get('io')
+            io.emit('replyReview', replyReview)
 
             return res.status(201).json({
                 status: 200,
-                review,
+                replyReview,
                 message: 'Reply successfully'
+
             });
         } catch (error) {
             next(error);
@@ -282,6 +270,8 @@ class ReviewController {
                     }
                 }
             }
+            const io = req.app.get('io')
+            io.emit('editReplyReview', idReplyReview, review)
 
 
             return res.status(200).json({
@@ -318,12 +308,10 @@ class ReviewController {
                 }
                 objectFilter._id = req.query.idReview
             }
-            if(req.query.content)
-            {
-                objectFilter.content = {$regex : req.query.content, $options : 'i' }
+            if (req.query.content) {
+                objectFilter.content = { $regex: req.query.content, $options: 'i' }
             }
-            if(req.query.rating)
-            {
+            if (req.query.rating) {
                 objectFilter.rating = req.query.rating
             }
             let [reviews, totalReview] = await Promise.all([
@@ -435,9 +423,16 @@ class ReviewController {
                 Review.updateOne({ _id: id }, { deletedAt: Date.now(), status: 0 }, { new: true }),
                 ResponseReview.updateOne({ idReview: id }, { deletedAt: Date.now() })
             ])
+            if(review?.modifiedCount > 0 && responseReview?.modifiedCount >= 0)
+            {
+                const io = req.app.get('io')
+                io.emit('deleteReview', id)
+            }
             return res.status(200).json({
                 status: 200,
-                message: 'Delete review successfully'
+                message: 'Delete review successfully',
+                review, 
+                responseReview
             })
         }
         catch (error) {
