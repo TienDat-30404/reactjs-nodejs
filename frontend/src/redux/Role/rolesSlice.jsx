@@ -22,8 +22,26 @@ export const rolesSlice = createSlice({
         },
         switchPage : (state, action) => {
             state.page = action.payload
+        },
+
+        addRoleRedux : (state, action) => {
+            state.roles.push(action.payload)
+        },
+
+        updateRoleRedux : (state, action) => {
+            state.roles = state.roles.map(role => {
+                if(role?._id === action.payload.id)
+                {
+                    return action.payload.newData
+                }
+                return role
+            })
+        },
+
+        deleteRoleRedux : (state, action) => {
+            state.roles = state.roles.filter(role => role._id !== action.payload)
         }
     }
 })
-export const {initDataRole, switchPage} = rolesSlice.actions
+export const {initDataRole, switchPage, addRoleRedux, updateRoleRedux, deleteRoleRedux} = rolesSlice.actions
 export default rolesSlice.reducer

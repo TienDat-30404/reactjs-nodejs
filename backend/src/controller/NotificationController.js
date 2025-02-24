@@ -159,8 +159,8 @@ export default class NotificationController {
     }
 
     static async deleteNotification(req,res, next) {
-        const {idNotification} = req.params
         try {
+            const {idNotification} = req.params
             const response = await Notification.updateOne({ _id : idNotification }, {
                 deletedAt : new Date()
             })

@@ -171,11 +171,9 @@ export default function Review({ idProduct }) {
         </div>
       ))
       }
-
-
-
-
-
     </div>
   )
 }
+
+
+

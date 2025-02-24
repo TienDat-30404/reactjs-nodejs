@@ -12,6 +12,7 @@ import Attribute from "../pages/Admin/Right/Attribute/Attribute";
 import Voucher from "../pages/Admin/Right/Voucher/Voucher";
 import Notification from "../pages/Admin/Right/Notification/Notification";
 import Review from "../pages/Admin/Right/Review/Review";
+import Role from "../pages/Admin/Right/Role/Role";
 export const adminRoutes = [
 
     {path: '*', page: NotFoundPage, layout : AdminLayout},
@@ -33,5 +34,6 @@ export const adminRoutes = [
     {path : '/admin/attribute', page : Attribute, layout : AdminLayout},
     {path : '/admin/voucher', page : Voucher, layout : AdminLayout},
     {path : '/admin/notification', page : Notification, layout : AdminLayout},
-    {path : '/admin/review', page : Review, layout : AdminLayout}
+    {path : '/admin/review', page : Review, layout : AdminLayout},
+    {path : '/admin/role', page : Role, layout : AdminLayout}
 ]

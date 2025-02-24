@@ -68,12 +68,13 @@ export default function SidebarAdmin() {
                 <li onClick={() => navigate('/admin/review')} class="nav-item">
                     <i class="bi bi-person-video2"></i>
                     <p class="nav-link">Review</p>
-                </li>
-                {/* 
-                <li onClick={() => navigate('/admin/review')} class="nav-item">
+                </li> 
+
+                <li onClick={() => navigate('/admin/role')} class="nav-item">
                     <i class="bi bi-person-video2"></i>
-                    <p class="nav-link">Review</p>
-                </li> */}
+                    <p class="nav-link">Role</p>
+                </li>
+                
             </ul>
         </div>
     )

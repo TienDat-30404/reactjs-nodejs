@@ -1,45 +1,117 @@
 // const Role = require('../model/RoleModel')
+import mongoose from 'mongoose';
 import Role from '../model/RoleModel.js'
+import Account from '../model/AccountModel.js'
+
 export default class RoleController {
 
-    static async addRole(req, res, next)  {
+    static async addRole(req, res, next) {
         try {
             const { name } = req.body;
-            const newRole = new Role({ name });
-            await newRole.save();
-            res.status(200).json(newRole);
+
+            const role = new Role({ name });
+            await role.save();
+            res.status(201).json({
+                role,
+                status: 201,
+                message: 'Crete role successfully'
+            });
         } catch (error) {
-            next(error);
-        }   
-    }
-    
-    static async getAllRole(req, res, next)  {
-        try 
-        {
-            const roles = await Role.find({})
-            return res.status(200).json({roles, status : 200})
-        }
-        catch (error)
-        {
-            next(error)
+            return res.status(500).json({
+                message: `Fail when create role : ${error}`
+            })
         }
     }
-    
-    static async detailRole(req, res, next)  {
+
+    static async getAllRole(req, res, next) {
         try {
-            const idRole = req.params.idRole
-            const detailRole = await Role.findOne({ _id: idRole })
-            if (detailRole == null) {
-                return res.status(400).json({
-                    message: "Fail Detail Role"
-                })
+            const page = parseInt(req.query.page) || 1
+            const limit = parseInt(req.query.limit) || 5
+            const startPage = (page - 1) * limit
+            const objectFilter = { deletedAt: null }
+            if (req.query.idRole) {
+                if (mongoose.Types.ObjectId.isValid(req.query.idRole)) {
+                    objectFilter._id = req.query.idRole
+                }
+                else {
+                    return res.status(200).json({
+                        status: 200,
+                        page: '',
+                        limit: '',
+                        totalPage: 1,
+                        totalRole: 0,
+                        roles: []
+                    })
+                }
             }
+            if (req.query.name) {
+                objectFilter.name = { $regex: req.query.name, $options: 'i' }
+            }
+
+            const [roles, totalRole] = await Promise.all([
+                Role.find(objectFilter)
+                    .skip(startPage)
+                    .limit(limit)
+                ,
+                Role.countDocuments(objectFilter)
+            ])
+            const totalPage = Math.ceil(totalRole / limit)
+
             return res.status(200).json({
-                detailRole
+                status: 200,
+                page,
+                totalPage,
+                totalRole,
+                roles,
+                limit
             })
         }
         catch (error) {
             next(error)
         }
     }
+
+    static async updateRole(req, res, next) {
+        try {
+
+            const { idRole } = req.params
+            const { name } = req.body
+            const role = await Role.findByIdAndUpdate({ _id: idRole },
+                { name },
+                { new: true }
+            )
+            return res.status(200).json({
+                role,
+                status: 200
+            })
+        }
+        catch (err) {
+            return res.status(500).json({
+                message: `Fail when update role : ${err}`
+            })
+        }
+    }
+
+    static async deleteRole(req, res, next) {
+        try {
+            const { idRole } = req.params
+            const response = await Role.updateOne({ _id: idRole }, {
+                deletedAt: new Date()
+            })
+            if (response.modifiedCount > 0) {
+                return res.status(200).json({
+                    status: 200,
+                    message: 'Delete role successfully'
+                })
+            }
+        }
+        catch(err)
+        {
+            return res.status(500).json({
+                message : `Fail when delete role : ${err}`
+            })
+        }
+    }
+
+
 }
