@@ -23,17 +23,17 @@ export default function Payment() {
     const phone = isAuthenticated && userData?.dataLogin?.phone
 
     // total Price
-    const totalPrice = (cartsCheck.reduce((sum, cart) =>
+    const totalPrice = Math.floor(cartsCheck.reduce((sum, cart) =>
         sum +
-        (cart?.attribute?.priceBought * cart?.quantity *
-            (cart?.attribute?.product?.discount?.length > 0 ?
-                ((100 - cart?.attribute?.product.discount[0].discountValue) / 100) : 1
+        (cart?.productAttribute?.priceBought * cart?.quantity *
+            (cart?.productAttribute?.product?.discount?.length > 0 ?
+                ((100 - cart?.productAttribute?.product.discount[0].discountValue) / 100) : 1
             ) *
             (
                 useVoucher?.length > 0 ?
                     ((100 - useVoucher[0]?.discountVoucher) / 100) : 1
             ) * 
-            ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
+            (1 + (cart?.productAttribute?.size?.sizePriceMultiplier / 100))
         )
         , 0))
 
@@ -82,6 +82,7 @@ export default function Payment() {
             }))
         }
     }, [idUser, phone, cartsCheck, chooseAddress.province, chooseAddress.district, chooseAddress.ward, showPayment])
+    console.log(cartsCheck)
 
     // fetch data province
     useEffect(() => {

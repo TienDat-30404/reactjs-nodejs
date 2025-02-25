@@ -1,10 +1,11 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
+import { handleChangeInput } from '../../../../until/function'
 import { useSelector, useDispatch } from 'react-redux'
 import { visiblePagination } from '../../../../until/function'
 import Pagination from '../../../../components/Pagination'
 import { getAllReceipt } from '../../../../services/ReceiptService'
-import { initDataReceipt } from '../../../../redux/Receipt/receiptsSlice'
+import { initDataReceipt, switchPage } from '../../../../redux/Receipt/receiptsSlice'
 import { getAllSupplier } from '../../../../services/SupplierService'
 import { initDataSupplier } from '../../../../redux/Supplier/suppliersSlice'
 import AddReceipt from './AddReceipt'
@@ -23,10 +24,10 @@ export default function Receipt() {
     const [showEdit, setShowEdit] = useState(false)
     const [selectedSupplier, setSelectedSupplier] = useState(null);
 
-    const [displayTextSearch, setDisplayTextSearch] = useState('idCategory')
+    const [displayTextSearch, setDisplayTextSearch] = useState('idReceipt')
     const [searchCriteria, setSearchCriteria] = useState({
-        idCategory: '',
-        name: ''
+        idReceipt: '',
+        supplier: ''
     })
 
 
@@ -35,18 +36,19 @@ export default function Receipt() {
 
             try {
                 let query = `page=${page}&limit=${limit}`
-                // if (searchCriteria.name != "") {
-                //   query += `&search=${searchCriteria.name}`
-                // }
-                // if (searchCriteria.idCategory != "") {
-                //   query += `&idCategory=${searchCriteria.idCategory}`
-                // }
+                if (searchCriteria.idReceipt != "") {
+                    query += `&idReceipt=${searchCriteria.idReceipt}`
+                }
+                if (searchCriteria.supplier != "") {
+                  query += `&supplier=${searchCriteria.supplier}`
+                }
+                console.log(query)
 
 
                 const [responseReceipt, responseSupplier, responseProduct] = await Promise.all([
                     await getAllReceipt(query),
                     await getAllSupplier(),
-                    await getAllProduct('typeDisplay=0')
+                    await getAllProduct()
                 ])
                 if (responseReceipt && responseReceipt.status == 200) {
                     dispatch(initDataReceipt(responseReceipt))
@@ -63,7 +65,7 @@ export default function Receipt() {
             }
         }
         fetchData()
-    }, [page, limit])
+    }, [page, limit, searchCriteria])
 
     const handleSwitchPageEdit = (data) => {
         // setShowEdit(true)
@@ -71,7 +73,7 @@ export default function Receipt() {
     }
 
     const handlePagination = (page) => {
-        // dispatch(switchPage(page))
+        dispatch(switchPage(page))
     }
 
 
@@ -87,11 +89,11 @@ export default function Receipt() {
     }
 
     const handleChangeSearchSelect = (e) => {
-        // setSearchCriteria({
-        //     idCategory: '',
-        //     name: ''
-        // })
-        // setDisplayTextSearch(e.target.value)
+        setSearchCriteria({
+            idReceipt: '',
+            supplier: ''
+        })
+        setDisplayTextSearch(e.target.value)
     }
     return (
         <div className='px-4 py-2 bg-white product'>
@@ -117,23 +119,43 @@ export default function Receipt() {
                 onChange={handleChangeSearchSelect}
                 class="form-select mt-2"
             >
-                <option value="idProduct" selected>Tìm kiếm theo Id</option>
-                <option value="name">Tìm kiếm theo tên</option>
+                <option value="idReceipt" selected>Tìm kiếm theo Id</option>
+                <option value="supplier">Tìm kiếm theo nhà cung cấp</option>
             </select>
 
 
-            {/* {displayTextSearch && (
-            <div class="input-group mb-3 mt-1">
-                <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
-                <input
-                    type="text"
-                    class="form-control"
-                    name={displayTextSearch}
-                    value={searchCriteria[`${displayTextSearch}`]}
-                    onChange={(e) => handleChangeInput(e, setSearchCriteria)}
-                />
-            </div>
-        )} */}
+            {displayTextSearch === 'idReceipt' && (
+                <div class="input-group mb-3 mt-1">
+                    <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
+                    <input
+                        type="text"
+                        class="form-control"
+                        name={displayTextSearch}
+                        value={searchCriteria[`${displayTextSearch}`]}
+                        onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+                    />
+                </div>
+            )}
+
+            {displayTextSearch == 'supplier' && (
+                <div>
+                    <select
+                        name={displayTextSearch}
+                        value={searchCriteria[`${displayTextSearch}`]}
+                        class="form-select"
+                        onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+                    >
+                        <option value = "">Chọn nhà cung cấp</option>
+                        {suppliers && suppliers?.length > 0 ? (
+                            suppliers?.map((supplier, index) => (
+                                <option key={index} value={supplier._id}>{supplier.name}</option>
+                            )
+                            )) :
+                            <option value="" selected>Không tồn tại nhà cung cấp</option>
+                        }
+                    </select>
+                </div>
+            )}
 
 
             <table class="table">

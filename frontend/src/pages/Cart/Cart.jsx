@@ -7,13 +7,14 @@ import { useSelector, useDispatch } from 'react-redux'
 import { initDataCart, switchPage, updateQuantity } from '../../redux/Cart/cartsSlice'
 import Voucher from './Voucher'; // Import component Voucher
 import { removeUseVoucher } from '../../redux/Voucher/vouchersSlice'
+import { toast } from 'react-toastify'
 
 export default function Cart() {
 
     const dispatch = useDispatch()
 
     const [cartsCheck, setCartsCheck] = useState([])
-
+    console.log(cartsCheck)
     const carts = useSelector(state => state.carts.carts)
     const page = useSelector(state => state.carts.page)
     const totalPage = useSelector(state => state.carts.totalPage)
@@ -64,14 +65,22 @@ export default function Cart() {
     }
 
     // increase quantity cart 
-    const handleIncreaseQuantityCart = async (idCart, newQuantity) => {
-        const response = await updateQuantityCart(idCart, newQuantity)
+    const handleUpdateQuantityCart = async (idCart, idProductAttribute, quantity) => {
+        const response = await updateQuantityCart(idCart, {
+            quantity,
+            idProductAttribute
+        })
         console.log(response)
-        if (response.success) {
+        if (response && response.status === 200) {
             dispatch(updateQuantity({
                 _id: idCart,
-                quantity: newQuantity
+                quantity
             }))
+        }
+        if(response && response.status === 400)
+        {
+            toast.error(response.message)
+            return;
         }
     }
 
@@ -92,19 +101,18 @@ export default function Cart() {
     // total Price
     const totalPrice = cartsCheck.reduce((sum, cart) =>
         sum +
-        (cart?.attribute?.priceBought * cart?.quantity *
-            (cart?.attribute?.product?.discount?.length > 0 ?
-                ((100 - cart?.attribute?.product.discount[0].discountValue) / 100) : 1
-            ) * ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
+        (cart?.productAttribute?.priceBought * cart?.quantity *
+            (cart?.productAttribute?.product?.discount?.length > 0 ?
+                ((100 - cart?.productAttribute?.product.discount[0].discountValue) / 100) : 1
+            ) * (1 + (cart?.productAttribute?.size?.sizePriceMultiplier / 100))
         )
         , 0)
-        console.log("ta tự hỏi", cartsCheck)
     const totalPriceDiscountProduct = cartsCheck.reduce((sum, cart) =>
         sum +
         (
-            cart?.attribute?.product?.discount?.length > 0 ?
-                (cart?.attribute?.product?.discount[0]?.discountValue / 100) * cart?.attribute?.priceBought *
-                ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
+            cart?.productAttribute?.product?.discount?.length > 0 ?
+                (cart?.productAttribute?.product?.discount[0]?.discountValue / 100) * cart?.productAttribute?.priceBought *
+                (1 + (cart?.productAttribute?.size?.sizePriceMultiplier / 100))
                 : 0
         ), 0)
 
@@ -160,24 +168,24 @@ export default function Cart() {
                                             style={{ width: '17px', height: '20px', marginRight: '8px' }}
                                             type="checkbox" name="" id=""
                                         />
-                                        <img width="60px" src={cart?.attribute?.product?.image} alt="" />
-                                        <p>{cart?.attribute?.product?.name}</p>
+                                        <img width="60px" src={cart?.productAttribute?.product?.image} alt="" />
+                                        <p>{cart?.productAttribute?.product?.name}</p>
                                     </div>
-                                    <span className='col-1'>{cart?.attribute?.size?.name}</span>
+                                    <span className='col-1'>{cart?.productAttribute?.size?.name}</span>
 
                                     <span
                                         className='col-2 '>
-                                        {(cart?.attribute?.priceBought *
-                                            (cart?.attribute?.product?.discount?.length > 0 ?
-                                                ((100 - cart?.attribute?.product?.discount[0]?.discountValue) / 100) : 1
-                                            ) * ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100)
+                                        {(cart?.productAttribute?.priceBought *
+                                            (cart?.productAttribute?.product?.discount?.length > 0 ?
+                                                ((100 - cart?.productAttribute?.product?.discount[0]?.discountValue) / 100) : 1
+                                            ) * (1 + (cart?.productAttribute?.size?.sizePriceMultiplier / 100))
                                         ).toLocaleString('vi-VN')}đ
                                     </span>
                                     <div className='col-2'>
                                         <button
                                             disabled={cart.quantity === 1}
                                             className={cart.quantity == 1 ? '' : 'hover_quantity-cart'}
-                                            onClick={() => handleIncreaseQuantityCart(cart._id, cart.quantity - 1)}
+                                            onClick={() => handleUpdateQuantityCart(cart?._id, cart?.productAttribute?._id, cart?.quantity - 1)}
 
                                             style={{ border: '1px solid #ccc', padding: '1px 8px', cursor: 'pointer' }}>
                                             -
@@ -185,17 +193,17 @@ export default function Cart() {
                                         <span style={{ border: '1px solid #ccc', padding: '1px 8px', }}>{cart?.quantity}</span>
                                         <button
                                             className='hover_quantity-cart'
-                                            onClick={() => handleIncreaseQuantityCart(cart._id, cart.quantity + 1)}
+                                            onClick={() => handleUpdateQuantityCart(cart?._id, cart?.productAttribute?._id, cart?.quantity + 1)}
                                             style={{ border: '1px solid #ccc', padding: '1px 8px' }}>
                                             +
                                         </button>
                                     </div>
                                     <span
                                         className='col-2 text-danger fw-bold'>
-                                        {(cart?.attribute?.priceBought * cart?.quantity *
-                                            (cart?.attribute?.product?.discount?.length > 0 ?
-                                                ((100 - cart?.attribute?.product?.discount[0]?.discountValue) / 100) : 1
-                                            ) * ((100 - cart?.attribute?.size?.sizePriceMultiplier) / 100 )
+                                        {(cart?.productAttribute?.priceBought * cart?.quantity *
+                                            (cart?.productAttribute?.product?.discount?.length > 0 ?
+                                                ((100 - cart?.productAttribute?.product?.discount[0]?.discountValue) / 100) : 1
+                                            ) * (1 + (cart?.productAttribute?.size?.sizePriceMultiplier / 100))
                                         )
                                             .toLocaleString('vi-VN')}
                                     </span>

@@ -63,7 +63,7 @@ export default function ProductSale() {
             <div className='row pb-3 d-flex ms-3 product'>
                 {products.length > 0 ? (
                     products.map((product, index) => {
-                        const indexPriceAttribute = product?.productAttributes?.find(attr => attr.priceBought !== null);
+                        const indexPriceAttribute = product?.productAttributes?.find(attr => attr.quantity !== 0);
 
                         if (!indexPriceAttribute) return null;
 
@@ -75,7 +75,7 @@ export default function ProductSale() {
                                 name={product?.name}
                                 priceNotDiscount={
                                     product?.discount?.length > 0
-                                        ? (indexPriceAttribute?.priceBought * ((100 - indexPriceAttribute?.size?.sizePriceMultiplier) / 100))
+                                        ? (indexPriceAttribute?.priceBought * (1 + (indexPriceAttribute?.size?.sizePriceMultiplier / 100)))
                                         .toLocaleString('vi-VN') + "đ"
                                         : ""
                                 }
@@ -88,9 +88,9 @@ export default function ProductSale() {
                                     product?.discount?.length > 0
                                         ? ((indexPriceAttribute?.priceBought *
                                             ((100 - product?.discount[0]?.discountValue) / 100)) *
-                                            ((100 - indexPriceAttribute?.size?.sizePriceMultiplier) / 100))
+                                            (1 + (indexPriceAttribute?.size?.sizePriceMultiplier / 100)))
                                             .toLocaleString('vi-VN')
-                                        : (indexPriceAttribute.priceBought * ((100 - indexPriceAttribute?.size?.sizePriceMultiplier) / 100))
+                                        : (indexPriceAttribute.priceBought * (1 + (indexPriceAttribute?.size?.sizePriceMultiplier / 100)))
                                         .toLocaleString('vi-VN')
                                 }
                                 widthImage="100px"

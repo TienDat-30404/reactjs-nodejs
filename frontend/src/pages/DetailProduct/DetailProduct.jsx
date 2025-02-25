@@ -38,7 +38,7 @@ export default function Detail() {
     const handleAddCart = async () => {
         const response = await addCart({
             idUser: idUser,
-            idAttribute: details?.detailProduct?.productAttributes[size]._id,
+            idProductAttribute: details?.detailProduct?.productAttributes[size]._id,
             quantity: 1
         })
         if (response.status === 400) {
@@ -56,7 +56,6 @@ export default function Detail() {
         toast.success("Thêm vào giỏ hàng thành công")
     }
     const totalReview = details?.detailProduct?.reviews?.length > 0 ? (details?.detailProduct?.reviews?.reduce((sum, review) => sum + review?.rating, 0) / details?.detailProduct?.reviews?.length).toFixed(2) : 0
-    console.log(details)
     return (
         <div className="container mt-3 detail">
 
@@ -182,7 +181,7 @@ export default function Detail() {
                         <h6 className='mt-2 mb-0'>Kích thước</h6>
                         <div className='mt-3 click_number'>
                             {details?.detailProduct?.productAttributes.map((attribute, index) => {
-                                if (attribute?.priceBought === null) return;
+                                if (attribute?.priceBought === 0) return;
                                 return (
                                     <>
                                         <button
@@ -195,14 +194,18 @@ export default function Detail() {
                                 )
                             })}
                         </div>
+                        <div className='d-flex align items-center'>
+                            <p class="font-italic mt-2 me-1">Số lượng :</p>
+                            <p className='mt-2 font-weight-bold'>{details?.detailProduct?.productAttributes[size]?.quantity}</p>
+                        </div>
                         <h6 className='mt-3 mb-0'>Tạm tính</h6>
                         <div className="d-flex align-items-center">
                             {details?.detailProduct?.discount?.length > 0 ? (
                                 <div className='d-flex align-items-center'>
                                     <h5 className='py-2 text-decoration-line-through text-danger'>
                                         {(details?.detailProduct?.productAttributes[size]?.priceBought *
-                                            ((100 - details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier) / 100)).
-                                            toLocaleString('vi-VN')}
+                                            (1 + (details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier / 100)))
+                                            .toLocaleString('vi-VN')}
                                         đ
                                     </h5>
                                     <h6 className='me-5'>-{(details?.detailProduct?.discount[0]?.discountValue).toFixed(0)}%</h6>
@@ -215,7 +218,7 @@ export default function Detail() {
                                     (details?.detailProduct?.discount.length > 0 ?
                                         ((100 - details?.detailProduct?.discount[0].discountValue) / 100) : 1
                                     )) *
-                                    ((100 - details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier) / 100)
+                                    (1 + (details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier / 100))
                                 )
                                     .toLocaleString('vi-VN')}đ
                             </h5>

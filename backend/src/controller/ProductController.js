@@ -12,11 +12,10 @@ import { isValidObjectId } from 'mongoose'
 
 
 export default class ProductController {
-
     static async getAllProduct(req, res, next) {
         try {
             const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 5
+            const limit = parseInt(req.query.limit) || 20
             const startPage = (page - 1) * limit;
             const sortBy = req.query.sortBy || 'idProduct';
             const type = req.query.type === "asc" ? 1 : -1;
@@ -86,7 +85,6 @@ export default class ProductController {
                     .populate('reviews')
                     .populate({
                         path: 'productAttributes',
-                        // match: { priceImport: { $ne: null }, priceBought: { $ne: null } }, 
                         populate: {
                             path: 'idSize',
                             model: 'Size',
@@ -140,14 +138,14 @@ export default class ProductController {
         try {
             let { name, idCategory, description, sizes } = req.body
 
-            const result = await cloudinary.uploader.upload(req.file.path);
-            if (!req.file) {
-                return res.status(400).json({ error: "File image is required." });
-            }
+            // const result = await cloudinary.uploader.upload(req.file.path);
+            // if (!req.file) {
+            //     return res.status(400).json({ error: "File image is required." });
+            // }
             const dataProduct = new Product(
                 {
                     name,
-                    image: result.secure_url, 
+                    // image: result.secure_url, 
                     idCategory,
                     description,
                 }

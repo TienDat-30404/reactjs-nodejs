@@ -23,9 +23,9 @@ const validateAddProduct = async (req, res, next) => {
             errors.name = "Tên sản phẩm đã tồn tại"
         }
     }
-    if (!req.file) {
-        errors.image = "Vui lòng chọn ảnh"
-    }
+    // if (!req.file) {
+    //     errors.image = "Vui lòng chọn ảnh"
+    // }
 
     if (idCategory == 0) {
         errors.idCategory = "Vui lòng chọn thể loại sản phẩm"

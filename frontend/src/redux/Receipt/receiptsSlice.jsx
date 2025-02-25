@@ -20,6 +20,7 @@ export const receiptsSlice = createSlice({
 
         addReceiptRedux : (state, action) => {
             state.data.push(action.payload)
+            state.totalReceipt += 1
         },
 
         switchPage : (state, action) => {

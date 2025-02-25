@@ -33,13 +33,13 @@ export const deleteCart = async(idCart) => {
     return response.json()
 }
 
-export const updateQuantityCart = async(idCart, quantity) => {
+export const updateQuantityCart = async(idCart, data) => {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/update-quantity-cart/${idCart}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body : JSON.stringify({quantity})
+        body : JSON.stringify(data)
     })
     return response.json()
 }

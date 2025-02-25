@@ -8,6 +8,7 @@ import OrderDetail from '../model/OrderDetailModel.js';
 import Notification from '../model/NotificationModel.js';
 import mongoose from 'mongoose';
 import Status from '../model/StatusModel.js';
+import ProductAttribute from '../model/ProductAttribute.js';
 export default class OrderController {
 
     static async addOrder(req, res, next) {
@@ -37,12 +38,18 @@ export default class OrderController {
             const orderDetails = products.map(product => {
                 return {
                     idOrder: newOrder._id,
-                    idAttribute: product.attribute._id,
+                    idProductAttribute: product.productAttribute._id,
                     quantity: product.quantity
                 }
             })
             await OrderDetail.insertMany(orderDetails)
 
+            await Promise.all(products.map((product) =>
+                ProductAttribute.findByIdAndUpdate(
+                    product?.productAttribute?._id,
+                    { $inc: { quantity: - product.quantity } }
+                )
+            ));
             // cart
             const cartIds = products.map(product => product._id)
             await Cart.deleteMany({ _id: { $in: cartIds } })
@@ -90,8 +97,8 @@ export default class OrderController {
                         ((currentDiscount).toFixed(1))
                         + "% khi mua hàng đạt mốc " + (vouchersOfUser?.length + i)
                         + " triệu ",
-                    type : 'personal',
-                    isRead : false
+                    type: 'personal',
+                    isRead: false
                 })
                 notificationAdded.push(notification)
                 await notification.save()
@@ -106,7 +113,7 @@ export default class OrderController {
                 .populate({
                     path: 'orderDetails',
                     populate: {
-                        path: 'idAttribute',
+                        path: 'idProductAttribute',
                         model: 'ProductAttribute',
                         populate: [
                             {
@@ -132,16 +139,15 @@ export default class OrderController {
                 order.paymentMethod = order.idPaymentMethod
 
                 order.orderDetails.map((item, index) => {
-                    if (item?.idAttribute && item?.idAttribute.idProduct && item?.idAttribute?.idSize) {
-                        console.log(index, item.idAttribute)
-                        item.idAttribute.product = item.idAttribute.idProduct
-                        item.idAttribute.size = item.idAttribute.idSize
+                    if (item?.idProductAttribute && item?.idProductAttribute.idProduct && item?.idProductAttribute?.idSize) {
+                        item.idProductAttribute.product = item.idProductAttribute.idProduct
+                        item.idProductAttribute.size = item.idProductAttribute.idSize
 
-                        delete item.idAttribute.idProduct
-                        delete item.idAttribute.idSize
+                        delete item.idProductAttribute.idProduct
+                        delete item.idProductAttribute.idSize
                     }
-                    item.attribute = item.idAttribute
-                    delete item.idAttribute
+                    item.productAttribute = item.idProductAttribute
+                    delete item.idProductAttribute
                 })
 
                 delete order.idUser
@@ -190,15 +196,14 @@ export default class OrderController {
                 })
             }
         }
-        if(req.query.status)
-        {
+        if (req.query.status) {
             if (mongoose.Types.ObjectId.isValid(req.query.status)) {
                 objectFilter.idStatus = req.query.status
             }
             else {
                 return res.status(200).json({
                     page: '',
-                    totalPage: '',  
+                    totalPage: '',
                     limit: '',
                     totalOrder: '',
                     orders: [],
@@ -218,15 +223,15 @@ export default class OrderController {
                 .populate({
                     path: 'orderDetails',
                     populate: {
-                        path: 'idAttribute',
+                        path: 'idProductAttribute',
                         model: 'ProductAttribute',
                         populate: [
                             {
                                 path: 'idProduct',
                                 model: 'Product',
-                                populate : {
-                                    path : 'discount',
-                                    model : 'Discount'
+                                populate: {
+                                    path: 'discount',
+                                    model: 'Discount'
                                 }
                             },
                             {
@@ -250,16 +255,16 @@ export default class OrderController {
             order.paymentMethod = order.idPaymentMethod
 
             order.orderDetails.map((item, index) => {
-                if (item?.idAttribute && item?.idAttribute.idProduct && item?.idAttribute?.idSize) {
-                    console.log(index, item.idAttribute)
-                    item.idAttribute.product = item.idAttribute.idProduct
-                    item.idAttribute.size = item.idAttribute.idSize
+                if (item?.idProductAttribute && item?.idProductAttribute.idProduct && item?.idProductAttribute?.idSize) {
+                    console.log(index, item.idProductAttribute)
+                    item.idProductAttribute.product = item.idProductAttribute.idProduct
+                    item.idProductAttribute.size = item.idProductAttribute.idSize
 
-                    delete item.idAttribute.idProduct
-                    delete item.idAttribute.idSize
+                    delete item.idProductAttribute.idProduct
+                    delete item.idProductAttribute.idSize
                 }
-                item.attribute = item.idAttribute
-                delete item.idAttribute
+                item.productAttribute = item.idProductAttribute
+                delete item.idProductAttribute
             })
 
             delete order.idUser

@@ -12,9 +12,9 @@ export default function DetailOrder({ show, close, data }) {
     const totalPrice = data?.orderDetails?.reduce((sum, order) => {
         return sum +
             order?.quantity *
-            order?.attribute?.priceBought *
-            order?.attribute?.size?.sizePriceMultiplier *
-            (order?.attribute?.product?.discount?.length > 0 ? order?.attribute?.product?.discount[0]?.discountValue : 1)
+            order?.productAttribute?.priceBought *
+            (1 + (order?.productAttribute?.size?.sizePriceMultiplier / 100)) *
+            (order?.productAttribute?.product?.discount?.length > 0 ? order?.productAttribute?.product?.discount[0]?.discountValue : 1)
     }, 0)
 
     useEffect(() => {
@@ -97,13 +97,12 @@ export default function DetailOrder({ show, close, data }) {
                             <tr key={index}>
                                 <th style={{ verticalAlign: 'middle' }} scope="row" className="table-cell">{index + 1}</th>
                                 <td>
-                                    {/* <img className='me-2' width="60px" src={order?.attribute?.product?.image} alt="" /> */}
-                                    {order?.attribute?.product?.name}
+                                    {order?.productAttribute?.product?.name}
                                 </td>
                                 <td style={{ verticalAlign: 'middle' }}>
                                     <span
                                         name="quantity">
-                                        {order?.attribute?.size?.name}
+                                        {order?.productAttribute?.size?.name}
                                     </span>
 
                                 </td>
@@ -115,17 +114,17 @@ export default function DetailOrder({ show, close, data }) {
                                 </td>
                                 <td style={{ verticalAlign: 'middle' }}>
                                     {
-                                        order?.attribute?.priceBought * order?.attribute?.size?.sizePriceMultiplier *
-                                        (order?.attribute?.product?.discount.length > 0 ?
-                                            order?.attribute?.product?.discount[0]?.discountValue : 1
+                                        order?.productAttribute?.priceBought * (1 + (order?.productAttribute?.size?.sizePriceMultiplier / 100)) *
+                                        (order?.productAttribute?.product?.discount.length > 0 ?
+                                            order?.productAttribute?.product?.discount[0]?.discountValue : 1
                                         )
                                     }
                                 </td>
                                 <td style={{ verticalAlign: 'middle' }}>
                                     {
-                                        order?.attribute?.priceBought * order?.attribute?.size?.sizePriceMultiplier * order?.quantity *
-                                        (order?.attribute?.product?.discount.length > 0 ?
-                                            order?.attribute?.product?.discount[0]?.discountValue : 1
+                                        order?.productAttribute?.priceBought * (1 + (order?.productAttribute?.size?.sizePriceMultiplier / 100)) * order?.quantity *
+                                        (order?.productAttribute?.product?.discount.length > 0 ?
+                                            order?.productAttribute?.product?.discount[0]?.discountValue : 1
                                         )
                                     }
                                 </td>
