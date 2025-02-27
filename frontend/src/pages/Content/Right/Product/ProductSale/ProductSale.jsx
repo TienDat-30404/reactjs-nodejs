@@ -86,11 +86,11 @@ export default function ProductSale() {
                                 }
                                 price={
                                     product?.discount?.length > 0
-                                        ? ((indexPriceAttribute?.priceBought *
+                                        ? Math.floor((indexPriceAttribute?.priceBought *
                                             ((100 - product?.discount[0]?.discountValue) / 100)) *
                                             (1 + (indexPriceAttribute?.size?.sizePriceMultiplier / 100)))
                                             .toLocaleString('vi-VN')
-                                        : (indexPriceAttribute.priceBought * (1 + (indexPriceAttribute?.size?.sizePriceMultiplier / 100)))
+                                        : Math.floor(indexPriceAttribute.priceBought * (1 + (indexPriceAttribute?.size?.sizePriceMultiplier / 100)))
                                         .toLocaleString('vi-VN')
                                 }
                                 widthImage="100px"

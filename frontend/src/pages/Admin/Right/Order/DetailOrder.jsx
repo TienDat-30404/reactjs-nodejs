@@ -114,18 +114,15 @@ export default function DetailOrder({ show, close, data }) {
                                 </td>
                                 <td style={{ verticalAlign: 'middle' }}>
                                     {
-                                        order?.productAttribute?.priceBought * (1 + (order?.productAttribute?.size?.sizePriceMultiplier / 100)) *
-                                        (order?.productAttribute?.product?.discount.length > 0 ?
-                                            order?.productAttribute?.product?.discount[0]?.discountValue : 1
-                                        )
-                                    }
+                                        Math.floor(order?.unitPrice).toLocaleString('vi-VN')
+                                    } 
                                 </td>
                                 <td style={{ verticalAlign: 'middle' }}>
                                     {
-                                        order?.productAttribute?.priceBought * (1 + (order?.productAttribute?.size?.sizePriceMultiplier / 100)) * order?.quantity *
+                                        Math.floor(order?.unitPrice * order?.quantity *
                                         (order?.productAttribute?.product?.discount.length > 0 ?
                                             order?.productAttribute?.product?.discount[0]?.discountValue : 1
-                                        )
+                                        )).toLocaleString('vi-VN')
                                     }
                                 </td>
                             </tr>
@@ -136,7 +133,7 @@ export default function DetailOrder({ show, close, data }) {
                     <div className='d-flex align-items-center'>
                         <p className='me-1'>Total : </p>
                         <p>
-                            {data && (totalPrice).toLocaleString('vi-VN')}đ
+                            {data && (Math.floor(totalPrice)).toLocaleString('vi-VN')}đ
                         </p>
                     </div>
                 </div>
@@ -151,7 +148,9 @@ export default function DetailOrder({ show, close, data }) {
                         <p className='me-1'>TotalPrice : </p>
                         <p>
                             {data?.voucher !== null ?
-                                (totalPrice * (1 - data?.voucher?.discountVoucher)).toLocaleString('vi-VN') : totalPrice.toLocaleString('vi-VN') + "đ"
+                                (Math.floor(totalPrice) * ((100 - data?.voucher?.discountVoucher) / 100))
+                                .toLocaleString('vi-VN') 
+                                : (Math.floor(totalPrice)).toLocaleString('vi-VN') + "đ"
                             }
                         </p>
                     </div>

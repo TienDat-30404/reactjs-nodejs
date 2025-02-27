@@ -9,7 +9,7 @@ export default function SidebarAdmin() {
                 <li class="nav-item">
                     <p style={{ fontSize: '25px' }} class="nav-link  ">Tiki</p>
                 </li>
-                <li class="nav-item">
+                <li onClick={() => navigate('/admin/dashboard')}  class="nav-item">
                     <i class="bi bi-grid-3x3-gap"></i>
                     <p class="nav-link">DashBoard</p>
                 </li>

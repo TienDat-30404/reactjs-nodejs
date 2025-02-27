@@ -203,7 +203,7 @@ export default function Detail() {
                             {details?.detailProduct?.discount?.length > 0 ? (
                                 <div className='d-flex align-items-center'>
                                     <h5 className='py-2 text-decoration-line-through text-danger'>
-                                        {(details?.detailProduct?.productAttributes[size]?.priceBought *
+                                        {Math.floor(details?.detailProduct?.productAttributes[size]?.priceBought *
                                             (1 + (details?.detailProduct?.productAttributes[size]?.size?.sizePriceMultiplier / 100)))
                                             .toLocaleString('vi-VN')}
                                         đ
@@ -214,7 +214,7 @@ export default function Detail() {
 
                             <h5
                                 className='py-2 text-danger'>
-                                {((details?.detailProduct?.productAttributes[size].priceBought *
+                                {(Math.floor(details?.detailProduct?.productAttributes[size].priceBought *
                                     (details?.detailProduct?.discount.length > 0 ?
                                         ((100 - details?.detailProduct?.discount[0].discountValue) / 100) : 1
                                     )) *

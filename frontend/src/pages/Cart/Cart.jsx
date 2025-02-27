@@ -175,7 +175,7 @@ export default function Cart() {
 
                                     <span
                                         className='col-2 '>
-                                        {(cart?.productAttribute?.priceBought *
+                                        {Math.floor(cart?.productAttribute?.priceBought *
                                             (cart?.productAttribute?.product?.discount?.length > 0 ?
                                                 ((100 - cart?.productAttribute?.product?.discount[0]?.discountValue) / 100) : 1
                                             ) * (1 + (cart?.productAttribute?.size?.sizePriceMultiplier / 100))
@@ -200,7 +200,7 @@ export default function Cart() {
                                     </div>
                                     <span
                                         className='col-2 text-danger fw-bold'>
-                                        {(cart?.productAttribute?.priceBought * cart?.quantity *
+                                        {Math.floor(cart?.productAttribute?.priceBought * cart?.quantity *
                                             (cart?.productAttribute?.product?.discount?.length > 0 ?
                                                 ((100 - cart?.productAttribute?.product?.discount[0]?.discountValue) / 100) : 1
                                             ) * (1 + (cart?.productAttribute?.size?.sizePriceMultiplier / 100))
@@ -244,7 +244,8 @@ export default function Cart() {
                                 <div className='d-flex align-items-center'>
                                     <p style={{ fontWeight: '500', fontSize: '14px', fontWeight: '400', cursor: 'pointer' }} className='ms-2 text-danger'>
 
-                                        {"-" + (totalPrice * (useVoucher[0]?.discountVoucher / 100)).toLocaleString('vi-VN') + "đ"}
+                                        {"-" + (totalPrice * (useVoucher[0]?.discountVoucher / 100))
+                                        .toLocaleString('vi-VN') + "đ"}
 
                                     </p>
                                     <p style={{ fontWeight: '500', fontSize: '14px', fontWeight: '400', cursor: 'pointer' }} className='ms-2 text-primary'>
@@ -268,9 +269,9 @@ export default function Cart() {
                             <p>
                                 {
                                     useVoucher && useVoucher?.length > 0 ? (
-                                        totalPrice * ((100 - useVoucher[0]?.discountVoucher) / 100)
+                                        (Math.floor(totalPrice) * ((100 - useVoucher[0]?.discountVoucher) / 100)).toLocaleString('vi-VN')
                                     ) :
-                                        Math.ceil(totalPrice)
+                                        Math.floor(totalPrice).toLocaleString('vi-VN').toLocaleString('vi-VN')
                                 }
                             </p>
                         </div>
@@ -285,7 +286,7 @@ export default function Cart() {
                             <p style={{ fontSize: '14px', fontWeight: '500' }}>Tổng tiền</p>
                             {cartsCheck.length > 0 ? (
                                 <p style={{ color: 'red', fontWeight: '500', fontSize: '20px' }}>
-                                    {(totalPrice * (
+                                    {(Math.floor(totalPrice) * (
                                         useVoucher?.length > 0 ? ((100 - useVoucher[0].discountVoucher) / 100) : 1
                                     ))
                                         .toLocaleString('vi-VN')}

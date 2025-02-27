@@ -202,7 +202,7 @@ export default function Product() {
                 </td>
 
 
-                <td>{order?.totalPrice}</td>
+                <td>{(order?.totalPrice).toLocaleString('vi-VN')}</td>
 
                 <td>{order?.voucher === null ? "null" : order?.voucher?.discountVoucher}</td>
                 <td>

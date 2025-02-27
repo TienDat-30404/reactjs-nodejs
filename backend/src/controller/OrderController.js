@@ -39,7 +39,8 @@ export default class OrderController {
                 return {
                     idOrder: newOrder._id,
                     idProductAttribute: product.productAttribute._id,
-                    quantity: product.quantity
+                    quantity: product.quantity,
+                    unitPrice : product?.productAttribute?.priceBought * (1 + product?.productAttribute?.size?.sizePriceMultiplier / 100)
                 }
             })
             await OrderDetail.insertMany(orderDetails)

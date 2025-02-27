@@ -1,6 +1,5 @@
 import NotFoundPage from "../pages/NotFoundPage";
 import User from '../pages/Admin/Right/User/User'
-import DashBoard from "../pages/Admin/Right/DashBoard";
 import Product from "../pages/Admin/Right/Product/Product";
 import Order from "../pages/Admin/Right/Order/Order";
 import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
@@ -13,6 +12,7 @@ import Voucher from "../pages/Admin/Right/Voucher/Voucher";
 import Notification from "../pages/Admin/Right/Notification/Notification";
 import Review from "../pages/Admin/Right/Review/Review";
 import Role from "../pages/Admin/Right/Role/Role";
+import DashBoard from "../pages/Admin/Right/DashBoard/DashBoard";
 export const adminRoutes = [
 
     {path: '*', page: NotFoundPage, layout : AdminLayout},
