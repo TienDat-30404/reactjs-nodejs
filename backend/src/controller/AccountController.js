@@ -1,14 +1,3 @@
-// const Account = require('../model/AccountModel');
-// const User = require('../model/UserModel');
-// const Role = require('../model/RoleModel')
-// const { hashPassword } = require('../utils/validate')
-// const otpGenerator = require('otp-generator');
-// const nodemailer = require('nodemailer');
-// const redisClient = require('../utils/redisClient');
-
-// const { OAuth2Client } = require("google-auth-library");
-// const errorHandler = require('http-errors')
-// const { generateToken, generateRefreshToken } = require('../utils/jwt')
 
 import Account from '../model/AccountModel.js';
 import User from '../model/UserModel.js';
@@ -183,10 +172,14 @@ export default class AccountController {
             sameSite: 'strict', // Chỉ cho phép gửi cookie khi đến từ cùng một site (tăng cường bảo mật)
             maxAge: 24 * 60 * 60 * 1000 // Thời gian sống của cookie (1 ngày trong ví dụ này)
         });
+
+        const isCheckRole = await Role.findById({_id : payloadToken.idRole})
+        
         return res.status(200).json({
             token: accessToken,
             message: 'Đăng nhập thành công',
-            avatar: avatar,
+            // avatar: avatar,
+            gg : isCheckRole
         })
     }
 

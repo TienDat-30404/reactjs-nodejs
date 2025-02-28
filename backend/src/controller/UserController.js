@@ -1,8 +1,3 @@
-// const User = require('../model/UserModel')
-// const cloudinary = require('../config/cloudinary');
-// const refreshTokenJWT = require('../utils/jwt')
-// const mongoose = require('mongoose')
-
 
 import User from '../model/UserModel.js';
 import cloudinary from '../config/cloudinary.js';
@@ -10,7 +5,8 @@ import mongoose from 'mongoose';
 import refreshTokenJWT from '../utils/jwt.js';
 import Account from '../model/AccountModel.js';
 import { userInfo } from 'os';
-// [PUT] : /update-user/:id
+import { hashPassword } from '../utils/validate.js';
+
 
 export default class UserController {
 
@@ -232,7 +228,7 @@ export default class UserController {
             var account = new Account({
                 userName,
                 email,
-                password,
+                password : hashPassword(password),
                 idRole: role,
                 typeLogin: "normal"
             })

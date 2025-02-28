@@ -64,16 +64,17 @@ export default function InformationBasicProfile() {
     }, [isAuthenticated, userData, dataUser]);
     const fetchApiUpdateUser = async (id, data) => {
         try {
-            const resultUpdate = await updateUser(id, data)
-            console.log(resultUpdate)
-            if (resultUpdate.errors) {
-                setErrors(resultUpdate.errors)
+            const response = await updateUser(id, data)
+            if (response.errors) {
+                console.log(response)
+
+                setErrors(response.errors)
                 return
             }
 
-            if (resultUpdate.message) {
+            if (response.message) {
                 toast.success("Chỉnh sửa thành công")
-               
+
                 const resultTokenUpdate = await loginService({
                     userName: userData.dataLogin.userName
                 })
@@ -89,7 +90,6 @@ export default function InformationBasicProfile() {
     };
 
     const handleSaveChanges = async () => {
-        console.log(dataUpdate)
         if (dataUpdate && userData?.dataLogin?.idUser) {
             var formData = new FormData()
             formData.append('name', dataUpdate?.name)
@@ -110,7 +110,7 @@ export default function InformationBasicProfile() {
         }));
     };
 
-  
+
 
     const handleChangeFile = (e) => {
         const selectedFileImage = e.target.files[0]
@@ -178,6 +178,7 @@ export default function InformationBasicProfile() {
                         className={`form-control flex-grow-1 ${errors.date_of_birth ? 'is-invalid' : ''}`}
                     />
                 </div>
+                {errors.date_of_birth && <ErrorMessageInput errors={errors} field="date_of_birth" />}
                 <div className='d-flex align-items-center mt-4'>
                     <p style={{ width: '85px' }} className='text-nowrap me-2'>Điện thoại</p>
                     <InputComponent
@@ -186,10 +187,10 @@ export default function InformationBasicProfile() {
                         onChange={handleChangeInput}
                         style={{ height: '35px' }}
                         type="text"
-                        className="form-control flex-grow-1"
+                        className={`form-control flex-grow-1 ${errors.phone ? 'is-invalid' : ""}`}
                     />
                 </div>
-                {errors.date_of_birth && <ErrorMessageInput errors={errors} field="date_of_birth" />}
+                {errors.phone && <ErrorMessageInput errors={errors} field="phone" />}
                 <div className='d-flex align-items-center mt-4'>
                     <p>Giới tính</p>
                     <div className="form-check ms-3">

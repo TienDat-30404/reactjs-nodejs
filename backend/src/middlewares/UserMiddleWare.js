@@ -98,16 +98,16 @@ const validateLogin = async (req, res, next) => {
 // validate update user
 const updateUserMiddleware = async (req, res, next) => {
     try {
-        const { name, address, phone, date_of_birth } = req.body
+        const { name, phone, date_of_birth } = req.body
         const phoneRegex = /^09\d{8,9}$/;
         const errors = {}
 
         if (name == "") {
             errors.name = "Tên không được để trống"
         }
-        if (address == "") {
-            errors.address = "Địa chỉ không được để trống"
-        }
+        // if (address == "") {
+        //     errors.address = "Địa chỉ không được để trống"
+        // }
         if (date_of_birth) {
             const today = new Date();
             const birthDate = new Date(date_of_birth);
@@ -115,13 +115,16 @@ const updateUserMiddleware = async (req, res, next) => {
                 errors.date_of_birth = "Ngày sinh không được vượt quá ngày hiện tại";
             }
         }
-        if (phone == "") {
-            errors.phone = "Số điện thoại không được để trống"
-        }
-        else {
-            if (!phoneRegex.test(phone)) {
-                errors.phone = "Số điện thoại không hợp lệ"
-            }
+        // if (phone == "") {
+        //     errors.phone = "Số điện thoại không được để trống"
+        // }
+        // else {
+        //     if (!phoneRegex.test(phone)) {
+        //         errors.phone = "Số điện thoại không hợp lệ"
+        //     }
+        // }
+        if (!phoneRegex.test(phone) && phone != "") {
+            errors.phone = "Số điện thoại không hợp lệ"
         }
 
         if (Object.keys(errors).length > 0) {
@@ -249,10 +252,8 @@ const addUserMiddleWare = async (req, res, next) => {
     if (phone === "") {
         errors.phone = "Số điện thoại không được để trống"
     }
-    else 
-    {
-        if(!phoneRegex.test(phone))
-        {
+    else {
+        if (!phoneRegex.test(phone)) {
             errors.phone = "Số điện thoại không hợp lệ"
         }
     }
