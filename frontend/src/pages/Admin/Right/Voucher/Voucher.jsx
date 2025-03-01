@@ -7,7 +7,7 @@ import Pagination from '../../../../components/Pagination'
 import { deleteVoucher, getAllVoucher } from '../../../../services/VoucherService'
 import { deleteVoucherReduxAdmin, initDataVoucher, switchPage } from '../../../../redux/Voucher/vouchersSlice'
 import EditVoucher from './EditVoucher'
-
+import { useRoleDetail } from '../../../../until/function'
 
 export default function Voucher() {
     const dispatch = useDispatch()
@@ -25,6 +25,9 @@ export default function Voucher() {
         idVoucher: '',
         status: ''
     })
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idRole = isAuthenticated && userData?.dataLogin?.idRole
+
 
 
     useEffect(() => {
@@ -51,6 +54,9 @@ export default function Voucher() {
         }
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria]);
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
+
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
         setSelectedVoucher(data)
@@ -76,7 +82,7 @@ export default function Voucher() {
     const handleChangeSearchSelect = (e) => {
         setSearchCriteria({
             idVoucher: '',
-            status : 1
+            status: 1
         })
         setDisplayTextSearch(e.target.value)
     }
@@ -86,7 +92,22 @@ export default function Voucher() {
                 <div className='d-flex align-items-center'>
                     <h3>Voucher</h3>
                     <h6 className='ms-3'>({totalVoucher} voucher found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo voucher</button>
+                    {!isRoleDetailsLoading ? (
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            type="button"
+                            className="btn btn-outline-success ms-3"
+                            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                (item) => item?.action === "voucher_add" && item?.allow === false
+                            )}
+                        >
+                            Tạo voucher
+                        </button>
+                    ) : (
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    )}
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -103,6 +124,9 @@ export default function Voucher() {
             <select
                 class="form-select"
                 onChange={handleChangeSearchSelect}
+                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                    (item) => item?.action === "voucher_search" && item?.allow === false
+                )}
             >
                 <option value="idVoucher" selected>Tìm kiếm theo Id</option>
                 <option value="status">Tìm kiếm theo trạng thái</option>
@@ -115,6 +139,9 @@ export default function Voucher() {
                     <input
                         type="text"
                         class="form-control"
+                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                            (item) => item?.action === "voucher_search" && item?.allow === false
+                        )}
                         name={displayTextSearch}
                         value={searchCriteria[`${displayTextSearch}`]}
                         onChange={(e) => handleChangeInput(e, setSearchCriteria)}
@@ -126,6 +153,9 @@ export default function Voucher() {
                 <select
                     name={displayTextSearch}
                     value={searchCriteria[`${displayTextSearch}`]}
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                        (item) => item?.action === "voucher_search" && item?.allow === false
+                    )}
                     onChange={(e) => handleChangeInput(e, setSearchCriteria)}
                     className="form-select mt-2"
                 >
@@ -133,7 +163,6 @@ export default function Voucher() {
                     <option value="0">Hết hạn sử dụng</option>
                 </select>
             )}
-
 
 
 
@@ -172,12 +201,25 @@ export default function Voucher() {
                                     <button
                                         onClick={() => handleSwitchPageEdit(voucher)}
                                         type="button"
-                                        className="btn btn-outline-primary">
+                                        className="btn btn-outline-primary"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "voucher_edit" && item?.allow === false
+                                        )}
+                                    >
                                         Edit
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteVoucher(voucher?._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button
+                                        onClick={() => handleDeleteVoucher(voucher?._id)}
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "voucher_delete" && item?.allow === false
+                                        )}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))
@@ -194,7 +236,7 @@ export default function Voucher() {
                     visiblePagination={visiblePagination}
                 />
             )}
-            <EditVoucher show={showEdit} close={() => setShowEdit(false)} data={selectedVouchr} /> 
+            <EditVoucher show={showEdit} close={() => setShowEdit(false)} data={selectedVouchr} />
         </div>
     )
 }

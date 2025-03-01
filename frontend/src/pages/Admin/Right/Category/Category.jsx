@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import ImageComponent from '../../../../components/ImageComponent'
 import { deleteCategory, getAllCategory } from '../../../../services/CategoryService'
-import { handleChangeInput } from '../../../../until/function'
+import { handleChangeInput, useRoleDetail } from '../../../../until/function'
 import { useSelector, useDispatch } from 'react-redux'
 import { deleteCategoryRedux, initDataCategory } from '../../../../redux/Category/categoriesSlice'
 import { visiblePagination } from '../../../../until/function'
@@ -10,6 +10,7 @@ import { toast } from 'react-toastify'
 import AddCategory from './AddCategory'
 import EditCategory from './EditCategory'
 import Pagination from '../../../../components/Pagination'
+import { getDetailRole } from '../../../../services/RoleService'
 export default function Category() {
   const dispatch = useDispatch()
   const categories = useSelector(state => state?.categories?.categories)
@@ -26,8 +27,13 @@ export default function Category() {
     idCategory: '',
     name: ''
   })
+  const { isAuthenticated, userData } = useSelector((state) => state.auth);
+  const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
 
+
+  const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+ 
   useEffect(() => {
     const fetchData = async () => {
 
@@ -46,6 +52,8 @@ export default function Category() {
           dispatch(initDataCategory(response))
         }
 
+        const g = await getDetailRole(idRole)
+        console.log(g)
       }
       catch (error) {
         console.log("Fail when get categories to display")
@@ -86,10 +94,30 @@ export default function Category() {
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>
+
         <div className='d-flex align-items-center'>
           <h3>Category</h3>
           <h6 className='ms-3'>({totalCategory} category found)</h6>
-          <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo thể loại</button>
+
+
+          {!isRoleDetailsLoading ? (
+            <button
+              onClick={() => setShowAddModal(true)}
+              type="button"
+              className="btn btn-outline-success ms-3"
+              disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                (item) => item?.action === "category_add" && item?.allow === false
+              )}
+            >
+              Create Category
+            </button>
+          ) : (
+            <div class="spinner-border" role="status">
+              <span class="sr-only"></span>
+            </div>
+          )}
+
+
         </div>
         <div className='d-flex align-items-center'>
           <i className="bi bi-bell me-3"></i>
@@ -159,12 +187,26 @@ export default function Category() {
                   <button
                     onClick={() => handleSwitchPageEdit(category)}
                     type="button"
-                    className="btn btn-outline-primary">
+                    className="btn btn-outline-primary"
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                      (item) => item?.action === "category_edit" && item?.allow === false
+                    )}
+                  >
                     Edit
+
                   </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button onClick={() => handleDeleteCategory(category._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                  <button
+                    onClick={() => handleDeleteCategory(category._id)}
+                    type="button"
+                    className="btn btn-outline-danger"
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                      (item) => item?.action === "category_delete" && item?.allow === false
+                    )}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))

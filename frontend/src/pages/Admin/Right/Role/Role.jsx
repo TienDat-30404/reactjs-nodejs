@@ -11,7 +11,7 @@ import { deleteRoleRedux, initDataRole, switchPage } from '../../../../redux/Rol
 import AddRole from './AddRole'
 import UpdateRole from './UpdateRole'
 import { toast } from 'react-toastify'
-
+import { useRoleDetail } from '../../../../until/function'
 export default function Role() {
     const dispatch = useDispatch()
     const roles = useSelector(state => state?.roles?.roles)
@@ -29,7 +29,10 @@ export default function Role() {
         idRole: '',
         name: ''
     })
-    
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idRole = isAuthenticated && userData?.dataLogin?.idRole
+
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -56,6 +59,8 @@ export default function Role() {
         }
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria]);
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
         setSelectedRole(data)
@@ -77,8 +82,7 @@ export default function Role() {
                 dispatch(switchPage(page - 1))
             }
         }
-        if(response && response.status === 400)
-        {
+        if (response && response.status === 400) {
             console.log(response)
             toast.error(response.message)
         }
@@ -99,7 +103,22 @@ export default function Role() {
                 <div className='d-flex align-items-center'>
                     <h3>Discount</h3>
                     <h6 className='ms-3'>({totalRole} role found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Create Role</button>
+                    {!isRoleDetailsLoading ? (
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            type="button"
+                            className="btn btn-outline-success ms-3"
+                            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                (item) => item?.action === "role_add" && item?.allow === false
+                            )}
+                        >
+                            Create Role
+                        </button>
+                    ) : (
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    )}
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -116,6 +135,9 @@ export default function Role() {
             <select
                 class="form-select"
                 onChange={handleChangeSearchSelect}
+                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                    (item) => item?.action === "role_search" && item?.allow === false
+                )}
             >
                 <option value="idRole" selected>Tìm kiếm theo Id</option>
                 <option value="name">Tìm kiếm theo tên</option>
@@ -128,6 +150,9 @@ export default function Role() {
                     <input
                         type="text"
                         class="form-control"
+                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                            (item) => item?.action === "role_search" && item?.allow === false
+                        )}
                         name={displayTextSearch}
                         value={searchCriteria[`${displayTextSearch}`]}
                         onChange={(e) => handleChangeInput(e, setSearchCriteria)}
@@ -161,12 +186,25 @@ export default function Role() {
                                     <button
                                         onClick={() => handleSwitchPageEdit(role)}
                                         type="button"
-                                        className="btn btn-outline-primary">
+                                        className="btn btn-outline-primary"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "role_edit" && item?.allow === false
+                                        )}
+                                    >
                                         Edit
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteRole(role?._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button
+                                        onClick={() => handleDeleteRole(role?._id)}
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "role_delete" && item?.allow === false
+                                        )}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))

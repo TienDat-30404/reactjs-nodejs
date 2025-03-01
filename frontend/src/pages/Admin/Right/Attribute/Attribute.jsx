@@ -9,6 +9,7 @@ import { deleteSizeService, getAllSizeService } from '../../../../services/SizeS
 import { deleteSizeRedux, initDataSize } from '../../../../redux/Size/sizesSlice'
 import AddAttribute from './AddAttribute'
 import EditAttribute from './EditAttribute'
+import { useRoleDetail } from '../../../../until/function'
 export default function Attribute() {
     const dispatch = useDispatch()
     const attributes = useSelector(state => state?.sizes?.data)
@@ -25,8 +26,10 @@ export default function Attribute() {
     const [searchCriteria, setSearchCriteria] = useState({
         idSize: ''
     })
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
-    
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -41,7 +44,7 @@ export default function Attribute() {
 
                 const response = await getAllSizeService(query)
                 console.log(response)
-                if(response && response?.status === 200){
+                if (response && response?.status === 200) {
                     dispatch(initDataSize(response))
                 }
             }
@@ -51,6 +54,8 @@ export default function Attribute() {
         }
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria]);
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
         setSelectedAttribute(data)
@@ -85,7 +90,22 @@ export default function Attribute() {
                 <div className='d-flex align-items-center'>
                     <h3>Discount</h3>
                     <h6 className='ms-3'>({totalAttribute} attribute found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Thêm thuộc tính</button>
+                    {!isRoleDetailsLoading ? (
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            type="button"
+                            className="btn btn-outline-success ms-3"
+                            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                (item) => item?.action === "attribute_add" && item?.allow === false
+                            )}
+                        >
+                            Thêm thuộc tính
+                        </button>
+                    ) : (
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    )}
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -102,6 +122,9 @@ export default function Attribute() {
             <select
                 class="form-select"
                 onChange={handleChangeSearchSelect}
+                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                    (item) => item?.action === "attribute_search" && item?.allow === false
+                )}
             >
                 <option value="idSize" selected>Tìm kiếm theo Id</option>
             </select>
@@ -111,6 +134,9 @@ export default function Attribute() {
                 <div class="input-group mb-3 mt-1">
                     <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
                     <input
+                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                            (item) => item?.action === "attribute_search" && item?.allow === false
+                        )}
                         type="text"
                         class="form-control"
                         name={displayTextSearch}
@@ -120,7 +146,7 @@ export default function Attribute() {
                 </div>
             )}
 
-          
+
 
 
 
@@ -140,7 +166,7 @@ export default function Attribute() {
                         attributes?.map((attribute, index) => (
                             <tr key={index}>
                                 <th scope="row">{(attribute?._id).slice(0, 10)}...</th>
-                                
+
 
                                 <td>{attribute?.name}</td>
                                 <td>{attribute?.sizePriceMultiplier}%</td>
@@ -152,12 +178,26 @@ export default function Attribute() {
                                     <button
                                         onClick={() => handleSwitchPageEdit(attribute)}
                                         type="button"
-                                        className="btn btn-outline-primary">
+                                        className="btn btn-outline-primary"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "attribute_edit" && item?.allow === false
+                                        )}
+                                    >
+
                                         Edit
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteDiscount(attribute?._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button
+                                        onClick={() => handleDeleteDiscount(attribute?._id)}
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "attribute_delete" && item?.allow === false
+                                        )}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))

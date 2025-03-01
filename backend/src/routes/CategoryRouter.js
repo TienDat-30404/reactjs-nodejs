@@ -5,14 +5,15 @@ import { uploadImageCategory } from '../utils/multerConfig.js';
 import { authencationMiddleWare, checkPermissionRoleMiddleware } from '../middlewares/authencationMiddleWare.js';
 const router = express.Router();
 
-router.post('/add-category', authencationMiddleWare, uploadImageCategory.single('image'),
-checkPermissionRoleMiddleware("category_add"), validateAddCategory, CategoryController.addCategory)
+router.post('/add-category', authencationMiddleWare, checkPermissionRoleMiddleware("category_add"),
+uploadImageCategory.single('image'), validateAddCategory, CategoryController.addCategory)
 
 router.put('/update-category/:idCategory', authencationMiddleWare, uploadImageCategory.single('image'),
 checkPermissionRoleMiddleware("category_edit"), CategoryController.updateCategory)
 
 router.delete('/delete-category/:idCategory', authencationMiddleWare,
 checkPermissionRoleMiddleware("category_delete"), CategoryController.deleteCategory)
+
 router.get('/get-all-category', CategoryController.getAllCategory)
 
 export default router

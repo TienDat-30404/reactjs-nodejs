@@ -11,6 +11,7 @@ import { OAuth2Client } from 'google-auth-library';
 import errorHandler from 'http-errors';
 // import { generateToken, generateRefreshToken } from '../utils/jwt.js';
 import refreshTokenJWT from '../utils/jwt.js';
+import RoleDetail from '../model/RoleDetail.js';
 export default class AccountController {
 
     

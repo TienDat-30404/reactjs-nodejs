@@ -3,7 +3,6 @@ import ImageComponent from '../../../../components/ImageComponent'
 import { getAllProduct, deleteProduct } from '../../../../services/ProductService'
 import AddProduct from './AddProduct'
 import EditProduct from './EditProduct'
-import { InputComponent } from '../../../../components/InputComponent'
 import { getAllCategory } from '../../../../services/CategoryService'
 import { handleChangeInput } from '../../../../until/function'
 import { useSelector, useDispatch } from 'react-redux'
@@ -13,6 +12,7 @@ import { initDataCategory } from '../../../../redux/Category/categoriesSlice'
 import { initDataSize } from '../../../../redux/Size/sizesSlice'
 import { visiblePagination } from '../../../../until/function'
 import Pagination from '../../../../components/Pagination'
+import { useRoleDetail } from '../../../../until/function'
 export default function Product() {
   const dispatch = useDispatch()
   const products = useSelector(state => state?.products?.products)
@@ -32,7 +32,8 @@ export default function Product() {
     priceFrom: '',
     priceTo: ''
   })
-
+  const { isAuthenticated, userData } = useSelector((state) => state.auth);
+  const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,6 +78,8 @@ export default function Product() {
     fetchData()
   }, [page, limit, searchCriteria, displayTextSearch])
 
+  const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
   const handleSwitchPageEdit = (data) => {
     setShowEdit(true)
     setSelectedProduct(data)
@@ -117,7 +120,23 @@ export default function Product() {
         <div className='d-flex align-items-center'>
           <h3>Product</h3>
           <h6 className='ms-3'>({totalProduct} product found)</h6>
-          <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo sản phẩm</button>
+          {!isRoleDetailsLoading ? (
+            <button
+              onClick={() => setShowAddModal(true)}
+              type="button"
+              className="btn btn-outline-success ms-3"
+              disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                (item) => item?.action === "product_add" && item?.allow === false
+              )}
+            >
+              Tạo sản phẩm
+            </button>
+          ) : (
+            <div class="spinner-border" role="status">
+              <span class="sr-only"></span>
+            </div>
+          )
+          }
         </div>
         <div className='d-flex align-items-center'>
           <i className="bi bi-bell me-3"></i>
@@ -134,6 +153,9 @@ export default function Product() {
       <select
         onChange={handleChangeSearchSelect}
         class="form-select mt-2"
+        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+          (item) => item?.action === "product_search" && item?.allow === false
+        )}
       >
         <option value="idProduct" selected>Tìm kiếm theo Id</option>
         <option value="name">Tìm kiếm theo tên</option>
@@ -150,6 +172,9 @@ export default function Product() {
               class="form-control"
               name="priceFrom"
               value={searchCriteria[`${displayTextSearch}From`]}
+              disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                (item) => item?.action === "product_search" && item?.allow === false
+              )}
               onChange={(e) => {
                 const value = e.target.value;
                 if (value === "" || Number(value)) {
@@ -248,12 +273,25 @@ export default function Product() {
                   <button
                     onClick={() => handleSwitchPageEdit(product)}
                     type="button"
-                    className="btn btn-outline-primary">
+                    className="btn btn-outline-primary"
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                      (item) => item?.action === "product_edit" && item?.allow === false
+                    )}
+                  >
                     Edit
                   </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button onClick={() => handleDeleteProduct(product._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                  <button
+                    onClick={() => handleDeleteProduct(product._id)}
+                    type="button"
+                    className="btn btn-outline-danger"
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                      (item) => item?.action === "product_delete" && item?.allow === false
+                    )}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))

@@ -11,7 +11,7 @@ import { deleteNotificationService, getAllNotification } from '../../../../servi
 import { deleteNotificationRedux, initDataNotification, switchPage } from '../../../../redux/Notification/notificationsSlice'
 import AddNotification from './AddNotification'
 import EditNotification from './EditNotification'
-
+import { useRoleDetail } from '../../../../until/function'
 export default function Discount() {
     const dispatch = useDispatch()
     const notifications = useSelector(state => state?.notifications?.data)
@@ -28,6 +28,8 @@ export default function Discount() {
         idNotification: '',
         content: ''
     })
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
     useEffect(() => {
         const fetchData = async () => {
@@ -53,6 +55,8 @@ export default function Discount() {
         }
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria]);
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
         setSelectedNotification(data)
@@ -87,7 +91,22 @@ export default function Discount() {
                 <div className='d-flex align-items-center'>
                     <h3>Discount</h3>
                     <h6 className='ms-3'>({totalNotification} notification found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo thông báo</button>
+                    {!isRoleDetailsLoading ? (
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            type="button"
+                            className="btn btn-outline-success ms-3"
+                            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                (item) => item?.action === "notification_add" && item?.allow === false
+                            )}
+                        >
+                            Tạo thông báo
+                        </button>
+                    ) : (
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    )}
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -104,6 +123,9 @@ export default function Discount() {
             <select
                 class="form-select"
                 onChange={handleChangeSearchSelect}
+                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                    (item) => item?.action === "notification_search" && item?.allow === false
+                )}
             >
                 <option value="idNotification" selected>Tìm kiếm theo Id</option>
                 <option value="content">Tìm kiếm theo nội dung</option>
@@ -116,6 +138,9 @@ export default function Discount() {
                     <input
                         type="text"
                         class="form-control"
+                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                            (item) => item?.action === "notification_search" && item?.allow === false
+                        )}
                         name={displayTextSearch}
                         value={searchCriteria[`${displayTextSearch}`]}
                         onChange={(e) => handleChangeInput(e, setSearchCriteria)}
@@ -149,12 +174,25 @@ export default function Discount() {
                                     <button
                                         onClick={() => handleSwitchPageEdit(notification)}
                                         type="button"
-                                        className="btn btn-outline-primary">
+                                        className="btn btn-outline-primary"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "notification_edit" && item?.allow === false
+                                        )}
+                                    >
                                         Edit
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteDiscount(notification?._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button
+                                        onClick={() => handleDeleteDiscount(notification?._id)}
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "notification_delete" && item?.allow === false
+                                        )}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))

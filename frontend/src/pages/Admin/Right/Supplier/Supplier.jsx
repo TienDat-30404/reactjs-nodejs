@@ -11,7 +11,7 @@ import AddSupplier from './AddSupplier'
 import EditSupplier from './EditSupplier'
 import { getAllProduct } from '../../../../services/ProductService'
 import { initDataProduct } from '../../../../redux/Products/productsSlice'
-
+import { useRoleDetail } from '../../../../until/function'
 export default function Supplier() {
     const dispatch = useDispatch()
     const products = useSelector(state => state.products.products)
@@ -28,7 +28,8 @@ export default function Supplier() {
         idSupplier: '',
         name: ''
     })
-
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idRole = isAuthenticated && userData?.dataLogin?.idRole
     console.log(totalPage)
     useEffect(() => {
         const fetchData = async () => {
@@ -61,6 +62,7 @@ export default function Supplier() {
         }
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria])
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
 
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
@@ -96,7 +98,22 @@ export default function Supplier() {
                 <div className='d-flex align-items-center'>
                     <h3>Supplier</h3>
                     <h6 className='ms-3'>({totalSupplier} supplier found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo nhà cung cấp</button>
+                    {!isRoleDetailsLoading ? (
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            type="button"
+                            className="btn btn-outline-success ms-3"
+                            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                (item) => item?.action === "supplier_add" && item?.allow === false
+                            )}
+                        >
+                            Tạo nhà cung cấp
+                        </button>
+                    ) : (
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    )}
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -113,6 +130,9 @@ export default function Supplier() {
             <select
                 onChange={handleChangeSearchSelect}
                 class="form-select mt-2"
+                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                    (item) => item?.action === "supplier_search" && item?.allow === false
+                )}
             >
                 <option value="idSupplier" selected>Tìm kiếm theo Id</option>
                 <option value="name">Tìm kiếm theo tên</option>
@@ -125,6 +145,9 @@ export default function Supplier() {
                     <input
                         type="text"
                         class="form-control"
+                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                            (item) => item?.action === "supplier_search" && item?.allow === false
+                        )}
                         name={displayTextSearch}
                         value={searchCriteria[`${displayTextSearch}`]}
                         onChange={(e) => handleChangeInput(e, setSearchCriteria)}
@@ -162,12 +185,25 @@ export default function Supplier() {
                                     <button
                                         onClick={() => handleSwitchPageEdit(supplier)}
                                         type="button"
-                                        className="btn btn-outline-primary">
+                                        className="btn btn-outline-primary"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "supplier_edit" && item?.allow === false
+                                        )}
+                                    >
                                         Edit
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteCategory(supplier._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button
+                                        onClick={() => handleDeleteCategory(supplier._id)}
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "supplier_delete" && item?.allow === false
+                                        )}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))

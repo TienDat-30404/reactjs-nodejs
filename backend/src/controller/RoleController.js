@@ -113,5 +113,24 @@ export default class RoleController {
         }
     }
 
+    static async detailRole(req, res, next) {
+        try 
+        {
+            const {idRole} = req.params
+            const permissions = await RoleDetail.find({idRole}, 'action allow')
+            return res.status(200).json({
+                status : 200,
+                message : 'List permission role',
+                permissions
+            })
+        }
+        catch(err)
+        {
+            return res.status(500).json({
+                message : `Fail when get list permissions`
+            })
+        }
+    }
+
 
 }

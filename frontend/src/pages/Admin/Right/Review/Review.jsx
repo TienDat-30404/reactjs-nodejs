@@ -8,6 +8,7 @@ import { deleteReview, getAllReview } from '../../../../services/ReviewService'
 import { addReviewRedux, deleteReviewRedux, initDataReview, switchPage } from '../../../../redux/Review/reviewsSlice'
 import ReplyReview from './ReplyReview'
 import { io } from 'socket.io-client'
+import { useRoleDetail } from '../../../../until/function'
 const socket = io(process.env.REACT_APP_API_URL);
 export default function Review() {
     const dispatch = useDispatch()
@@ -26,8 +27,10 @@ export default function Review() {
         content: '',
         rating: ''
     })
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
-    
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -42,10 +45,9 @@ export default function Review() {
                     query += `&rating=${searchCriteria.rating}`
                 }
 
-                
+
                 const response = await getAllReview(query)
-                if(response && response.status === 200)
-                {
+                if (response && response.status === 200) {
                     dispatch(initDataReview(response))
                 }
 
@@ -56,6 +58,8 @@ export default function Review() {
         }
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria]);
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
 
     useEffect(() => {
         socket.on('review', (review) => {
@@ -84,12 +88,12 @@ export default function Review() {
         }
     }
 
-    
+
 
     const handleChangeSearchSelect = (e) => {
         setSearchCriteria({
             idReview: '',
-            content : '',
+            content: '',
             rating: ''
         })
         setDisplayTextSearch(e.target.value)
@@ -116,6 +120,9 @@ export default function Review() {
             <select
                 class="form-select"
                 onChange={handleChangeSearchSelect}
+                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                    (item) => item?.action === "review_search" && item?.allow === false
+                )}
             >
                 <option value="idReview" selected>Tìm kiếm theo Id</option>
                 <option value="content">Tìm kiếm theo nội dung</option>
@@ -129,6 +136,9 @@ export default function Review() {
                     <input
                         type="text"
                         class="form-control"
+                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                            (item) => item?.action === "review_search" && item?.allow === false
+                        )}
                         name={displayTextSearch}
                         value={searchCriteria[`${displayTextSearch}`]}
                         onChange={(e) => handleChangeInput(e, setSearchCriteria)}
@@ -142,6 +152,9 @@ export default function Review() {
                     value={searchCriteria[`${displayTextSearch}`]}
                     onChange={(e) => handleChangeInput(e, setSearchCriteria)}
                     className="form-select mt-2"
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                        (item) => item?.action === "review_search" && item?.allow === false
+                    )}
                 >
                     <option value="1">1 star</option>
                     <option value="2">2 star</option>
@@ -184,12 +197,25 @@ export default function Review() {
                                     <button
                                         onClick={() => handleSwitchPageEdit(review)}
                                         type="button"
-                                        className={`btn btn-outline-${review?.response?.length > 0 ? 'primary' : 'danger'}`}>
+                                        className={`btn btn-outline-${review?.response?.length > 0 ? 'primary' : 'danger'}`}
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "review_reply" && item?.allow === false
+                                        )}
+                                    >
                                         {review?.response?.length > 0 ? 'Đã trả lời' : 'Chưa trả lời'}
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteReview(review?._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button
+                                        onClick={() => handleDeleteReview(review?._id)}
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "review_delete" && item?.allow === false
+                                        )}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))
@@ -206,7 +232,7 @@ export default function Review() {
                     visiblePagination={visiblePagination}
                 />
             )}
-             <ReplyReview show={showEdit} close={() => setShowEdit(false)} data={selectedReview} /> 
+            <ReplyReview show={showEdit} close={() => setShowEdit(false)} data={selectedReview} />
             {/* <AddDiscount show={showAddModal} close={() => setShowAddModal(false)} />
             <EditDiscount show={showEdit} close={() => setShowEdit(false)} data={selectedReview} /> */}
         </div>

@@ -9,6 +9,7 @@ import { getAllStatus } from '../../../../services/StatusService'
 import { initDataOrder, switchPage } from '../../../../redux/Order/ordersSlice'
 import { initDataStatus } from '../../../../redux/Status/statusSlice'
 import Pagination from '../../../../components/Pagination'
+import { useRoleDetail } from '../../../../until/function'
 export default function Product() {
   const dispatch = useDispatch()
   const orders = useSelector(state => state?.orders?.data)
@@ -28,6 +29,8 @@ export default function Product() {
     status: '',
 
   })
+  const { isAuthenticated, userData } = useSelector((state) => state.auth);
+  const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
 
   useEffect(() => {
@@ -69,6 +72,8 @@ export default function Product() {
     }
     fetchData()
   }, [page, limit, searchCriteria, displayTextSearch])
+  const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
 
   const handleSwitchDetailOrder = (data) => {
     setShowEdit(true)
@@ -94,7 +99,7 @@ export default function Product() {
   const handleChangeSearchSelect = (e) => {
     setSearchCriteria({
       idOrder: '',
-      status : ''
+      status: ''
     })
     setDisplayTextSearch("")
     setDisplayTextSearch(e.target.value)
@@ -126,6 +131,9 @@ export default function Product() {
       <select
         onChange={handleChangeSearchSelect}
         class="form-select mt-2"
+        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+          (item) => item?.action === "order_search" && item?.allow === false
+        )}
       >
         <option value="idOrder" selected>Tìm kiếm theo idOrder</option>
         <option value="status">Tìm kiếm theo trạng thái đơn hàng</option>
@@ -140,6 +148,9 @@ export default function Product() {
           <input
             type="text"
             class="form-control"
+            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+              (item) => item?.action === "order_search" && item?.allow === false
+            )}
             name={displayTextSearch}
             value={searchCriteria[`${displayTextSearch}`]}
             onChange={(e) => handleChangeInput(e, setSearchCriteria)}
@@ -151,6 +162,9 @@ export default function Product() {
             name={displayTextSearch}
             value={searchCriteria[`${displayTextSearch}`]}
             class="form-select"
+            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+              (item) => item?.action === "order_search" && item?.allow === false
+            )}
             onChange={(e) => {
               handleChangeInput(e, setSearchCriteria);
               // dispatch(switchPage(1))
@@ -222,7 +236,11 @@ export default function Product() {
                   <button
                     onClick={() => handleSwitchDetailOrder(order)}
                     type="button"
-                    className="btn btn-outline-primary">
+                    className="btn btn-outline-primary"
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                      (item) => item?.action === "order_confirm" && item?.allow === false
+                    )}
+                  >
                     Detail
                   </button>
                 </td>

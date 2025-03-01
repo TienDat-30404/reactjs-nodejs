@@ -2,6 +2,10 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/Auth/authSlice";
 import dayjs from 'dayjs';
 import { useCallback } from "react";
+// import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
+import { getDetailRole } from "../services/RoleService";
+
 export const handleChangeInput = (e, setState) => {
     const { name, value } = e.target;
     setState(prevInfo => ({
@@ -103,4 +107,13 @@ export const visiblePagination = (page, totalPage) => {
         }
     }
     return pages
+}
+
+
+export const useRoleDetail = (idRole) => {
+    return useQuery({
+        queryKey : ["permissions", idRole],
+        queryFn : () => getDetailRole(idRole),
+        enabled : !!idRole
+    })
 }

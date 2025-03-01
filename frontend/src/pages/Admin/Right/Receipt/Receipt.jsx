@@ -11,7 +11,7 @@ import { initDataSupplier } from '../../../../redux/Supplier/suppliersSlice'
 import AddReceipt from './AddReceipt'
 import { initDataProduct } from '../../../../redux/Products/productsSlice'
 import { getAllProduct } from '../../../../services/ProductService'
-
+import { useRoleDetail } from '../../../../until/function'
 export default function Receipt() {
     const dispatch = useDispatch()
     const suppliers = useSelector(state => state?.suppliers.data)
@@ -29,6 +29,8 @@ export default function Receipt() {
         idReceipt: '',
         supplier: ''
     })
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
 
     useEffect(() => {
@@ -40,7 +42,7 @@ export default function Receipt() {
                     query += `&idReceipt=${searchCriteria.idReceipt}`
                 }
                 if (searchCriteria.supplier != "") {
-                  query += `&supplier=${searchCriteria.supplier}`
+                    query += `&supplier=${searchCriteria.supplier}`
                 }
                 console.log(query)
 
@@ -66,6 +68,8 @@ export default function Receipt() {
         }
         fetchData()
     }, [page, limit, searchCriteria])
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
 
     const handleSwitchPageEdit = (data) => {
         // setShowEdit(true)
@@ -101,7 +105,22 @@ export default function Receipt() {
                 <div className='d-flex align-items-center'>
                     <h3>Receipt</h3>
                     <h6 className='ms-3'>({totalReceipt} receipt found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo phiếu nhập</button>
+                    {!isRoleDetailsLoading ? (
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            type="button"
+                            className="btn btn-outline-success ms-3"
+                            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                (item) => item?.action === "receipt_add" && item?.allow === false
+                            )}
+                        >
+                            Tạo phiếu nhập
+                        </button>
+                    ) : (
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    )}
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -118,6 +137,9 @@ export default function Receipt() {
             <select
                 onChange={handleChangeSearchSelect}
                 class="form-select mt-2"
+                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                    (item) => item?.action === "receipt_search" && item?.allow === false
+                )}
             >
                 <option value="idReceipt" selected>Tìm kiếm theo Id</option>
                 <option value="supplier">Tìm kiếm theo nhà cung cấp</option>
@@ -130,6 +152,9 @@ export default function Receipt() {
                     <input
                         type="text"
                         class="form-control"
+                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                            (item) => item?.action === "receipt_search" && item?.allow === false
+                        )}
                         name={displayTextSearch}
                         value={searchCriteria[`${displayTextSearch}`]}
                         onChange={(e) => handleChangeInput(e, setSearchCriteria)}
@@ -145,7 +170,7 @@ export default function Receipt() {
                         class="form-select"
                         onChange={(e) => handleChangeInput(e, setSearchCriteria)}
                     >
-                        <option value = "">Chọn nhà cung cấp</option>
+                        <option value="">Chọn nhà cung cấp</option>
                         {suppliers && suppliers?.length > 0 ? (
                             suppliers?.map((supplier, index) => (
                                 <option key={index} value={supplier._id}>{supplier.name}</option>
@@ -184,12 +209,25 @@ export default function Receipt() {
                                     <button
                                         onClick={() => handleSwitchPageEdit(receipt)}
                                         type="button"
-                                        className="btn btn-outline-primary">
+                                        className="btn btn-outline-primary"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "receipt_edit" && item?.allow === false
+                                        )}
+                                    >
                                         Edit
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteCategory(receipt._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button
+                                        onClick={() => handleDeleteCategory(receipt._id)}
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "receipt_delete" && item?.allow === false
+                                        )}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))

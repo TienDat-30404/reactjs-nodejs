@@ -23,7 +23,7 @@ const Header = () => {
     const [showModal, setShowModal] = useState(false);
     const displaySearchAdvanced = () => {
         setShowModal(true);
-    };
+    }; 
     const [showModalLogin, setShowModalLogin] = useState(false)
     const [showModalSignUp, setShowModalSignUp] = useState(false)
     const [showProfile, setShowProfile] = useState(false)

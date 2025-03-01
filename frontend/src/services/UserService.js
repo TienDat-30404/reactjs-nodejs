@@ -64,7 +64,11 @@ export const refreshTokenService = async () => {
 }
 
 export const updateUser = async (id, data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/update-user/${id}`, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        },
         method: 'PUT',
         body: data
     });
@@ -72,9 +76,12 @@ export const updateUser = async (id, data) => {
 }
 
 export const getAllUser = async (query) => {
+    const token = Cookies.get('accessToken')
+
     const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-user?${query}`, {
         method: 'GET',
         headers: {
+            "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
     });
@@ -82,12 +89,12 @@ export const getAllUser = async (query) => {
 }
 
 export const deleteUser = async (id) => {
-    // const token = Cookies.get('accessToken')
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-user/${id}`, {
-        method: 'DELETE'
-        // headers: {
-        //     'Authorization': `Bearer ${token}`,
-        // }
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
     })
     return response.json()
 }
@@ -120,9 +127,11 @@ export const changePassword = async (id, data, isChange) => {
 
 
 export const logoutUser = async () => {
+    // const token = Cookies.get('accessToken')
     await fetch(`${process.env.REACT_APP_API_URL}/logout-refresh-token`, {
         method: 'POST',
         headers: {
+            // 'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
         credentials: 'include' // Để gửi cookie từ client đến server
@@ -133,9 +142,11 @@ export const logoutUser = async () => {
 
 
 export const addUser = async (data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/add-user`, {
         method: 'POST',
         headers: {
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),

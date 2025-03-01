@@ -73,6 +73,13 @@ const createDefaultRoleDetail = async () => {
             {idRole : adminRoleId, action : 'notification_edit', allow : true},
             {idRole : adminRoleId, action : 'notification_delete', allow : true},
             {idRole : adminRoleId, action : 'notification_search', allow : true},
+            {idRole : adminRoleId, action : 'review_search', allow : true},
+            {idRole : adminRoleId, action : 'review_reply', allow : true},
+            {idRole : adminRoleId, action : 'review_delete', allow : true},
+            {idRole : adminRoleId, action : 'role_add', allow : true},
+            {idRole : adminRoleId, action : 'role_edit', allow : true},
+            {idRole : adminRoleId, action : 'role_delete', allow : true},
+            {idRole : adminRoleId, action : 'role_search', allow : true},
 
             // staff 
             {idRole : staffRoleId, action : 'overview_statistic', allow : false},
@@ -115,6 +122,13 @@ const createDefaultRoleDetail = async () => {
             {idRole : staffRoleId, action : 'notification_edit', allow : false},
             {idRole : staffRoleId, action : 'notification_delete', allow : false},
             {idRole : staffRoleId, action : 'notification_search', allow : false},
+            {idRole : staffRoleId, action : 'review_search', allow : true},
+            {idRole : staffRoleId, action : 'review_reply', allow : true},
+            {idRole : staffRoleId, action : 'review_delete', allow : false},
+            {idRole : staffRoleId, action : 'role_add', allow : false},
+            {idRole : staffRoleId, action : 'role_edit', allow : false},
+            {idRole : staffRoleId, action : 'role_delete', allow : false},
+            {idRole : staffRoleId, action : 'role_search', allow : false},
 
             // customer 
             {idRole : customerRoleId, action : 'overview_statistic', allow : false},
@@ -157,7 +171,14 @@ const createDefaultRoleDetail = async () => {
             {idRole : customerRoleId, action : 'notification_edit', allow : false},
             {idRole : customerRoleId, action : 'notification_delete', allow : false},
             {idRole : customerRoleId, action : 'notification_search', allow : false},
-
+            {idRole : customerRoleId, action : 'review_search', allow : false},
+            {idRole : customerRoleId, action : 'review_reply', allow : false},
+            {idRole : customerRoleId, action : 'review_delete', allow : false},
+            {idRole : customerRoleId, action : 'role_add', allow : false},
+            {idRole : customerRoleId, action : 'role_edit', allow : false},
+            {idRole : customerRoleId, action : 'role_delete', allow : false},
+            {idRole : customerRoleId, action : 'role_search', allow : false},
+            
 
             // manager 
             {idRole : managerRoleId, action : 'overview_statistic', allow : true},
@@ -200,6 +221,13 @@ const createDefaultRoleDetail = async () => {
             {idRole : managerRoleId, action : 'notification_edit', allow : true},
             {idRole : managerRoleId, action : 'notification_delete', allow : true},
             {idRole : managerRoleId, action : 'notification_search', allow : true},
+            {idRole : managerRoleId, action : 'review_search', allow : true},
+            {idRole : managerRoleId, action : 'review_reply', allow : true},
+            {idRole : managerRoleId, action : 'review_delete', allow : true},
+            {idRole : managerRoleId, action : 'role_add', allow : false},
+            {idRole : managerRoleId, action : 'role_edit', allow : false},
+            {idRole : managerRoleId, action : 'role_delete', allow : false},
+            {idRole : managerRoleId, action : 'role_search', allow : false},
 
 
         ]

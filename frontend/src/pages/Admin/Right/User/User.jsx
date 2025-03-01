@@ -11,6 +11,7 @@ import { getAllRole } from '../../../../services/RoleService'
 import { initDataRole } from '../../../../redux/Role/rolesSlice'
 import ChangePassword from './ChangePassword'
 import Pagination from '../../../../components/Pagination'
+import { useRoleDetail } from '../../../../until/function'
 export default function Product() {
   const dispatch = useDispatch()
   const roles = useSelector(state => state?.roles?.roles)
@@ -33,6 +34,8 @@ export default function Product() {
     role: '',
     phone: ''
   })
+  const { isAuthenticated, userData } = useSelector((state) => state.auth);
+  const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
 
   useEffect(() => {
@@ -74,6 +77,9 @@ export default function Product() {
     }
     fetchData()
   }, [page, limit, searchCriteria, displayTextSearch])
+
+  const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
 
   const handleSwitchPageEdit = (data) => {
     setShowEdit(true)
@@ -142,14 +148,31 @@ export default function Product() {
         <div className='d-flex align-items-center'>
           <h3>User</h3>
           <h6 className='ms-3'>({totalUser} user found)</h6>
-          <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo tài khoản</button>
+          {!isRoleDetailsLoading ? (
+            <button
+              onClick={() => setShowAddModal(true)}
+              type="button"
+              className="btn btn-outline-success ms-3"
+              disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                (item) => item?.action === "user_add" && item?.allow === false
+              )}
+            >
+              Tạo tài khoản
+            </button>
+          ) : (
+            <div class="spinner-border" role="status">
+              <span class="sr-only"></span>
+            </div>
+          )}
           <button
             onClick={() => {
               setShowChangePassword(true)
             }}
             type="button"
             className="btn btn-outline-success ms-3 btn-change-password"
-            disabled={selectedChangePassword === null}
+            disabled={selectedChangePassword === null || !isRoleDetailsLoading && roleDetails?.permissions?.find(
+              (item) => item?.action === "user_changePassword" && item?.allow === false
+            )}
           >
             Đổi mật khẩu
           </button>
@@ -170,6 +193,9 @@ export default function Product() {
       <select
         onChange={handleChangeSearchSelect}
         class="form-select mt-2"
+        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+          (item) => item?.action === "user_search" && item?.allow === false
+        )}
       >
         <option value="idUser" selected>Tìm kiếm theo idUser</option>
         <option value="userName">Tìm kiếm theo userName</option>
@@ -188,6 +214,9 @@ export default function Product() {
             name={displayTextSearch}
             value={searchCriteria[`${displayTextSearch}`]}
             onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+              (item) => item?.action === "user_search" && item?.allow === false
+            )}
           />
         </div>
       ) :
@@ -260,12 +289,24 @@ export default function Product() {
                   <button
                     onClick={() => handleSwitchPageEdit(user)}
                     type="button"
-                    className="btn btn-outline-primary">
+                    className="btn btn-outline-primary"
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                      (item) => item?.action === "user_edit" && item?.allow === false
+                    )}
+                    >
                     Edit
                   </button>
                 </td>
                 <td style={{ width: '6%' }} className='text-center'>
-                  <button onClick={() => handleDeleteUser(user._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                  <button
+                    onClick={() => handleDeleteUser(user._id)}
+                    type="button"
+                    className="btn btn-outline-danger"
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                      (item) => item?.action === "user_edit" && item?.allow === false
+                    )}
+                  >
+                    Delete</button>
                 </td>
               </tr>
             ))

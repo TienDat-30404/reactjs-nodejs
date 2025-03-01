@@ -11,6 +11,7 @@ import { getAllProduct } from '../../../../services/ProductService'
 import { initDataProduct } from '../../../../redux/Products/productsSlice'
 import AddDiscount from './AddDiscount'
 import EditDiscount from './EditDiscount'
+import { useRoleDetail } from '../../../../until/function'
 export default function Discount() {
     const dispatch = useDispatch()
     const products = useSelector(state => state?.products?.products)
@@ -29,10 +30,9 @@ export default function Discount() {
         status: '',
         name: ''
     })
+    const { isAuthenticated, userData } = useSelector((state) => state.auth);
+    const idRole = isAuthenticated && userData?.dataLogin?.idRole
 
-    console.log("status", searchCriteria.status)
-    console.log("displaySearch", displayTextSearch)
-    console.log("searchCriteria{displayTextSearch}", searchCriteria)
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -64,6 +64,8 @@ export default function Discount() {
         }
         fetchData()
     }, [page, limit, searchCriteria]);
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
+
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
         setSelectedDiscount(data)
@@ -100,7 +102,22 @@ export default function Discount() {
                 <div className='d-flex align-items-center'>
                     <h3>Discount</h3>
                     <h6 className='ms-3'>({totalDiscount} discount found)</h6>
-                    <button onClick={() => setShowAddModal(true)} type="button" className="btn btn-outline-success ms-3">Tạo giảm giá cho sản phẩm</button>
+                    {!isRoleDetailsLoading ? (
+                        <button
+                            onClick={() => setShowAddModal(true)}
+                            type="button"
+                            className="btn btn-outline-success ms-3"
+                            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                (item) => item?.action === "discount_add" && item?.allow === false
+                            )}
+                        >
+                            Tạo giảm giá cho sản phẩm
+                        </button>
+                    ) : (
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                    )}
                 </div>
                 <div className='d-flex align-items-center'>
                     <i className="bi bi-bell me-3"></i>
@@ -117,6 +134,9 @@ export default function Discount() {
             <select
                 class="form-select"
                 onChange={handleChangeSearchSelect}
+                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                    (item) => item?.action === "discount_search" && item?.allow === false
+                )}
             >
                 <option value="idDiscount" selected>Tìm kiếm theo Id</option>
                 <option value="status">Tìm kiếm theo trạng thái</option>
@@ -130,6 +150,9 @@ export default function Discount() {
                     <input
                         type="text"
                         class="form-control"
+                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                            (item) => item?.action === "discount_search" && item?.allow === false
+                        )}
                         name={displayTextSearch}
                         value={searchCriteria[`${displayTextSearch}`]}
                         onChange={(e) => handleChangeInput(e, setSearchCriteria)}
@@ -141,6 +164,9 @@ export default function Discount() {
                 <select
                     name={displayTextSearch}
                     value={searchCriteria[`${displayTextSearch}`]}
+                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                        (item) => item?.action === "discount_search" && item?.allow === false
+                    )}
                     onChange={(e) => handleChangeInput(e, setSearchCriteria)}
                     className="form-select mt-2"
                 >
@@ -192,12 +218,25 @@ export default function Discount() {
                                     <button
                                         onClick={() => handleSwitchPageEdit(discount)}
                                         type="button"
-                                        className="btn btn-outline-primary">
+                                        className="btn btn-outline-primary"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "discount_edit" && item?.allow === false
+                                        )}
+                                    >
                                         Edit
                                     </button>
                                 </td>
                                 <td style={{ width: '6%' }} className='text-center'>
-                                    <button onClick={() => handleDeleteDiscount(discount?._id)} type="button" className="btn btn-outline-danger">Delete</button>
+                                    <button
+                                        onClick={() => handleDeleteDiscount(discount?._id)}
+                                        type="button"
+                                        className="btn btn-outline-danger"
+                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                            (item) => item?.action === "discount_delete" && item?.allow === false
+                                        )}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))

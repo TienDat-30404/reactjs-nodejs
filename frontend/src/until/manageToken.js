@@ -58,6 +58,7 @@ export const useAuthHandler = () => {
     const saveTokenOnRedux = useSaveTokenOnRedux();
     const handleRefreshToken = async () => {
         try {
+            const token = Cookies.get('accessToken')
             const refreshToken = await refreshTokenService()
             if (refreshToken.success) {
                 setCookieForToken(refreshToken.tokenNew);
@@ -74,7 +75,6 @@ export const useAuthHandler = () => {
         const checkToken = async () => {
             const token = Cookies.get('accessToken');
             if (token) {
-                console.log("accessToken")
                 dispatch(loginSuccess({ dataLogin: jwtDecode(token) }));
             } else {
                 console.log("refreshToken")

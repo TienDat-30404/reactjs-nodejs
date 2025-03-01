@@ -51,3 +51,18 @@ export const deleteRole = async (id) => {
         console.log("Fail when delete role", err)
     }
 }
+
+export const getDetailRole = async(id) => {
+    try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/permissions/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        return response.json()
+    }
+    catch (err) {
+        console.log("Fail when get permissions", err)
+    }
+}
