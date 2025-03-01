@@ -3,7 +3,7 @@ export default class refreshTokenJWT {
 
     static generateToken(payload) {
         return jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: '15s',
+            expiresIn: '15m',
         });
     };
     
@@ -15,7 +15,7 @@ export default class refreshTokenJWT {
     
     static generateAccessToken(payload)  {
         return jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: '15s',
+            expiresIn: '15m',
         });
     };
     

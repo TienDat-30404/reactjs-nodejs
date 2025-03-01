@@ -25,7 +25,6 @@ export default function CartProduct({ id, image, name, priceNotDiscount, percent
         const query = `idUser=${idUser}&limit=100`
         const fetchData = async () => {
             const response = await getFavoriteOfUserService(query)
-            console.log(response)
             if (response && response.status === 200) {
                 dispatch(initDataFavorite(response))
             }

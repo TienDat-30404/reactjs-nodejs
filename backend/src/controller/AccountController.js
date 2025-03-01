@@ -173,13 +173,11 @@ export default class AccountController {
             maxAge: 24 * 60 * 60 * 1000 // Thời gian sống của cookie (1 ngày trong ví dụ này)
         });
 
-        const isCheckRole = await Role.findById({_id : payloadToken.idRole})
         
         return res.status(200).json({
             token: accessToken,
             message: 'Đăng nhập thành công',
             // avatar: avatar,
-            gg : isCheckRole
         })
     }
 

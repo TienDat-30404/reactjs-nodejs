@@ -1,8 +1,11 @@
 import Cookies from 'js-cookie'
 export const getAllCategory = async (query) => {
+    // const token = Cookies.get('accessToken')
+
     const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-category?${query}`, {
         method: 'GET',
         headers: {
+            // "Authorization" : `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
     })
@@ -10,7 +13,11 @@ export const getAllCategory = async (query) => {
 }
 
 export const addCategory = async (data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/add-category`, {
+        headers : {
+            "Authorization" : `Bearer ${token}`
+        },
         method: 'POST',
         body: data
     })
@@ -40,7 +47,11 @@ export const deleteCategory = async (id) => {
 
 
 export const updateCategory = async(id, data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/update-category/${id}`, {
+        headers : {
+            "Authorization" : `Bearer ${token}`
+        },
         method: 'PUT',
         body : data
     })

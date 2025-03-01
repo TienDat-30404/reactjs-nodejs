@@ -3,7 +3,7 @@
 
 import jwt from 'jsonwebtoken';
 import refreshTokenJWT from '../utils/jwt.js';
-
+import { getRolePermissions } from '../utils/rolePermission.js';
 const authencationMiddleWare = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
@@ -14,14 +14,15 @@ const authencationMiddleWare = (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
+    console.log(token)
     if (!token) {
         return res.status(401).json({
             status: "Error",
             message: "Token not provided"
         });
     }
-
-    jwt.verify(token, process.env.JWT_REFRESH_SECRET, (err, user) => {
+    
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
             console.log(err.message)
             return res.status(400).json({
@@ -30,18 +31,7 @@ const authencationMiddleWare = (req, res, next) => {
             });
         }
 
-        if (user.idRole === 0) {
-            req.user = user; 
-            next();
-        } else if (user.idRole === 1) {
-            return res.status(403).json({
-                message: "You do not have permission to delete"
-            });
-        } else {
-            return res.status(403).json({
-                message: "Unauthorized role"
-            });
-        }
+       next()
     });
 };
 
@@ -82,4 +72,33 @@ const authenticateToken = async (req, res, next) => {
     }
 };
 
-export {authencationMiddleWare, authenticateToken}
+const checkPermissionRoleMiddleware = (requiredAction) => {
+    return async (req, res, next) => { 
+        const authHeader = req.headers['authorization']
+        const accessToken = authHeader && authHeader.split(' ')[1]
+        console.log("accessToken", accessToken)
+        const decoded = jwt.verify(accessToken, process.env.JWT_SECRET)
+        const idRole = decoded.idRole
+        console.log("idRole", idRole)
+
+        if (!idRole) {
+            return res.status(403).json({
+                status: "Error",
+                message: "User role not found"
+            });
+        }
+    
+        const permissions = await getRolePermissions(idRole); 
+    
+        if (!permissions[requiredAction]) {
+            return res.status(403).json({
+                status: "Error",
+                message: "You do not have permission to perform this action"
+            });
+        }
+    
+        next(); 
+    }
+}
+
+export {authencationMiddleWare, authenticateToken, checkPermissionRoleMiddleware}

@@ -12,11 +12,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { privateRoutes } from './routes/privateRoutes';
 import { adminRoutes } from './routes/adminRoutes';
 function App() {
-  const { checkAndUpdateToken } = useAuthHandler();
-
-  useEffect(() => {
-    checkAndUpdateToken();
-  }, [checkAndUpdateToken]);
+  // const { checkAndUpdateToken } = useAuthHandler(); 
+  useAuthHandler()
+  // useEffect(() => {
+  //   checkAndUpdateToken();
+  // }, [checkAndUpdateToken]);
 
   return (
     <div className='div_biggest'>

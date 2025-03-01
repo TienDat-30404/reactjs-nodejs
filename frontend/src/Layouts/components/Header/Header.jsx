@@ -70,30 +70,6 @@ const Header = () => {
 
 
 
-    // useEffect(() => {
-    //     const handleClickOutside = (event) => {
-    //         if (avatarRef.current && !avatarRef.current.contains(event.target)) {
-    //             setStatusHiddenLogout(false);
-    //         }
-    //         if (modalRef.current && !modalRef.current.contains(event.target)) {
-    //             setShowModal(false);
-    //         }
-    //     };
-
-    //     const handleClickInsideHeader = (event) => {
-    //         if (headerRef.current && headerRef.current.contains(event.target)) {
-    //             setShowModal(false);
-    //         }
-    //     };
-    //     document.addEventListener("mousedown", handleClickOutside);
-    //     document.addEventListener("mousedown", handleClickInsideHeader);
-
-    //     return () => {
-    //         document.removeEventListener("mousedown", handleClickOutside);
-    //         document.addEventListener("mousedown", handleClickInsideHeader);
-    //     };
-    // }, [setStatusHiddenLogout]);
-
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search);
         const type = queryParams.get('type');

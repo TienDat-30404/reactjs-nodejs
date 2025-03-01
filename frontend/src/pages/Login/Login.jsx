@@ -55,9 +55,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
   const handleClickLogin = async () => {
     try {
       dispatch(refreshAllNotificationRedux())
-
       const response = await loginService(dataLogin, true)
-      console.log(response)
       if (response.errors) {
         setErrors(response.errors)
         return

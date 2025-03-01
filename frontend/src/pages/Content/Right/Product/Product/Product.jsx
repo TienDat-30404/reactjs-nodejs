@@ -8,13 +8,11 @@ export default function Product() {
     const limit = 5
     const [totalPage, setTotalPage] = useState(1)
 
-
     const dispatch = useDispatch()
     const products = useSelector(state => state.products.products)
     useEffect(() => {
         const fetchDatasProduct = async () => {
             const listProduct = await getAllProduct(page, 'idProduct', 'asc', limit)
-            console.log(listProduct)
             if (listProduct) {
                 dispatch(initDataProduct(listProduct))
             }

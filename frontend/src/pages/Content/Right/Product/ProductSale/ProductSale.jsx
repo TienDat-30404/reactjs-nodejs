@@ -18,9 +18,7 @@ export default function ProductSale() {
     useEffect(() => {
         const fetchDatasProduct = async () => {
             const query = `page=${page}&sortBy=idProduct&type=asc&limit=${limit}&typeDisplay=1`
-            console.log(query)
             const response = await getAllProduct(query)
-            console.log(response)
             if (response) {
                 dispatch(initDataProduct(response))
             }

@@ -10,11 +10,9 @@ const Category = () => {
     const switchCategory = (id) => {
         navigate(`/category/${id}`)
     }
-    console.log(categories)
     useEffect(() => {
         const fetchDataCategory = async () => {
             const response = await getAllCategory()
-            console.log(response)
             if(response)
             {
                 dispatch(initDataCategory(response))

@@ -74,6 +74,7 @@ export default function EditCategory({ data, show, close }) {
         const response = await updateCategory(data?._id, formData)
         if(response && response?.status === 200)
         {
+            toast.success("Chỉnh sửa thành công")
             dispatch(updateCategoryRedux(
                 {
                     id : data?._id, 
@@ -85,9 +86,7 @@ export default function EditCategory({ data, show, close }) {
             setErrors(response.errors)
             return
         }
-        else {
-            toast.success("Chỉnh sửa thành công")
-        }
+        
     }
 
     const validateInput = (name, value) => {

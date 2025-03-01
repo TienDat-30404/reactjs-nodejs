@@ -42,7 +42,6 @@ export default function Category() {
 
 
         const response = await getAllCategory(query)
-        console.log(query)
         if (response && response.status == 200) {
           dispatch(initDataCategory(response))
         }
@@ -59,8 +58,6 @@ export default function Category() {
     setShowEdit(true)
     setSelectedCategory(data)
   }
-  console.log(deleteCategory)
-  console.log(searchCriteria)
 
   const handlePagination = (page) => {
     dispatch(switchPage(page))
@@ -86,7 +83,6 @@ export default function Category() {
     })
     setDisplayTextSearch(e.target.value)
   }
-  console.log(displayTextSearch)
   return (
     <div className='px-4 py-2 bg-white product'>
       <div className='d-flex justify-content-between'>

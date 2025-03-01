@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import multer from 'multer';
 import path from 'path';
 import Supplier from '../model/SupplierModel.js';
+import RoleDetail from '../model/RoleDetail.js'
 
 // Check email 
 const validateEmail = (email) => {

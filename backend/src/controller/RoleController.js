@@ -2,7 +2,7 @@
 import mongoose from 'mongoose';
 import Role from '../model/RoleModel.js'
 import Account from '../model/AccountModel.js'
-
+import RoleDetail from '../model/RoleDetail.js';
 export default class RoleController {
 
     static async addRole(req, res, next) {

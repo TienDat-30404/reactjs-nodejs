@@ -6,14 +6,14 @@ export default class CategoryController {
     static async addCategory(req, res, next) {
         try {
             const { name } = req.body
-            const result = await cloudinary.uploader.upload(req.file.path);
-            if (!req.file) {
-                return res.status(400).json({ error: "File image is required." });
-            }
+            // const result = await cloudinary.uploader.upload(req.file.path);
+            // if (!req.file) {
+            //     return res.status(400).json({ error: "File image is required." });
+            // }
             const category = new Category(
                 {
                     name,
-                    image: result.secure_url
+                    // image: result.secure_url
                 }
             )
             await category.save()
@@ -33,7 +33,7 @@ export default class CategoryController {
         const page = parseInt(req.query.page) || 1
         const limit = parseInt(req.query.limit) || 5
         const startPage = (page - 1) * limit
-        const objectFilter = {}
+        const objectFilter = {deletedAt : null}
         if (req.query.idCategory) {
             if (mongoose.Types.ObjectId.isValid(req.query.idCategory)) {
                 objectFilter._id = req.query.idCategory
@@ -109,8 +109,8 @@ export default class CategoryController {
     static async deleteCategory(req, res, next) {
         try {
             const idCategory = req.params.idCategory
-            const category = await Category.deleteOne({ _id: idCategory })
-            if (category.deletedCount > 0) {
+            const category = await Category.updateOne({_id : idCategory}, {deletedAt : new Date()})
+            if (category.modifiedCount > 0) {
                 return res.status(200).json({
                     category,
                     message: "Xóa thể loại thành công",
