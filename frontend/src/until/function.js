@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { useCallback } from "react";
 // import { useQuery } from '@tanstack/react-query';
 import { useQuery } from "@tanstack/react-query";
-import { getDetailRole } from "../services/RoleService";
+import { getListPermissionsOfRole } from "../services/RoleService";
 
 export const handleChangeInput = (e, setState) => {
     const { name, value } = e.target;
@@ -113,7 +113,7 @@ export const visiblePagination = (page, totalPage) => {
 export const useRoleDetail = (idRole) => {
     return useQuery({
         queryKey : ["permissions", idRole],
-        queryFn : () => getDetailRole(idRole),
+        queryFn : () => getListPermissionsOfRole(idRole),
         enabled : !!idRole
     })
 }

@@ -27,9 +27,11 @@ export const getVoucherOfUser = async (query) => {
 
 export const getAllVoucher = async (query) => {
     try {
+        const token = Cookies.get('accessToken'); 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-voucher?${query}`, {
             method: 'GET',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
@@ -47,9 +49,11 @@ export const getAllVoucher = async (query) => {
 
 export const deleteVoucher = async (id) => {
     try {
+        const token = Cookies.get('accessToken'); 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-voucher/${id}`, {
             method: 'DELETE',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
@@ -68,9 +72,11 @@ export const deleteVoucher = async (id) => {
 
 export const editVoucher = async(id, data) => {
     try {
+        const token = Cookies.get('accessToken'); 
         const response = await fetch(`${process.env.REACT_APP_API_URL}/edit-voucher/${id}`, {
             method: 'PUT',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),

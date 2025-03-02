@@ -37,6 +37,7 @@ export default class refreshTokenJWT {
                     sex : user.sex,
                     date_of_birth : user.date_of_birth,
                     idRole : user.idRole,
+                    nameRole : user.nameRole,
                     idAccount : user.idAccount,
                     avatar : user.avatar
                 })

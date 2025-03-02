@@ -143,26 +143,33 @@ export default class AccountController {
     // [POST] : /sign-in
     static async loginUser(req, res, next) {
         const { userName } = req.body
-        const isCheckAccount = await Account.findOne({ userName })
+        const isCheckAccount = await Account.findOne({ userName }).populate('idRole')
         if (isCheckAccount == null) {
             return res.status(404).json({ message: "Tài khoản không tồn tại." });
         }
         const isCheckUser = await User.findOne({ idAccount: isCheckAccount._id })
         const avatar = isCheckUser.avatar
+        
         const payloadToken = {
-            idUser: isCheckUser._id,
-            name: isCheckUser.name,
-            userName: isCheckAccount.userName,
-            email: isCheckAccount.email,
-            typeLogin: isCheckAccount.typeLogin,
-            address: isCheckUser.address,
-            phone: isCheckUser.phone,
-            sex: isCheckUser.sex,
-            date_of_birth: isCheckUser.date_of_birth,
-            idRole: isCheckAccount.idRole,
-            idAccount: isCheckAccount._id,
-            avatar
+            idUser: isCheckUser?._id,
+            name: isCheckUser?.name,
+            userName: isCheckAccount?.userName,
+            email: isCheckAccount?.email,
+            typeLogin: isCheckAccount?.typeLogin,
+            address: isCheckUser?.address,
+            phone: isCheckUser?.phone,
+            sex: isCheckUser?.sex,
+            date_of_birth: isCheckUser?.date_of_birth,
+            idRole: isCheckAccount?.idRole?._id,
+            nameRole : isCheckAccount?.idRole?.name,
+            idAccount: isCheckAccount?._id,
+            avatar,
         };
+        // if(payloadToken.nameRole === "Customer")
+        // {
+        //     return res.status(403).json({ message: "Bạn không có quyền truy cập Admin." });
+
+        // }
 
         const accessToken = refreshTokenJWT.generateToken(payloadToken)
         const refreshToken = refreshTokenJWT.generateRefreshToken(payloadToken)

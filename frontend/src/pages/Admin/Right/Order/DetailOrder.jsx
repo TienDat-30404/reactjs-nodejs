@@ -4,7 +4,6 @@ import { confirmOrder } from '../../../../services/OrderService';
 import { useSelector, useDispatch } from 'react-redux';
 import { confirmOrderRedux } from '../../../../redux/Order/ordersSlice';
 export default function DetailOrder({ show, close, data }) {
-    console.log(data)
     const dispatch = useDispatch()
     const statuss = useSelector(state => state?.statuss?.data)
     const [status, setStatus] = useState('')

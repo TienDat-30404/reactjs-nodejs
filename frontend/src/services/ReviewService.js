@@ -1,5 +1,5 @@
+import Cookies from 'js-cookie'
 export const getAllReviewOfProduct = async (id, query) => {
-    
     const response = await fetch(`${process.env.REACT_APP_API_URL}/get-review-of-product/${id}?${query}`, {
         method: 'GET',
         headers: {
@@ -9,21 +9,25 @@ export const getAllReviewOfProduct = async (id, query) => {
     return response.json()
 }
 
-export const addReview = async(data) => {
+export const addReview = async (data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/add-review`, {
-        method : 'POST',
-        headers : {
+        method: 'POST',
+        headers: {
+            'Authorization' : `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body : JSON.stringify(data)
+        body: JSON.stringify(data)
     })
     return response.json()
 }
 
-export const getAllReview = async(query) => {
+export const getAllReview = async (query) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-review?${query}`, {
-        method : 'GET',
-        headers : {
+        method: 'GET',
+        headers: {
+            'Authorization' : `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
     })
@@ -31,34 +35,41 @@ export const getAllReview = async(query) => {
 }
 
 
-export const replyReview = async(data) => {
+
+export const replyReview = async (data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/reply-review`, {
-        method : 'POST',
-        headers : {
+        method: 'POST',
+        headers: {
+            'Authorization' : `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body : JSON.stringify(data)
+        body: JSON.stringify(data)
     })
     return response.json()
 }
 
-export const editReplyReview = async(data) => {
+export const editReplyReview = async (data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/edit-reply-review`, {
-        method : 'PATCH',
-        headers : {
+        method: 'PATCH',
+        headers: {
+            'Authorization' : `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body : JSON.stringify(data)
+        body: JSON.stringify(data)
     })
     return response.json()
 }
 
 
-export const deleteReview = async(id) => {
+export const deleteReview = async (id) => {
+    const token = Cookies.get('accessToken')
+    console.log(token)
     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-review/${id}`, {
-        method : 'DELETE',
-        header : {
-            'Content-Type': "application/json"
+        method: 'DELETE',
+        headers: {
+            'Authorization' : `Bearer ${token}`
         }
     })
     return response.json()

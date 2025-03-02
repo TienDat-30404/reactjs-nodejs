@@ -9,5 +9,6 @@ router.get('/get-all-role', RoleController.getAllRole)
 router.post('/add-role', validateAddRoleMiddleWare, RoleController.addRole)
 router.put('/update-role/:idRole', validateUpdateRoleMiddleWare, RoleController.updateRole)
 router.delete('/delete-role/:idRole', deleteRoleMiddleWare, RoleController.deleteRole)
-router.get('/permissions/:idRole', RoleController.detailRole)
+router.get('/permissions/:idRole', RoleController.getListPermissionsOfRole)
+router.get('/detail-role/:idRole', RoleController.getDetailRole)
 export default router

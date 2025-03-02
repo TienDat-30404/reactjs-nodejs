@@ -3,6 +3,7 @@ import CategoryController from '../controller/CategoryController.js';
 import { validateAddCategory, middlewareUpdateCategory } from '../middlewares/CategoryMiddleWare.js';
 import { uploadImageCategory } from '../utils/multerConfig.js';
 import { authencationMiddleWare, checkPermissionRoleMiddleware } from '../middlewares/authencationMiddleWare.js';
+import { isCheckRole } from '../middlewares/authencationMiddleWare.js';
 const router = express.Router();
 
 router.post('/add-category', authencationMiddleWare, checkPermissionRoleMiddleware("category_add"),

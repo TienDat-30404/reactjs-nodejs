@@ -1,9 +1,11 @@
 import Cookies from 'js-cookie'
 export const getAllSupplier = async (query) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-supplier?${query}`, {
             method: 'GET',
             headers: {
+                "Authorization": `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
         })
@@ -15,9 +17,11 @@ export const getAllSupplier = async (query) => {
 
 export const addSupplier = async (data) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/add-supplier`, {
             method: 'POST',
             headers: {
+                "Authorization": `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -29,9 +33,11 @@ export const addSupplier = async (data) => {
 }
 
 export const updateSupplier = async (id, data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/update-supplier/${id}`, {
         method: 'PUT',
         headers: {
+            "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)
@@ -51,9 +57,11 @@ export const deleteSupplier = async (id) => {
 }
 
 export const deleteProductOfSupplier = async (data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-product-of-supplier`, {
         method: 'DELETE',
         headers: {
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(data)

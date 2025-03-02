@@ -33,21 +33,6 @@ export default class VoucherController {
     };
 
 
-    static async updateVoucher(req, res, next) {
-        try {
-            const idVoucher = req.params._id
-            console.log(idVoucher)
-            const voucher = await Voucher.updateOne({ _id: idVoucher }, {
-                status: 0
-            })
-            if (voucher.modifiedCount > 0) {
-                return res.status(200).json({ voucher })
-            }
-        }
-        catch (err) {
-            next(err)
-        }
-    }
 
     static async getAllVoucher(req, res, next) {
         try {

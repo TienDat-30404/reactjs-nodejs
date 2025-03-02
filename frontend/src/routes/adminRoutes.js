@@ -13,10 +13,12 @@ import Notification from "../pages/Admin/Right/Notification/Notification";
 import Review from "../pages/Admin/Right/Review/Review";
 import Role from "../pages/Admin/Right/Role/Role";
 import DashBoard from "../pages/Admin/Right/DashBoard/DashBoard";
+import { Navigate } from "react-router-dom";
+
 export const adminRoutes = [
 
-    {path: '*', page: NotFoundPage, layout : AdminLayout},
-
+    // {path: '*', page: NotFoundPage, layout : AdminLayout},
+    {path : '/not-found', page : NotFoundPage, layout : null},
     {path: '/admin', page: Product, layout : AdminLayout},
 
 

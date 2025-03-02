@@ -3,12 +3,11 @@ import Cookies from 'js-cookie';
 export const getNotificationOfUserService = async (id, query) => {
 
     try {
-        // const token = Cookies.get('accessToken')
-
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/get-notification-user?idUser=${id}&${query}`, {
             method: 'GET',
             headers: {
-                // 'Authorization' :  `Bearer ${token}`,
+                'Authorization' :  `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
@@ -22,9 +21,11 @@ export const getNotificationOfUserService = async (id, query) => {
 
 export const readNotificationService = async (id) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/read-notification`, {
             method: 'PATCH',
             headers: {
+                'Authorization' :  `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(id)
@@ -38,9 +39,11 @@ export const readNotificationService = async (id) => {
 
 export const getAllNotification = async (query) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-notification?${query}`, {
             method: 'GET',
             headers: {
+                'Authorization' :  `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         })
@@ -54,9 +57,11 @@ export const getAllNotification = async (query) => {
 
 export const createNotificationForAll = async (data) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/create-notification`, {
             method: 'POST',
             headers: {
+                'Authorization' :  `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -70,9 +75,11 @@ export const createNotificationForAll = async (data) => {
 
 export const updateNotificationService = async (id, data) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/update-notification/${id}`, {
             method: 'PATCH',
             headers: {
+                'Authorization' :  `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -86,9 +93,11 @@ export const updateNotificationService = async (id, data) => {
 
 export const deleteNotificationService = async (id) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-notification/${id}`, {
             method: 'DELETE',
             headers: {
+                'Authorization' :  `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         })
@@ -101,9 +110,11 @@ export const deleteNotificationService = async (id) => {
 
 export const readNotificationCommon = async (data) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/read-notification-common`, {
             method: 'PATCH',
             headers: {
+                'Authorization' :  `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body : JSON.stringify(data)

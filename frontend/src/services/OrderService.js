@@ -1,8 +1,10 @@
 import Cookies from 'js-cookie'
 export const addOrder = async (data) => {
+    const token = Cookies.get('accessToken')
     const response = await fetch(`${process.env.REACT_APP_API_URL}/add-order`, {
         method: 'POST',
         headers: {
+            "Authorization": `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)

@@ -56,7 +56,9 @@ export default function Discount() {
         fetchData()
     }, [page, limit, displayTextSearch, searchCriteria]);
     const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(idRole)
-
+    const isDisplayPageNotification = roleDetails?.permissions?.some(item =>
+        item.action.toLowerCase().includes('notification') && item.allow === true
+    )
     const handleSwitchPageEdit = (data) => {
         setShowEdit(true)
         setSelectedNotification(data)
@@ -87,130 +89,135 @@ export default function Discount() {
     }
     return (
         <div className='px-4 py-2 bg-white product'>
-            <div className='d-flex justify-content-between'>
-                <div className='d-flex align-items-center'>
-                    <h3>Discount</h3>
-                    <h6 className='ms-3'>({totalNotification} notification found)</h6>
-                    {!isRoleDetailsLoading ? (
-                        <button
-                            onClick={() => setShowAddModal(true)}
-                            type="button"
-                            className="btn btn-outline-success ms-3"
-                            disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
-                                (item) => item?.action === "notification_add" && item?.allow === false
+            {isDisplayPageNotification ? (
+                <Fragment>
+
+                    <div className='d-flex justify-content-between'>
+                        <div className='d-flex align-items-center'>
+                            <h3>Discount</h3>
+                            <h6 className='ms-3'>({totalNotification} notification found)</h6>
+                            {!isRoleDetailsLoading ? (
+                                <button
+                                    onClick={() => setShowAddModal(true)}
+                                    type="button"
+                                    className="btn btn-outline-success ms-3"
+                                    disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                        (item) => item?.action === "notification_add" && item?.allow === false
+                                    )}
+                                >
+                                    Tạo thông báo
+                                </button>
+                            ) : (
+                                <div class="spinner-border" role="status">
+                                    <span class="sr-only"></span>
+                                </div>
                             )}
-                        >
-                            Tạo thông báo
-                        </button>
-                    ) : (
-                        <div class="spinner-border" role="status">
-                            <span class="sr-only"></span>
                         </div>
-                    )}
-                </div>
-                <div className='d-flex align-items-center'>
-                    <i className="bi bi-bell me-3"></i>
-                    <i className="bi bi-search me-3"></i>
-                    <ImageComponent
-                        src="https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png" alt=""
-                        width="30px"
-                        height="30px"
-                        borderRadius="5px"
-                    />
-                </div>
-            </div>
-
-            <select
-                class="form-select"
-                onChange={handleChangeSearchSelect}
-                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
-                    (item) => item?.action === "notification_search" && item?.allow === false
-                )}
-            >
-                <option value="idNotification" selected>Tìm kiếm theo Id</option>
-                <option value="content">Tìm kiếm theo nội dung</option>
-            </select>
-
-
-            {displayTextSearch && (
-                <div class="input-group mb-3 mt-1">
-                    <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
-                    <input
-                        type="text"
-                        class="form-control"
+                        <div className='d-flex align-items-center'>
+                            <i className="bi bi-bell me-3"></i>
+                            <i className="bi bi-search me-3"></i>
+                            <ImageComponent
+                                src="https://frontend.tikicdn.com/_desktop-next/static/img/account/avatar.png" alt=""
+                                width="30px"
+                                height="30px"
+                                borderRadius="5px"
+                            />
+                        </div>
+                    </div>
+        
+                    <select
+                        class="form-select"
+                        onChange={handleChangeSearchSelect}
                         disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
                             (item) => item?.action === "notification_search" && item?.allow === false
                         )}
-                        name={displayTextSearch}
-                        value={searchCriteria[`${displayTextSearch}`]}
-                        onChange={(e) => handleChangeInput(e, setSearchCriteria)}
-                    />
-                </div>
-            )}
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Id</th>
-                        <th scope="col">Content</th>
-                        <th scope="col">Created At</th>
-                        <th scope="col">Updated At</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {notifications && notifications?.length > 0 ? (
-                        notifications?.map((notification, index) => (
-                            <tr key={index}>
-                                <th scope="row">{(notification?._id).slice(0, 10)}...</th>
-
-
-                                <td>{notification?.content}</td>
-
-                                <td>{new Date(notification?.createdAt).toLocaleString('vi-VN')}</td>
-                                <td>{new Date(notification?.updatedAt).toLocaleString('vi-VN')}</td>
-
-                                <td style={{ width: '6%' }} className='text-center'>
-                                    <button
-                                        onClick={() => handleSwitchPageEdit(notification)}
-                                        type="button"
-                                        className="btn btn-outline-primary"
-                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
-                                            (item) => item?.action === "notification_edit" && item?.allow === false
-                                        )}
-                                    >
-                                        Edit
-                                    </button>
-                                </td>
-                                <td style={{ width: '6%' }} className='text-center'>
-                                    <button
-                                        onClick={() => handleDeleteDiscount(notification?._id)}
-                                        type="button"
-                                        className="btn btn-outline-danger"
-                                        disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
-                                            (item) => item?.action === "notification_delete" && item?.allow === false
-                                        )}
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+                    >
+                        <option value="idNotification" selected>Tìm kiếm theo Id</option>
+                        <option value="content">Tìm kiếm theo nội dung</option>
+                    </select>
+        
+        
+                    {displayTextSearch && (
+                        <div class="input-group mb-3 mt-1">
+                            <button class="btn btn-outline-secondary" disabled type="button" id="button-addon1">Tìm kiếm theo {displayTextSearch}</button>
+                            <input
+                                type="text"
+                                class="form-control"
+                                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                    (item) => item?.action === "notification_search" && item?.allow === false
+                                )}
+                                name={displayTextSearch}
+                                value={searchCriteria[`${displayTextSearch}`]}
+                                onChange={(e) => handleChangeInput(e, setSearchCriteria)}
+                            />
+                        </div>
+                    )}
+        
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Content</th>
+                                <th scope="col">Created At</th>
+                                <th scope="col">Updated At</th>
+                                <th scope="col">Action</th>
                             </tr>
-                        ))
-                    ) : <p>Không có thông báo</p>}
-
-                </tbody>
-            </table>
-
-            {totalPage > 1 && (
-                <Pagination
-                    totalPage={totalPage}
-                    handlePagination={handlePagination}
-                    page={page}
-                    visiblePagination={visiblePagination}
-                />
-            )}
-            <AddNotification show={showAddModal} close={() => setShowAddModal(false)} />
-            <EditNotification show={showEdit} close={() => setShowEdit(false)} data={selectedNotification} />
+                        </thead>
+                        <tbody>
+                            {notifications && notifications?.length > 0 ? (
+                                notifications?.map((notification, index) => (
+                                    <tr key={index}>
+                                        <th scope="row">{(notification?._id).slice(0, 10)}...</th>
+        
+        
+                                        <td>{notification?.content}</td>
+        
+                                        <td>{new Date(notification?.createdAt).toLocaleString('vi-VN')}</td>
+                                        <td>{new Date(notification?.updatedAt).toLocaleString('vi-VN')}</td>
+        
+                                        <td style={{ width: '6%' }} className='text-center'>
+                                            <button
+                                                onClick={() => handleSwitchPageEdit(notification)}
+                                                type="button"
+                                                className="btn btn-outline-primary"
+                                                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                                    (item) => item?.action === "notification_edit" && item?.allow === false
+                                                )}
+                                            >
+                                                Edit
+                                            </button>
+                                        </td>
+                                        <td style={{ width: '6%' }} className='text-center'>
+                                            <button
+                                                onClick={() => handleDeleteDiscount(notification?._id)}
+                                                type="button"
+                                                className="btn btn-outline-danger"
+                                                disabled={!isRoleDetailsLoading && roleDetails?.permissions?.find(
+                                                    (item) => item?.action === "notification_delete" && item?.allow === false
+                                                )}
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : <p>Không có thông báo</p>}
+        
+                        </tbody>
+                    </table>
+        
+                    {totalPage > 1 && (
+                        <Pagination
+                            totalPage={totalPage}
+                            handlePagination={handlePagination}
+                            page={page}
+                            visiblePagination={visiblePagination}
+                        />
+                    )}
+                    <AddNotification show={showAddModal} close={() => setShowAddModal(false)} />
+                    <EditNotification show={showEdit} close={() => setShowEdit(false)} data={selectedNotification} />
+                </Fragment>
+            ) : ""}
         </div>
     )
 }

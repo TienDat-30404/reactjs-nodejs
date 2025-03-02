@@ -7,6 +7,7 @@ import { deleteProductOfSupplierRedux, updateSupplierRedux } from '../../../../r
 import { deleteProductOfSupplier, updateSupplier } from '../../../../services/SupplierService';
 
 export default function EditSupplier({ data, show, close }) {
+    console.log("data", data)
     const dispatch = useDispatch()
     const [information, setInformation] = useState({
         name: '',

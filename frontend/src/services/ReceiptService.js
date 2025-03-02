@@ -3,9 +3,11 @@
 import Cookies from 'js-cookie'
 export const getAllReceipt = async (query) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-receipt?${query}`, {
             method: 'GET',
             headers: {
+                "Authorization": `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
         })
@@ -17,9 +19,11 @@ export const getAllReceipt = async (query) => {
 
 export const addReceipt = async (data) => {
     try {
+        const token = Cookies.get('accessToken')
         const response = await fetch(`${process.env.REACT_APP_API_URL}/add-receipt`, {
             method: 'POST',
             headers: {
+                "Authorization": `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
@@ -30,24 +34,24 @@ export const addReceipt = async (data) => {
     }
 }
 
-export const updateSupplier = async (id, data) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/update-supplier/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-    return response.json()
-}
+// export const updateSupplier = async (id, data) => {
+//     const response = await fetch(`${process.env.REACT_APP_API_URL}/update-supplier/${id}`, {
+//         method: 'PUT',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(data)
+//     });
+//     return response.json()
+// }
 
-export const deleteSupplier = async (id) => {
-    const token = Cookies.get('accessToken')
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-supplier/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        }
-    })
-    return response.json()
-}
+// export const deleteSupplier = async (id) => {
+//     const token = Cookies.get('accessToken')
+//     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-supplier/${id}`, {
+//         method: 'DELETE',
+//         headers: {
+//             'Authorization': `Bearer ${token}`,
+//         }
+//     })
+//     return response.json()
+// }
