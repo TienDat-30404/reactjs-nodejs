@@ -5,29 +5,67 @@ import { useSelector, useDispatch } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify';
 import { updateRole } from '../../../../services/RoleService';
 import { updateRoleRedux } from '../../../../redux/Role/rolesSlice';
-
+import { useRoleDetail } from '../../../../until/function';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function UpdateRole({ data, show, close }) {
     const dispatch = useDispatch()
     const [name, setName] = useState('')
+    const [checkPartManage, setCheckPartMange] = useState(false)
+    const [updatedPermissions, setUpdatedPermissions] = useState([])
+    const [initialPermissions, setInitialPermission] = useState([])
+    const queryClient = useQueryClient();
 
 
+    const { data: roleDetails, isLoading: isRoleDetailsLoading, isError: isRoleDetailsError, error: roleDetailsError } = useRoleDetail(data?._id)
     useEffect(() => {
         if (data) {
+            setInitialPermission(roleDetails?.permissions)
+            setUpdatedPermissions(roleDetails?.permissions)
             setName(data?.name)
         }
-    }, [show]);
+    }, [show, roleDetails]);
 
 
+    // const { mutate: updateRoleMutation, isLoading: isUpdating } = useMutation({
+    //     mutationFn: (updatedData) => updateRole(data?._id, updatedData),
+    //     onSuccess: (response) => {
+    //         if (response?.status === 200) {
+    //             dispatch(updateRoleRedux({
+    //                 id: data?._id,
+    //                 newData: response.role
+    //             }));
 
+    //             console.log(response)
+    //             queryClient.setQueryData(["permissions", data?._id], (oldData) => {
+    //                 console.log(oldData)
+    //                 if (!oldData) return;
+    //                 return {
+    //                     ...oldData,
+    //                     permission : {
+    //                         _id : "22222",
+    //                         action : "333",
+    //                         allow : true
+    //                     }
+    //                 };
+    //             });
+
+    //             toast.success("Chỉnh sửa thành công");
+    //         }
+    //     },
+    //     onError: (error) => {
+    //         console.error(error);
+    //         toast.error("Cập nhật thất bại!");
+    //     }
+    // });
 
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
 
 
     const handleChangeInput = (e) => {
-        const {name, value} = e.target
-       setName(value)
+        const { name, value } = e.target
+        setName(value)
         const isValid = validateInput(name, value);
         setErrors(prevErrors => {
             const newErrors = { ...prevErrors };
@@ -41,7 +79,7 @@ export default function UpdateRole({ data, show, close }) {
     };
 
 
-
+    console.log(updatedPermissions)
     const closeModal = () => {
         close()
         setName("")
@@ -50,9 +88,13 @@ export default function UpdateRole({ data, show, close }) {
 
     const handleUpdateRole = async () => {
         inputFocusRef.current.focus()
+        const changedPermissions = updatedPermissions.filter((perm, index) =>
+            perm.allow !== initialPermissions[index].allow
+        );
 
         const response = await updateRole(data?._id, {
-            name
+            name,
+            permissions : changedPermissions
         })
         if (response && response?.status === 200) {
             dispatch(updateRoleRedux(
@@ -69,6 +111,10 @@ export default function UpdateRole({ data, show, close }) {
         else {
             toast.success("Chỉnh sửa thành công")
         }
+        // updateRoleMutation({ 
+        //     name, 
+        //     permissions: changedPermissions 
+        // });
     }
 
     const validateInput = (name, value) => {
@@ -77,9 +123,17 @@ export default function UpdateRole({ data, show, close }) {
                 return value.trim() !== '';
         }
     };
+
+    const handleChangePermissions = (index, value) => {
+        const permission = updatedPermissions?.map((item, i) =>
+            i === index ? { ...item, allow: value } : item
+        )
+        setUpdatedPermissions(permission)
+    }
+    console.log(updatedPermissions)
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
-            <div className="modal-dialog add_product">
+            <div className="detail_order">
                 {show && data ? (
                     <div className=" modal-content">
                         <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Chỉnh sửa quyền</p>
@@ -89,7 +143,7 @@ export default function UpdateRole({ data, show, close }) {
                                 <InputComponent
                                     name="name"
                                     value={name}
-                                    placeholder = {errors.name ? errors.name : ""}
+                                    placeholder={errors.name ? errors.name : ""}
                                     onChange={handleChangeInput}
                                     className={`form-control ${errors.name ? 'is-invalid' : ''} `}
                                     ref={inputFocusRef}
@@ -98,6 +152,33 @@ export default function UpdateRole({ data, show, close }) {
                             </div>
                         </div>
 
+                        <div class="accordion">
+                            <div class="accordion-item p-3">
+                                <h2 class="accordion-header">
+                                    <button onClick={() => setCheckPartMange(!checkPartManage)} class="accordion-button" type="button">
+                                        Permissions
+                                    </button>
+                                </h2>
+                                {checkPartManage ? (
+                                    <div className='d-flex flex-wrap' style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                        {updatedPermissions?.map((item, index) => (
+                                            <div class="form-check me-3" key={index} style={{ minWidth: '180px' }}>
+                                                <input
+                                                    onChange={() => handleChangePermissions(index, !item.allow)}
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    checked={item.allow}
+                                                />
+                                                <label class="form-check-label">
+                                                    {item.action}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : ""}
+
+                            </div>
+                        </div>
 
                         <div className="modal-footer d-flex justify-content-between ">
                             <button onClick={() => closeModal()} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>

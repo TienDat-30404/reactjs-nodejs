@@ -10,10 +10,11 @@ const validateAddRoleMiddleWare = async(req, res, next) => {
 
 const validateUpdateRoleMiddleWare = async(req, res, next) => {
     const {name} = req.body
-    const isCheckExistRole = await Role.countDocuments({name})
+    const { idRole } = req.params
+    const isNameExist = await Role.findOne({ name, _id: { $ne: idRole } }); 
     const errors = {}
     name === "" ? errors.name = "Tên không được để trống"   
-        : isCheckExistRole > 0  ? errors.name = "Tên quyền đã tồn tại" : null
+        : isNameExist ? errors.name = "Tên quyền đã tồn tại" : null
     return Object.keys(errors).length > 0 ? res.status(200).json({errors}) : next()
 }
 

@@ -19,11 +19,7 @@ const hashPassword = (password) => {
   return bcrypt.hashSync(password, 10)
 }
 
-// validate Name Product
-const validateNameProduct = async (name) => {
-  const existNameProduct = await Product.findOne({ name })
-  return !existNameProduct
-}
+
 
 const validateNameSupplier = async(name) => {
   const existNameSupplier = await Supplier.findOne({name})
@@ -81,7 +77,7 @@ const isCheckExistCategory = async (name) => {
 }
 
 export  {
-  validateEmail, hashPassword, validateNameProduct,
+  validateEmail, hashPassword,
   validateNameProductWhenUpdate, isCheckExistNameCategory, conditionLoginMiddleware, shouldUseValidation,
   conditionChagePasswordMiddleware, shouldUseChangePassword, isCheckExistCategory, validateNameSupplier
 }

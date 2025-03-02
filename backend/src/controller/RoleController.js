@@ -75,11 +75,19 @@ export default class RoleController {
         try {
 
             const { idRole } = req.params
-            const { name } = req.body
+            const { name, permissions } = req.body
             const role = await Role.findByIdAndUpdate({ _id: idRole },
                 { name },
                 { new: true }
             )
+            if(Array.isArray(permissions) && permissions?.length > 0)
+            {
+                permissions?.map((async(permission) => {
+                    await RoleDetail.findByIdAndUpdate(permission?._id,
+                        {allow : permission?.allow}
+                    )
+                }))
+            }
             return res.status(200).json({
                 role,
                 status: 200

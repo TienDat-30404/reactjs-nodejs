@@ -104,7 +104,7 @@ export default function EditVoucher({ data, show, close }) {
             <div className="modal-dialog add_product">
                 {show && data ? (
                     <div className=" modal-content">
-                        <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Chỉnh sửa giảm giá sản phẩm</p>
+                        <p style={{ fontSize: '20px', paddingTop: '20px' }} className='text-center'>Cập nhật trạng thái đơn hàng</p>
                         <div className='px-4 py-2 d-flex align-items-center'>
                             <label style={{ fontSize: '14px' }} className="form-label">Discount Voucher</label>
                             <div style={{ width: '100%' }}>

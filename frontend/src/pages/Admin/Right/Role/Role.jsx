@@ -106,7 +106,7 @@ export default function Role() {
 
                     <div className='d-flex justify-content-between'>
                         <div className='d-flex align-items-center'>
-                            <h3>Discount</h3>
+                            <h3>Role</h3>
                             <h6 className='ms-3'>({totalRole} role found)</h6>
                             {!isRoleDetailsLoading ? (
                                 <button

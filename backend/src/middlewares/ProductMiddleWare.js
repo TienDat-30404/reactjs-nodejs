@@ -1,25 +1,17 @@
-// const Product = require('../model/ProductModel')
-// const Size = require('../model/SizeModel')
-// const ProductAttribute = require('../model/ProductAttribute')
-
-// const { validateNameProduct } = require('../utils/validate')
 
 import Product from '../model/ProductModel.js';
 import Size from '../model/SizeModel.js';
-import ProductAttribute from '../model/ProductAttribute.js';
-
-import { validateNameProduct } from '../utils/validate.js';
 
 const validateAddProduct = async (req, res, next) => {
     let { name, idCategory, description, sizes } = req.body
 
-    const isCheckExistNameProduct = await validateNameProduct(name)
+    const isCheckExistNameProduct = await Product.countDocuments({name})
     const errors = {}
     if (name.trim() == "") {
         errors.name = "Vui lòng nhập tên sản phẩm"
     }
     else {
-        if (!isCheckExistNameProduct) {
+        if (isCheckExistNameProduct > 0) {
             errors.name = "Tên sản phẩm đã tồn tại"
         }
     }
@@ -76,11 +68,11 @@ const validateUpdateProduct = async (req, res, next) => {
         errors.name = "Vui lòng nhập tên sản phẩm"
     }
     else {
-        if (name != product.name) {
-            const isCheckExistNameProduct = await validateNameProduct(name)
-            if (!isCheckExistNameProduct) {
-                errors.name = "Tên sản phẩm đã tồn tại"
-            }
+
+        const isExistName = await Product.findOne({name, _id : {$ne : idProduct}})
+        if(isExistName)
+        {
+             errors.name = "Tên sản phẩm đã tồn tại"
         }
     }
  
