@@ -15,7 +15,6 @@ import { useRoleDetail } from '../../../../until/function'
 export default function Role() {
     const dispatch = useDispatch()
     const roles = useSelector(state => state?.roles?.roles)
-    console.log(roles)
     const page = useSelector(state => state?.roles?.page)
     const totalPage = useSelector(state => state?.roles?.totalPage)
     const totalRole = useSelector(state => state?.roles?.totalRole)

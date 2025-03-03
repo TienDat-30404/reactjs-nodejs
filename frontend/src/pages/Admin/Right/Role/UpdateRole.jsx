@@ -27,41 +27,36 @@ export default function UpdateRole({ data, show, close }) {
     }, [show, roleDetails]);
 
 
-    // const { mutate: updateRoleMutation, isLoading: isUpdating } = useMutation({
-    //     mutationFn: (updatedData) => updateRole(data?._id, updatedData),
-    //     onSuccess: (response) => {
-    //         if (response?.status === 200) {
-    //             dispatch(updateRoleRedux({
-    //                 id: data?._id,
-    //                 newData: response.role
-    //             }));
+    const { mutate: updateRoleMutation, isLoading: isUpdating } = useMutation({
+        mutationFn: (updatedData) => updateRole(data?._id, updatedData),
+        onSuccess: (response) => {
+            if (response?.status === 200) {
+                dispatch(updateRoleRedux({
+                    id: data?._id,
+                    newData: response.role
+                }));
 
-    //             console.log(response)
-    //             queryClient.setQueryData(["permissions", data?._id], (oldData) => {
-    //                 console.log(oldData)
-    //                 if (!oldData) return;
-    //                 return {
-    //                     ...oldData,
-    //                     permission : {
-    //                         _id : "22222",
-    //                         action : "333",
-    //                         allow : true
-    //                     }
-    //                 };
-    //             });
+                queryClient.setQueryData(["permissions", data?._id], (oldData) => {
+                    if (!oldData) return;
+               
+                    return {
+                        permissions : updatedPermissions,
+                        name : name
+                    };
+                });
 
-    //             toast.success("Chỉnh sửa thành công");
-    //         }
-    //     },
-    //     onError: (error) => {
-    //         console.error(error);
-    //         toast.error("Cập nhật thất bại!");
-    //     }
-    // });
+                toast.success("Chỉnh sửa thành công");
+            }
+        },
+        onError: (error) => {
+            console.error(error);
+            toast.error("Cập nhật thất bại!");
+        }
+    });
 
     const inputFocusRef = useRef();
     const [errors, setErrors] = useState({})
-
+    console.log(updatedPermissions)
 
     const handleChangeInput = (e) => {
         const { name, value } = e.target
@@ -79,7 +74,6 @@ export default function UpdateRole({ data, show, close }) {
     };
 
 
-    console.log(updatedPermissions)
     const closeModal = () => {
         close()
         setName("")
@@ -91,30 +85,12 @@ export default function UpdateRole({ data, show, close }) {
         const changedPermissions = updatedPermissions.filter((perm, index) =>
             perm.allow !== initialPermissions[index].allow
         );
+        console.log(changedPermissions)
 
-        const response = await updateRole(data?._id, {
-            name,
-            permissions : changedPermissions
-        })
-        if (response && response?.status === 200) {
-            dispatch(updateRoleRedux(
-                {
-                    id: data?._id,
-                    newData: response.role
-                }
-            ))
-        }
-        if (response.errors) {
-            setErrors(response.errors)
-            return
-        }
-        else {
-            toast.success("Chỉnh sửa thành công")
-        }
-        // updateRoleMutation({ 
-        //     name, 
-        //     permissions: changedPermissions 
-        // });
+        updateRoleMutation({ 
+            permissions : changedPermissions,
+            name : name
+        });
     }
 
     const validateInput = (name, value) => {
@@ -130,7 +106,6 @@ export default function UpdateRole({ data, show, close }) {
         )
         setUpdatedPermissions(permission)
     }
-    console.log(updatedPermissions)
     return (
         <div className={`modal ${show ? 'd-block' : 'd-none'}  modal-display`} tabIndex="-1">
             <div className="detail_order">
