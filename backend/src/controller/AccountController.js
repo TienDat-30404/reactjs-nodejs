@@ -173,6 +173,8 @@ export default class AccountController {
 
         const accessToken = refreshTokenJWT.generateToken(payloadToken)
         const refreshToken = refreshTokenJWT.generateRefreshToken(payloadToken)
+        // const refreshToken = refreshTokenJWT.generateRefreshToken({})
+
         // Lưu refresh token vào cookie
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,   // Cookie chỉ có thể được truy cập bởi server, ko thể truy cập qua client(chẳng hạn Cookies.get('refreshToken'))
@@ -185,6 +187,7 @@ export default class AccountController {
         return res.status(200).json({
             token: accessToken,
             message: 'Đăng nhập thành công',
+            refreshToken
             // avatar: avatar,
         })
     }

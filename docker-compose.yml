@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  r0:
+    image: mongo:latest
+    container_name: r0
+    ports:
+      - "27108:27017"
+    networks:
+      - mongoNet
+    command: ["mongod", "--replSet", "mongoRepSet"]
+  
+  r1:
+    image: mongo:latest
+    container_name: r1
+    ports:
+      - "27109:27017"
+    networks:
+      - mongoNet
+    command: ["mongod", "--replSet", "mongoRepSet"]
+
+  r2:
+    image: mongo:latest
+    container_name: r2
+    ports:
+      - "27110:27017"
+    networks:
+      - mongoNet
+    command: ["mongod", "--replSet", "mongoRepSet"]
+
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - mongoNet
+    command: ["redis-server", "--appendonly", "yes"]
+
+networks:
+  mongoNet:
+    driver: bridge
