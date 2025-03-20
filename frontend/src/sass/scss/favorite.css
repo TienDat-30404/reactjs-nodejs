@@ -1,0 +1,22 @@
+@charset "UTF-8";
+.heart-fly {
+  width: 24px;
+  height: 24px;
+  background: #FF5252;
+  -webkit-clip-path: path("M12 4.248c-3.148-5.402-12-3.825-12 2.944 0 4.661 5.571 9.427 12 15.808 6.43-6.381 12-11.147 12-15.808 0-6.792-8.875-8.306-12-2.944z");
+          clip-path: path("M12 4.248c-3.148-5.402-12-3.825-12 2.944 0 4.661 5.571 9.427 12 15.808 6.43-6.381 12-11.147 12-15.808 0-6.792-8.875-8.306-12-2.944z");
+  animation: fly-to-top 1s ease-in-out forwards;
+  z-index: 9999;
+}
+
+/* Animation bay lên */
+@keyframes fly-to-top {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(150px, -300px) scale(0.5);
+    opacity: 0;
+  }
+}/*# sourceMappingURL=favorite.css.map */

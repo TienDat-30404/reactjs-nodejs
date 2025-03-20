@@ -1,43 +1,129 @@
 version: '3.8'
 
 services:
-  r0:
-    image: mongo:latest
-    container_name: r0
-    ports:
-      - "27108:27017"
-    networks:
-      - mongoNet
-    command: ["mongod", "--replSet", "mongoRepSet"]
   
-  r1:
-    image: mongo:latest
-    container_name: r1
-    ports:
-      - "27109:27017"
-    networks:
-      - mongoNet
-    command: ["mongod", "--replSet", "mongoRepSet"]
+ 
+  
 
-  r2:
-    image: mongo:latest
-    container_name: r2
+
+  mongo-express:
+    image: mongo-express
+    container_name: my-mongo-express
+    restart: always
     ports:
-      - "27110:27017"
+      - "8081:8081"
     networks:
-      - mongoNet
-    command: ["mongod", "--replSet", "mongoRepSet"]
+      - project_network
+    environment:
+      # ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      # ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      # ME_CONFIG_MONGODB_SERVER: mongodb
+
+      ME_CONFIG_BASICAUTH: "false"
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+
+    depends_on:
+      - mongo
+
+ 
+
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+      - redis
+    env_file:
+      - ./backend/.env 
+    networks:
+      - project_network
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/mydatabase
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    env_file:
+      - ./frontend/.env 
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - project_network
+
+
+  mongo:
+    image: mongo:latest 
+    container_name: mongodb
+    ports:
+      - "27017:27017" 
+    networks:
+      - project_network
+    volumes:
+      - mongo-data:/data/db
 
   redis:
     image: redis:latest
-    container_name: redis-container
+    container_name: redis
     restart: always
     ports:
       - "6379:6379"
     networks:
-      - mongoNet
+      - project_network
     command: ["redis-server", "--appendonly", "yes"]
 
 networks:
-  mongoNet:
+  project_network:
     driver: bridge
+
+volumes:
+  mongo-data:
+
+
+
+ # r0:
+  #   image: mongo:latest
+  #   container_name: r0
+  #   ports:
+  #     - "27108:27017"
+  #   networks:
+  #     - mongoNet
+  #   command: ["mongod", "--replSet", "mongoRepSet"]
+  
+  # r1:
+  #   image: mongo:latest
+  #   container_name: r1
+  #   ports:
+  #     - "27109:27017"
+  #   networks:
+  #     - mongoNet
+  #   command: ["mongod", "--replSet", "mongoRepSet"]
+
+  # r2:
+  #   image: mongo:latest
+  #   container_name: r2
+  #   ports:
+  #     - "27110:27017"
+  #   networks:
+  #     - mongoNet
+  #   command: ["mongod", "--replSet", "mongoRepSet"]
+
+
+
+
+
+  # mongo-setup:
+  #   image: mongo:latest
+  #   container_name: mongo-setup
+  #   depends_on:
+  #     - r0
+  #     - r1
+  #     - r2
+  #   networks:
+  #     - mongoNet
+  #   entrypoint: [ "bash", "-c", "sleep 10 && mongosh --host r0 --eval 'rs.initiate({_id: \"mongoRepSet\", members: [{ _id: 0, host: \"r0:27017\" }, { _id: 1, host: \"r1:27017\" }, { _id: 2, host: \"r2:27017\" }]})'" ]

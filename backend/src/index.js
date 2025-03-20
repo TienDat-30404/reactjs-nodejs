@@ -45,8 +45,6 @@ app.set('io', io);
 
 // Sự kiện kết nối từ client
 io.on('connection', (socket) => {
-  console.log('New client connected', socket.id);
-
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
@@ -64,10 +62,5 @@ app.use(errorHandler);
 
 server.listen(port, async() => {
   console.log(`Server is running on port ${port}`);
-  // try {
-  //   const url = await ngrok.connect(5000);  
-  //   console.log(`Ngrok tunnel established at ${url}`);
-  // } catch (error) {
-  //   console.error('Error starting ngrok tunnel:', error);
   // }
 });

@@ -14,9 +14,9 @@ const validateAddCategory = async (req, res, next) => {
     if (!existNameCategory) {
         errors.name = "Tên thể loại đã tồn tại"
     }
-    // if (!req.file) {
-    //     errors.image = "Vui lòng chọn ảnh"
-    // }
+    if (!req.file) {
+        errors.image = "Vui lòng chọn ảnh"
+    }
     if (Object.keys(errors).length > 0) {
         return res.status(400).json({ errors });
     }

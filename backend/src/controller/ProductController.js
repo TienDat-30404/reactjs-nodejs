@@ -138,14 +138,14 @@ export default class ProductController {
         try {
             let { name, idCategory, description, sizes } = req.body
 
-            // const result = await cloudinary.uploader.upload(req.file.path);
-            // if (!req.file) {
-            //     return res.status(400).json({ error: "File image is required." });
-            // }
+            const result = await cloudinary.uploader.upload(req.file.path);
+            if (!req.file) {
+                return res.status(400).json({ error: "File image is required." });
+            }
             const dataProduct = new Product(
                 {
                     name,
-                    // image: result.secure_url, 
+                    image: result.secure_url, 
                     idCategory,
                     description,
                 }

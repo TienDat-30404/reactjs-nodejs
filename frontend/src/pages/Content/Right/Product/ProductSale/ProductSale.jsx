@@ -62,7 +62,7 @@ export default function ProductSale() {
                 {products.length > 0 ? (
                     products.map((product, index) => {
                         const indexPriceAttribute = product?.productAttributes?.find(attr => attr.quantity !== 0);
-
+                        console.log(indexPriceAttribute)
                         if (!indexPriceAttribute) return null;
 
                         return (

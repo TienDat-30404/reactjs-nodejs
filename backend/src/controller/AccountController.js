@@ -11,10 +11,9 @@ import { OAuth2Client } from 'google-auth-library';
 import errorHandler from 'http-errors';
 // import { generateToken, generateRefreshToken } from '../utils/jwt.js';
 import refreshTokenJWT from '../utils/jwt.js';
-import RoleDetail from '../model/RoleDetail.js';
 export default class AccountController {
 
-    
+
 
     // [POST] : /sign-in
     static async sendOtpForCreateAccount(req, res, next) {
@@ -25,7 +24,9 @@ export default class AccountController {
             const otp = otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
 
             // Lưu OTP và thông tin tạm thời vào Redis
-            await redisClient.setEx(`otp:${email}`, 300, otp); // Lưu 5 phút
+            await redisClient.set(`otp:${email}`, otp, "EX", 300);
+            // await redisClient.setEx(`otp:${email}`, 300, otp); // Lưu 5 phút
+
             // Gửi OTP qua email
             const transporter = nodemailer.createTransport({
                 service: 'Gmail',
@@ -42,12 +43,14 @@ export default class AccountController {
                     rejectUnauthorized: false  // Tắt kiểm tra chứng chỉ SSL
                 }
             });
-            await transporter.sendMail({
+
+            const gg = await transporter.sendMail({
                 from: process.env.MAIL_SEND,
                 to: email,
                 subject: 'Xác nhận OTP',
                 text: `Mã OTP của bạn là: ${otp}`,
             });
+            console.log("gg", gg)
 
             res.status(200).json({ message: 'OTP đã được gửi đến email của bạn', status: 200 });
 
@@ -61,10 +64,12 @@ export default class AccountController {
 
     static async verifyOtpForCreateAccount(req, res, next) {
         const { userName, name, email, password, typeLogin, idRole, otp } = req.body;
+        console.log("userName")
         const typeOfLogin = typeLogin ? "google" : 'normal'
         const role = await Role.findOne({ name: "Customer" })
         const roleDefault = idRole ? idRole : role._id
         const otpCorrect = await redisClient.get(`otp:${email}`)
+
         if (otp != otpCorrect) {
             return res.status(400).json({
                 message: "Otp không hợp lệ",
@@ -97,7 +102,12 @@ export default class AccountController {
         if (userData) {
             accountObject.userInformation = userData
         }
-        res.status(200).json({ account: accountObject });
+        res.status(200).json(
+            {
+                account: accountObject,
+                otpCorrect
+            }
+        );
     }
 
 
@@ -149,7 +159,7 @@ export default class AccountController {
         }
         const isCheckUser = await User.findOne({ idAccount: isCheckAccount._id })
         const avatar = isCheckUser.avatar
-        
+
         const payloadToken = {
             idUser: isCheckUser?._id,
             name: isCheckUser?.name,
@@ -161,7 +171,7 @@ export default class AccountController {
             sex: isCheckUser?.sex,
             date_of_birth: isCheckUser?.date_of_birth,
             idRole: isCheckAccount?.idRole?._id,
-            nameRole : isCheckAccount?.idRole?.name,
+            nameRole: isCheckAccount?.idRole?.name,
             idAccount: isCheckAccount?._id,
             avatar,
         };
@@ -183,7 +193,7 @@ export default class AccountController {
             maxAge: 24 * 60 * 60 * 1000 // Thời gian sống của cookie (1 ngày trong ví dụ này)
         });
 
-        
+
         return res.status(200).json({
             token: accessToken,
             message: 'Đăng nhập thành công',
@@ -201,7 +211,7 @@ export default class AccountController {
             if (response.modifiedCount > 0) {
                 return res.status(200).json({
                     message: "Change Password Successful",
-                    status : 200
+                    status: 200
                 })
             }
 

@@ -1,0 +1,100 @@
+@charset "UTF-8";
+.promotion li {
+  white-space: normal;
+  word-wrap: break-word;
+  text-align: center;
+  max-width: 10%; /* điều chỉnh kích thước theo ý muốn */
+}
+
+.promotion a {
+  font-size: 14px;
+  color: black;
+}
+
+.product li:hover {
+  background-color: #efefef;
+  cursor: pointer;
+}
+
+.image_demo-video {
+  height: 45%;
+  margin-top: -6px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.image_demo-video img {
+  width: 40%;
+  height: 100%;
+  border-radius: 20px;
+}
+
+.image_demo-video p {
+  padding-left: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 7px;
+}
+
+.image_demo-video h6 {
+  padding-left: 10px;
+}
+
+.video_product {
+  width: 384px;
+  height: 400px;
+  padding-left: 7px;
+  padding-right: 0px;
+}
+
+.product_name {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+p {
+  padding-top: 0;
+}
+
+.toast_add-cart {
+  position: absolute;
+  top: 15%;
+  right: 0;
+  z-index: 2;
+  opacity: 1;
+  animation: slideAdd ease 0.7s, fadeAdd linear 1.2s 1s forwards;
+}
+
+@keyframes slideAdd {
+  from {
+    opacity: 0;
+    transform: translateX(calc(100% + 20px));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes fadeAdd {
+  to {
+    opacity: 0;
+  }
+}
+.icon_chat {
+  position: fixed;
+  right: 5%;
+  bottom: 20%;
+}
+
+.customer_helper {
+  position: fixed;
+  bottom: 10%;
+  right: 1%;
+  background-color: rgb(10, 104, 255);
+}/*# sourceMappingURL=right.css.map */
