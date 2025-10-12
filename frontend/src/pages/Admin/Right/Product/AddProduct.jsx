@@ -157,7 +157,7 @@ export default function AddProduct({ show, close }) {
                     </div>
                     <div className='px-4 py-2 d-flex align-items-center'>
                         <label style={{ fontSize: '14px' }} className="form-label">Thuộc tính</label>
-                        <div style={{ width: '100%' }}>
+                        <div className = "w-100 text-black">
                             <Select
                                 isMulti
                                 value={selectedOptions}
@@ -176,7 +176,6 @@ export default function AddProduct({ show, close }) {
                                     }),
                                 }}
                             />
-                            {errors.size && <ErrorMessageInput errors={errors} field="size" />}
                         </div>
                     </div>
                     <div className='px-4 py-2 d-flex align-items-center'>

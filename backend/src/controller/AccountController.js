@@ -105,7 +105,7 @@ export default class AccountController {
         res.status(200).json(
             {
                 account: accountObject,
-                otpCorrect
+                otpCorrectf
             }
         );
     }

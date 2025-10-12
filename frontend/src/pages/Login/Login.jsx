@@ -80,24 +80,24 @@ function LoginModal({ show, handleClose, switchSignIn }) {
     handleClose()
   }
 
-  const handleClickLoginGoogle = (credentialResponse) => {
-    dispatch(refreshAllNotificationRedux())
-    console.log(credentialResponse)
-    console.log("Token từ Google:", credentialResponse.credential);
+  // const handleClickLoginGoogle = (credentialResponse) => {
+  //   dispatch(refreshAllNotificationRedux())
+  //   console.log(credentialResponse)
+  //   console.log("Token từ Google:", credentialResponse.credential);
 
-    fetch("http://localhost:3001/auth/google", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ token: credentialResponse.credential }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Thông tin người dùng:", data);
-      })
-      .catch((err) => console.error("Lỗi:", err));
-  }
+  //   fetch("http://localhost:3001/auth/google", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ token: credentialResponse.credential }),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log("Thông tin người dùng:", data);
+  //     })
+  //     .catch((err) => console.error("Lỗi:", err));
+  // }
 
 
 
@@ -111,7 +111,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
           <div style={{ width: '50%' }} className='m-3'>
             <i onClick={() => handleCloseModal()} className="bi bi-x-lg icon_close"></i>
             <h3 className='fw-bold'>Hello, </h3>
-            <h3 onClick={() => handleClickLoginGoogle()} className='fw-bold'>Welcome Back </h3>
+            <h3  className='fw-bold'>Welcome Back </h3>
             <div className='mb-2'>
               <label htmlFor="inputPassword5" className="form-label">UserName</label>
               <InputComponent

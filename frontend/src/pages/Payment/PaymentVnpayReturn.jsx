@@ -11,10 +11,12 @@ export default function PaymentVnpayReturn() {
   if (window.location.search) {
     params = new URLSearchParams(window.location.search);
   }
+  console.log("params", params)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("params", params)
         const response = await paymentVpnReturnService(params)
         const informations = localStorage.getItem('informationPayment');
         const parsedInfo = informations ? JSON.parse(informations) : null;
@@ -43,6 +45,7 @@ export default function PaymentVnpayReturn() {
       {result?.statusTransaction === "00" ? (
 
         <div style={{ width: '500px' }} class=" py-5 text-center" >
+          <h1>2222222</h1>
           <img style={{ width: '120px' }} src="https://static.vecteezy.com/system/resources/previews/009/362/934/original/tick-icon-accept-approve-sign-design-free-png.png" class="card-img-top" alt="..." />
           <div class="card-body">
             <h5 class={`card-title text-success text-uppercase mt-3`}>Thanh toán thành công</h5>
@@ -85,6 +88,7 @@ export default function PaymentVnpayReturn() {
         <div style={{ width: '400px' }} class=" py-5 text-center" >
           <img style={{ width: '120px' }} src="https://tse2.mm.bing.net/th?id=OIP.2DsT9kz1pM-5dum3u5-rowAAAA&pid=Api&P=0&h=180" class="card-img-top" alt="..." />
           <div class="card-body">
+            <h1>33333</h1>
             <h5 class={`card-title text-danger text-uppercase mt-3`}>Thanh toán thất bại</h5>
             <a href="http://localhost:3000" class="btn btn-primary mt-3">Quay về trang chủ</a>
           </div>
@@ -94,3 +98,7 @@ export default function PaymentVnpayReturn() {
 
   )
 }
+
+
+
+
