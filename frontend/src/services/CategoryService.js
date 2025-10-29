@@ -9,6 +9,9 @@ export const getAllCategory = async (query) => {
             'Content-Type': 'application/json',
         },
     })
+
+    console.log("urlllllllllllllllllllllllllllllllllllll", process.env.REACT_APP_API_URL)
+    console.log("ressponse ssssssssssssssssssssssssssssss" , response)
     return response.json()
 }
 
