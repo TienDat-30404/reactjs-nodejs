@@ -1,18 +1,23 @@
-# Sử dụng Node.js để chạy app
-FROM node:18
+# Sử dụng image Node.js slim để giảm kích thước image
+FROM node:18-slim
 
-# Đặt thư mục làm việc
+# Đặt thư mục làm việc trong container
 WORKDIR /app
 
-# Copy package.json và cài đặt dependencies
-COPY package.json package-lock.json ./
-RUN npm install
+# Copy package.json và package-lock.json
+COPY frontend/package.json frontend/package-lock.json ./
 
-# Copy toàn bộ mã nguồn vào container
-COPY . .
+# Cài đặt dependencies (sử dụng npm ci để build ổn định hơn)
+RUN npm ci
 
-# Mở cổng 3000
-EXPOSE 3000
+# Copy mã nguồn frontend
+COPY frontend/ .
 
-# Chạy ứng dụng React
-CMD ["npm", "start"]
+# Build ứng dụng React (sẽ tạo ra thư mục 'build/')
+RUN npm run build
+
+# Cài đặt server tĩnh để phục vụ ứng dụng
+RUN npm install -g serve
+
+
+CMD ["serve", "-s", "build", "-l", "$PORT"]
