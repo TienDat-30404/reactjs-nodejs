@@ -34,7 +34,7 @@ const server = http.createServer(app);
 // Tích hợp socket.io với server
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // Client domain
+    origin: process.env.PORT_CLIENT, // Client domain
     methods: ["GET", "POST"],
     credentials: true,
   },
