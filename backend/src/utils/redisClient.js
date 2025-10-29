@@ -24,11 +24,11 @@
 import Redis from "ioredis";
 
 const redis = new Redis({
-  host: "redis",
-    // host: "localhost",
-
-  port: 6379,
-  retryStrategy: (times) => Math.min(times * 50, 2000), 
+    host: process.env.REDIS_HOST,
+    port: 6379,
+    password: process.env.REDIS_PASSWORD, 
+    tls: { rejectUnauthorized: false }, 
+    retryStrategy: (times) => Math.min(times * 50, 2000),
 });
 
 redis.on("connect", () => console.log("Connected to Redis"));
