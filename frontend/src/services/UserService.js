@@ -54,7 +54,7 @@ export const verifyOtpAgreeCreateAccount = async (data) => {
 
 export const refreshTokenService = async () => {
     console.log("tnj23r233333333333333333333333333333", process.env.REACT_APP_API_URL)
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/refresh-token/22222222`, {
+    const response = await fetch(`https://backend-commerce-psdz.onrender.com/refresh-token/22222222`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
