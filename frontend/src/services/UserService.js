@@ -53,7 +53,8 @@ export const verifyOtpAgreeCreateAccount = async (data) => {
 
 
 export const refreshTokenService = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/refresh-token`, {
+    console.log("tnj23r233333333333333333333333333333", process.env.REACT_APP_API_URL)
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/refresh-token/22222222`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
