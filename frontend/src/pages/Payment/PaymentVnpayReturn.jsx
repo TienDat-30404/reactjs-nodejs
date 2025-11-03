@@ -81,7 +81,7 @@ export default function PaymentVnpayReturn() {
                 {moment(result?.createdAt, "YYYYMMDDHHmmss").format("DD/MM/YYYY HH:mm:ss")}
               </p>
             </div>
-            <a href="http://localhost:3000" class="btn btn-primary mt-3">Quay về trang chủ</a>
+            <a href="https://frontend-ecommerce-pk9h.onrender.com" class="btn btn-primary mt-3">Quay về trang chủ</a>
           </div>
         </div>
       ) :
@@ -90,7 +90,7 @@ export default function PaymentVnpayReturn() {
           <div class="card-body">
             <h1>33333</h1>
             <h5 class={`card-title text-danger text-uppercase mt-3`}>Thanh toán thất bại</h5>
-            <a href="http://localhost:3000" class="btn btn-primary mt-3">Quay về trang chủ</a>
+            <a href="https://frontend-ecommerce-pk9h.onrender.com" class="btn btn-primary mt-3">Quay về trang chủ</a>
           </div>
         </div>
       }
