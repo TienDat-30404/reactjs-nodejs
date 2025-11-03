@@ -1,8 +1,9 @@
 import Cookies from 'js-cookie'
 export const getAllCategory = async (query) => {
     // const token = Cookies.get('accessToken')
-    console.log('22222222222222222222222222222222222222222222222222222222222222')
-    const response = await fetch(`https://backend-commerce-psdz.onrender.com/get-all-category?${query}`, {
+    console.log('22222222222222222222222222222222222222222222222222222222222222', process.env.REACT_APP_API_URL)
+    console.log("urlllllllllllllllllllllllllllllllllllllllllllllllllllcategorysrvice" , )
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/get-all-category?${query}`, {
         method: 'GET',
         headers: {
             // "Authorization" : `Bearer ${token}`,
