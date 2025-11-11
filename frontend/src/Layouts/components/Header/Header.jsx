@@ -110,7 +110,7 @@ const Header = () => {
                         <div className="col-2 d-flex align-items-center">
                             <a onClick={() => navigate('/')} className="navbar-brand">
                                 <ImageComponent
-                                    src="https://salt.tikicdn.com/ts/upload/0e/07/78/ee828743c9afa9792cf20d75995e134e.png"
+                                    src="https://img.lovepik.com/free-png/20210923/lovepik-creative-three-hardcover-books-illustration-png-image_401276495_wh1200.png"
                                     width="100px"
                                     height="50px"
                                 />

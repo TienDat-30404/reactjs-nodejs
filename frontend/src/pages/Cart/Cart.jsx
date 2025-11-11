@@ -235,7 +235,7 @@ export default function Cart() {
                 <div className='col-4 px-3'>
                     <div className='bg-white py-2 px-3'>
                         <div className='d-flex justify-content-between'>
-                            <p style={{ fontSize: '14px', fontWeight: '500' }}>Tiki khuyến mãi</p>
+                            <p style={{ fontSize: '14px', fontWeight: '500' }}>Tiki Clone khuyến mãi</p>
                             <p style={{ fontSize: '14px' }}>Có thể chọn {carts.length}</p>
                         </div>
                         <div className='d-flex align-items-center mt-3' >

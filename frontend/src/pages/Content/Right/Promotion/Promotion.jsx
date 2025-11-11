@@ -10,7 +10,7 @@ function Promotion() {
                 </li>
                 <li className="nav-item d-flex flex-column align-items-center mt-3 ">
                     <img className='rounded-4' width="40px" src="https://salt.tikicdn.com/ts/upload/72/8d/23/a810d76829d245ddd87459150cb6bc77.png" alt="" />
-                    <a className="nav-link active" aria-current="page">Tiki Trading</a>
+                    <a className="nav-link active" aria-current="page">Tiki CLone Trading</a>
                 </li>
                 <li className="nav-item d-flex flex-column align-items-center mt-3 ">
                     <img className='rounded-4' width="40px" src="https://salt.tikicdn.com/ts/upload/8b/a4/9f/84d844f70e365515b6e4e3e745dac1d5.png" alt="" />
@@ -30,7 +30,7 @@ function Promotion() {
                 </li>
                 <li className="nav-item d-flex flex-column align-items-center mt-3">
                     <img className='rounded-4' width="40px" src="https://salt.tikicdn.com/cache/750x750/ts/upload/28/52/b2/e77e55676a38e02c5ac7242cc43f46dc.jpg.webp" alt="" />
-                    <a className="nav-link active " aria-current="page">Mọt sách tiki</a>
+                    <a className="nav-link active " aria-current="page">Mọt sách tiki Clone</a>
                 </li>
                 <li className="nav-item d-flex flex-column align-items-center mt-3">
                     <img className='rounded-4' width="40px" src="https://salt.tikicdn.com/cache/750x750/ts/upload/25/a7/1f/5538b19e95600da86e1241082fb631bf.jpg.webp" alt="" />

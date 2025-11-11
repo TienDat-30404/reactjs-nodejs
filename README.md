@@ -68,9 +68,11 @@ Clothing Store Website
 
 - Một số giao diện của website: 
 + Trang chủ : 
-<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1742497196/rt05q66nneajiezrxvgh.png">
-<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1742497286/iaediwrdu98wazqecdkw.png">
-<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1742497417/kktwbfxexdmeuvi7z8fq.png">
-<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1742497479/rty25kmuma3xpvxeletf.png">
-<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1742497564/ant40ymrjrxowmuupmjj.png">
-<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1742497359/rnw36tzpzan0kwm6k15a.png">
+<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1762859271/c5zl3p8xspdwuxfjxxqm.png">
+<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1762859497/sldfo7nkctgb9petroid.png">
+<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1762859398/zxaws2lzrouskftigng8.png">
+<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1762859568/w4err8yypxuvkulajhlp.png">
+<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1762859633/dbp0xmbyhaiqy0xal2bd.png">
+<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1762859758/vdsphvejsp7u4o3obbiz.png">
+<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1762859838/jr5jxr20kr0ok0jvgiyy.png">
+<img src = "https://res.cloudinary.com/dtggoa1u7/image/upload/v1762859969/llq2e1tss5pmawgspk83.png">

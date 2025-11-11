@@ -167,7 +167,7 @@ export default function Detail() {
                                 <img className='rounded-4' width="40px" src="https://vcdn.tikicdn.com/cache/w100/ts/seller/21/ce/5c/b52d0b8576680dc3666474ae31b091ec.jpg.webp" alt="" />
                             </div>
                             <div className='ms-2 d-flex flex-column'>
-                                <h6 style={{ marginBlock: '0px' }}>Tiki Trading</h6>
+                                <h6 style={{ marginBlock: '0px' }}>Tiki Clone Trading</h6>
                                 <div className='d-flex align-items-center introduce-shop-official'>
                                     <img width="80px" src=" https://salt.tikicdn.com/cache/w100/ts/upload/6b/25/fb/c288b5bcee51f35f2df0a5f5f03de2e1.png.webp" alt="" />
                                     <div className='border-space ms-2'></div>

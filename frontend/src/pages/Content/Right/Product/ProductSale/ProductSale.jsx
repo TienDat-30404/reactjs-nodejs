@@ -56,7 +56,7 @@ export default function ProductSale() {
                 <p className='border border-primary rounded-5 px-3 py-1 text-primary'>Chăm sóc nhà cửa</p>
                 <p className='border rounded-5 px-3 py-1 ms-3'>Phụ kiện thời trang</p>
                 <p className='border rounded-5 px-3 py-1 ms-3'>Ngon</p>
-                <p className='border rounded-5 px-3 py-1 ms-3'>Nhà Sách Tiki</p>
+                <p className='border rounded-5 px-3 py-1 ms-3'>Nhà Sách Tiki Clone</p>
             </div>
             <div className='row pb-3 d-flex ms-3 product'>
                 {products.length > 0 ? (

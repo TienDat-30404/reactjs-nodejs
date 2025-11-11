@@ -80,7 +80,7 @@ const SearchAdvanced = forwardRef(({ show, setShowModal }, ref) => {
                 </div>
                 <div className='d-flex align-items-center mb-3'>
                     <i className="bi bi-search me-2"></i>
-                    <p>Áo khoác tiki</p>
+                    <p>Áo khoác tiki clone</p>
                 </div>
                 <div className="mb-3 row d-flex align-items-center border-top">
                     <div style={{ width: '100%' }} className="col-sm-10 mt-3">

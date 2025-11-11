@@ -253,7 +253,7 @@ export default function Payment() {
                 <div className='col-12 container d-flex justify-content-between '>
                     <div style={{ position: 'relative' }} className='d-flex align-items-center'>
                         <ImageComponent
-                            src="https://salt.tikicdn.com/ts/upload/c1/64/f7/4e6e925ea554fc698123ea71ed7bda26.png"
+                            src="https://img.lovepik.com/free-png/20210923/lovepik-creative-three-hardcover-books-illustration-png-image_401276495_wh1200.png"
                             width="80px"
                             height="80px"
                         />
