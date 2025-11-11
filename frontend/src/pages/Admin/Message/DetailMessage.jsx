@@ -91,7 +91,7 @@ export default function DetailMessage({ show, close, idUser, keyMessage }) {
                         className='rounded-2'
                         src="https://scontent.fhan4-3.fna.fbcdn.net/v/t1.6435-1/152256675_830708044179501_4412667266017141843_n.jpg?stp=cp0_dst-jpg_s40x40&_nc_cat=100&ccb=1-7&_nc_sid=0ecb9b&_nc_ohc=zHeKk027D0YQ7kNvgHO16_R&_nc_ht=scontent.fhan4-3.fna&oh=00_AYAaelseltUFmW7nMBb5Eb-dZR0SdkA34a9DQ2PUPLjFBA&oe=672367D6" alt=""
                     />
-                    <h6 style={{ fontSize: '15px' }} className='fw-bold detail_message-text px-2'>Biệt đội bú liếm Rank</h6>
+                    <h6 style={{ fontSize: '15px' }} className='fw-bold detail_message-text px-2'>Biệt đội </h6>
                     <i style={{ color: '#4992ee' }} class="bi bi-chevron-down"></i>
                 </div>
                 <div style={{ width: '30%' }} className='d-flex align-items-center justify-content-between'>

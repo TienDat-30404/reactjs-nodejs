@@ -18,7 +18,7 @@ export default function SidebarAdmin() {
         <div className='admin_left'>
             <ul class="nav flex-column admin_left-content">
                 <li class="nav-item">
-                    <p style={{ fontSize: '25px' }} class="nav-link  ">Tiki</p>
+                    <p style={{ fontSize: '25px' }} class="nav-link  ">Tiki Clone</p>
                 </li>
                 <li
                     onClick={() => navigate('/admin/dashboard')}

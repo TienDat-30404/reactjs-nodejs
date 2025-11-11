@@ -155,7 +155,7 @@ function LoginModal({ show, handleClose, switchSignIn }) {
               </GoogleOAuthProvider>
 
             </div>
-            <p className='text-center mt-2 note_login'>Bằng việc tiếp tục, bạn đã đọc và đồng ý với <a href="">điều khoản sử dụng</a> và <a href="">Chính sách bảo mật thông tin cá nhân</a> của Tiki </p>
+            <p className='text-center mt-2 note_login'>Bằng việc tiếp tục, bạn đã đọc và đồng ý với <a href="">điều khoản sử dụng</a> và <a href="">Chính sách bảo mật thông tin cá nhân</a> của Tiki Clone  </p>
 
           </div>
         </div>
