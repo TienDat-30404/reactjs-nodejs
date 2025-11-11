@@ -22,8 +22,15 @@ const HeaderSupport = () => {
                     <a className="nav-link" href="">Giá siêu rẻ</a>
                 </li>
             </ul>
-            <div
-                className="border-top border-gray"></div>
+            <div className="border-top border-gray"></div>
+            <div 
+                className="bg-danger text-white text-center py-5 fixed shadow" 
+                // zIndex cao để đảm bảo banner luôn nằm trên cùng
+                style={{ zIndex: 1050 }} 
+            >
+                <strong className="text-uppercase me-2">⚠️ CẢNH BÁO: ĐÂY CHỈ LÀ WEBSITE DEMO</strong>
+                <span className="d-none d-sm-inline">(Các tính năng, cam kết, và dữ liệu chỉ mang tính chất minh họa)</span>
+            </div>
         </div>
     )
 }
